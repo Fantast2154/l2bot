@@ -13,7 +13,7 @@ class Fisher(threading.Thread):
     def fishing_message(message):
         print(message) #how to send message to main file?
 
-    def run(self):
+    def start(self):
         # while True:
         self.fishing_message('fisher - ' + str(self.number) + ' is fishing')
             # time.sleep(self.number)

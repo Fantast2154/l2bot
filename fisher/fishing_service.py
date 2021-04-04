@@ -13,15 +13,14 @@ class FishingService:
             self.fishing_window.append(FishingWindow(500*i, 0, 500, 500))
 
         for i in range(number_of_fishers):
-            self.fisher.append(Fisher(self.fishing_window[i], number_of_fishers))
+            self.fishers.append(Fisher(self.fishing_window[i], number_of_fishers))
 
-    # @staticmethod
-    # def startFishing():
-    #
-    #     fisher1 = Fisher(fishing_window1, 1)
-    #     fisher2 = Fisher(fishing_window2, 2)
-        # fisher1.start()
-        # fisher2.start()
 
-    fisher = []
+    @staticmethod
+    def startFishing():
+    
+        for fisher in fishers:
+            fisher.start()
+
+    fishers = []
     fishing_window = []
