@@ -1,4 +1,5 @@
-
+# import screen_analyzer
+from fisher.screen_analyzer import ScreenAnalyzer
 
 class FishingWindow:
     def __init__(self, left_top_x, left_top_y, right_bottom_x, right_bottom_y):
