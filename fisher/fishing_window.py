@@ -4,8 +4,13 @@ from system.l2window import L2window
 
 class FishingWindow(L2window):
     def __init__(self):
+        super().__init__(self, i)
         self.send_message(f'TEST FishingWindow(L2window) calling')
-        pass
+
+        self.left_top_x = parent.left
+        self.left_top_y = y
+        self.width = width
+        self.height = height
 
     @classmethod
     def send_message(cls, message):

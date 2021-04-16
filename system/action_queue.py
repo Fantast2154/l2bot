@@ -1,5 +1,12 @@
 import time
 
+class CommandQueue:
+    def __init__(self):
+        pass
+
+    def command(self, type, window, coordinates=None, key=None):
+        if type == 'mouse'
+
 
 class ActionQueue:
     def __init__(self):
