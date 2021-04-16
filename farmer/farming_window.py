@@ -2,14 +2,19 @@ from system.screen_analyzer import ScreenAnalyzer
 from system.l2window import L2window
 
 
-class FishingWindow(L2window):
-    def __init__(self):
-        self.send_message(f'TEST FishingWindow(L2window) calling')
-        pass
+# import os
+# import sys
+#
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# import ../db.py
 
-    @classmethod
-    def send_message(cls, message):
-        print(message)
+
+class FarmingWindow(L2window):
+    def __init__(self, left_top_x, left_top_y, width, height):
+        self.left_top_x = left_top_x
+        self.left_top_y = left_top_y
+        self.width = width
+        self.height = height
 
     # pos_variables
     vision_fishing_pos = 0

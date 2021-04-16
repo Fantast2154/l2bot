@@ -1,5 +1,4 @@
-from fisher.action_service import ActionService
-import pyautogui
+# import pyautogui
 
 class ScreenAnalyzer:
 

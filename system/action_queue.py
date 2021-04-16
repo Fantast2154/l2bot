@@ -1,9 +1,11 @@
-from fisher.action_service import ActionService
 import time
-class  ActionQueue:
+
+
+class ActionQueue:
     def __init__(self):
         pass
-    def send_task(action):
+
+    def send_task(self, action):
         self.actions_list.append(action)
 
     def task_execution(self, action):
@@ -11,7 +13,7 @@ class  ActionQueue:
 
     def start_loop(self):
 
-        while True: #break point?
+        while True:  # break point?
 
             if actions_list:
                 self.task_execution()

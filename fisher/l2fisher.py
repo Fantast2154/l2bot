@@ -1,24 +1,24 @@
 import threading
-import time
-from fisher.fishing_window import FishingWindow
-from fisher.action_queue import ActionQueue
 
 
 class Fisher(threading.Thread):
-    def __init__(self, fishing_window, number):
+    def __init__(self, fishing_window, fisher_number):
+        self.send_message(f'TEST fisher {fisher_number} calling')
         threading.Thread.__init__(self)
         self.fishing_window = fishing_window
-        self.number = number
+        self.fisher_number = fisher_number
 
-    def fishing_message(message):
-        print(message) #how to send message to main file?
+    @classmethod
+    def send_message(cls, message):
+        print(message)
 
     def start(self):
-        # while True:
-        self.fishing_message('fisher - ' + str(self.number) + ' is fishing')
-            # time.sleep(self.number)
+        self.send_message(f'TEST fisher {self.fisher_number} is fishing')
 
-    def start_fishing(self):
+    def stop(self):
+        self.send_message(f'TEST fisher {self.fisher_number} has finished fishing')
+
+    def get_status(self):
         pass
 
     def pumping(self):
@@ -46,4 +46,4 @@ class Fisher(threading.Thread):
         pass
 
     fishing_window = None
-    number = None
+    fisher_number = None
