@@ -15,15 +15,15 @@ class FishingService:
     fishers = []
     fishing_windows = []
     raised_error = False
-    queue = None
+    q = None
 
-    def __new__(cls, number_of_fishers, windows):
+    def __new__(cls, number_of_fishers, windows, q):
         if number_of_fishers < 1 or number_of_fishers > 2 or number_of_fishers != len(windows):
             # warning
             return None
         return super(FishingService, cls).__new__(cls)
 
-    def __init__(self, number_of_fishers, windows):
+    def __init__(self, number_of_fishers, windows, q):
         self.send_message(f'TEST FishingService calling')
 
         for i in range(number_of_fishers):
@@ -35,12 +35,12 @@ class FishingService:
             temp_fishing_window = FishingWindow(x, y, width, height)
             self.fishing_windows.append(temp_fishing_window)
 
-            temp_fisher = Fisher(temp_fishing_window, i, number_of_fishers)
+            temp_fisher = Fisher(temp_fishing_window, i, number_of_fishers, q)
             temp_fisher.start()
             self.fishers.append(temp_fisher)
 
         self.number_of_fishers = number_of_fishers
-
+        self.q = q
         self.start_fishing()
 
     def __del__(self):
@@ -77,6 +77,7 @@ class FishingService:
                 fisher.stop_fishing()
                 fisher.join()
 
+        # cls.q.join()
         del cls.fishers
 
     @classmethod
@@ -85,15 +86,15 @@ class FishingService:
         if response == 0:  # OK
             pass
         if response == 1:  # stopped fishing
-            cls.send_message(f'TEST FishingService fisher_response(response) calling')
+            # cls.send_message(f'TEST FishingService fisher_response(response) calling')
             cls.raise_error()
         if response == 2:  # fatal problem
-            cls.send_message(f'TEST FishingService fisher_response(response) calling')
+            # cls.send_message(f'TEST FishingService fisher_response(response) calling')
             cls.raise_error()
 
     @classmethod
     def run_loop(cls):
-        cls.send_message(f'TEST FishingService run_loop() calling')
+        # cls.send_message(f'TEST FishingService run_loop() calling')
         while True:
             for fisher in cls.fishers:
                 cls.fisher_response(fisher.current_state)
@@ -104,5 +105,5 @@ class FishingService:
 
     @classmethod
     def raise_error(cls):
-        cls.send_message(f'TEST raise_error calling')
+        # cls.send_message(f'TEST raise_error calling')
         cls.raised_error = True
