@@ -1,11 +1,12 @@
 import threading
 import numpy as np
-import win32gui, win32ui, win32con
+import win32gui
+import win32ui
+import win32con
 from threading import Thread, Lock
 
 
 class ScreenshotMaster(threading.Thread):
-
     stopped = True
     lock = None
     screenshot = None
@@ -63,7 +64,7 @@ class ScreenshotMaster(threading.Thread):
             self.offset_x = window_rect[0] + self.cropped_x
             self.offset_y = window_rect[1] + self.cropped_y
 
-    #@classmethod
+    # @classmethod
     def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
 
         # get the window image data

@@ -1,5 +1,6 @@
 import threading
 import time
+import cv2
 
 
 class Fisher(threading.Thread):
@@ -8,30 +9,40 @@ class Fisher(threading.Thread):
     fisher_number = None
     number_of_fishers = None
     current_state = None
+    stopped = None
     q = None
+    screen_master = None
 
     def __init__(self, fishing_window, fisher_number, number_of_fishers, q):
         self.send_message(f'TEST fisher {fisher_number} calling')
         threading.Thread.__init__(self)
+        # self.daemon = True
         self.exit = threading.Event()
         self.fishing_window = fishing_window
         self.fisher_number = fisher_number
         self.number_of_fishers = number_of_fishers
         self.current_state = 0
         self.q = q
+        self.screen_master = fishing_window.screen_analyzer
 
     def run(self):
         # self.send_message(f'TEST fisher {self.fisher_number} run_loop() calling')
         time.sleep(3)
         count = 0
         self.start_fishing()
-        while not self.exit.is_set():
+        while not self.stopped:
             self.test_action(count)
             time.sleep(1)
             count += 1
-            if count > 10:
+            if count == 3:
+                s = self.screen_master.get_screenshot()
+                cv2.imshow('Test', s)
+                cv2.waitKey(1)
+            if count > 3:
                 self.current_state = 1
+                print('100% closing fisher')
                 return
+
         self.current_state = 2
 
     def get_status(self):
@@ -47,10 +58,11 @@ class Fisher(threading.Thread):
 
     def start_fishing(self):
         self.send_message(f'TEST fisher {self.fisher_number} starts fishing\n')
+        self.stopped = False
 
     def stop_fishing(self):
         self.send_message(f'TEST fisher {self.fisher_number} has finished fishing\n')
-        self.exit.set()
+        self.stopped = True
 
     def pumping(self):
         pass

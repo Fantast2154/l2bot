@@ -29,11 +29,14 @@ if __name__ == '__main__':
     print('PROGRAM start-------------------------------------')
     queue = ActionQueue()
     queue.start()
+    screen_analyzer = ScreenshotMaster()
+    screen_analyzer.start()
+
     while True:
 
-        n = input_number('number of windows: ')
-
-        # print('number of windows:', n)
+        # n = input_number('number of windows: ')
+        n = 2
+        print('number of windows:', n)
         m = 2  # m = input_number('')
         print('number of fishers: ', m)
 
@@ -47,11 +50,16 @@ if __name__ == '__main__':
 
         windows = []
         for i in range(n):
-            windows.append(L2window(i))
+            windows.append(L2window(i, screen_analyzer))
 
         windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
-        FishingService(m, windows_f, queue)
+        fishing_service = FishingService(m, windows_f, queue)
+        # for fisher in fishing_service.fishers:
+        #     fisher.stop_fishing()
+
         queue.stop()
+        screen_analyzer.stop()
+
         sys.exit('PROGRAM ends ......... BYE BYE BYE BYE BYE BYE')
         # print()
         # answer = input('You want to restart the program (type yes) ')
