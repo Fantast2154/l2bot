@@ -30,7 +30,8 @@ class Fisher(threading.Thread):
         time.sleep(3)
         count = 0
         self.start_fishing()
-        while not self.stopped:
+        #while not self.stopped:
+        while not self.exit.is_set():
             self.test_action(count)
             time.sleep(1)
             count += 1
@@ -62,7 +63,8 @@ class Fisher(threading.Thread):
 
     def stop_fishing(self):
         self.send_message(f'TEST fisher {self.fisher_number} has finished fishing\n')
-        self.stopped = True
+        #self.stopped = True
+        self.exit.set()
 
     def pumping(self):
         pass

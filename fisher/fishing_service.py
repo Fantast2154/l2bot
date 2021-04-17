@@ -74,17 +74,17 @@ class FishingService:
         if fishers_list is None:
             for fisher in cls.fishers:
                 fisher.stop_fishing()
-                # fisher.join()
+                fisher.join()
 
         else:
             for fisher in fishers_list:
                 fisher.stop_fishing()
-                # fisher.join()
+                fisher.join()
 
         cls.send_message(f'TEST FishingService stop_fishing() ending')
         # cls.q.stop()
         # cls.screen_analyzer.stop()
-        # del cls.fishers
+        del cls.fishers
 
     @classmethod
     def fisher_response(cls, response):
