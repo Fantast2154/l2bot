@@ -16,7 +16,7 @@ class FishingService:
     fishing_windows = []
     raised_error = False
     q = None
-    screen_analyzer = None
+    win_capture = None
 
     def __new__(cls, number_of_fishers, windows, q):
         if number_of_fishers < 1 or number_of_fishers > 2 or number_of_fishers != len(windows):
@@ -32,16 +32,16 @@ class FishingService:
             y = windows[fisher_id].left_top_y
             width = windows[fisher_id].width
             height = windows[fisher_id].height
-            screen_analyzer = windows[fisher_id].screen_analyzer
+            win_capture = windows[fisher_id].win_capture
 
-            temp_fishing_window = FishingWindow(x, y, width, height, fisher_id, screen_analyzer)
+            temp_fishing_window = FishingWindow(x, y, width, height, fisher_id, win_capture)
             self.fishing_windows.append(temp_fishing_window)
 
             temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
             temp_fisher.start()
 
             self.fishers.append(temp_fisher)
-            self.screen_analyzer = screen_analyzer
+            self.win_capture = win_capture
 
         self.number_of_fishers = number_of_fishers
         self.q = q

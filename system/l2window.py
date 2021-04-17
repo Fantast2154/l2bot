@@ -4,9 +4,9 @@ class L2window:
     left_top_y = 0
     width = 0
     height = 0
-    screen_analyzer = None
+    win_capture = None
 
-    def __init__(self, i, screen_analyzer):
+    def __init__(self, i, win_capture):
         self.send_message(f'TEST L2window calling')
         x = 500
         y = 500
@@ -18,7 +18,7 @@ class L2window:
         self.width = width
         self.height = height
 
-        self.screen_analyzer = screen_analyzer
+        self.win_capture = win_capture
 
     @classmethod
     def send_message(cls, message):

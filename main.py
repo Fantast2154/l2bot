@@ -25,12 +25,11 @@ def input_number(message):
 
 
 if __name__ == '__main__':
-    ScreenCapture()
     print('PROGRAM start-------------------------------------')
     queue = ActionQueue()
     queue.start()
-    screen_analyzer = ScreenCapture()
-    screen_analyzer.start()
+    win_capture = ScreenCapture()
+    win_capture.start()
 
     while True:
 
@@ -50,13 +49,13 @@ if __name__ == '__main__':
 
         windows = []
         for i in range(n):
-            windows.append(L2window(i, screen_analyzer))
+            windows.append(L2window(i, win_capture))
 
         windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
         FishingService(m, windows_f, queue)
 
         queue.stop()
-        screen_analyzer.stop()
+        win_capture.stop()
 
         sys.exit('PROGRAM ends ......... BYE BYE BYE BYE BYE BYE')
         # print()

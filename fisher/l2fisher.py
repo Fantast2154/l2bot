@@ -23,7 +23,7 @@ class Fisher(threading.Thread):
         self.number_of_fishers = number_of_fishers
         self.current_state = 0
         self.q = q
-        self.screen_master = fishing_window.screen_analyzer
+        self.screen_master = fishing_window.win_capture
 
     def run(self):
         time.sleep(3)
