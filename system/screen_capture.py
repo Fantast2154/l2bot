@@ -6,7 +6,7 @@ import win32con
 from threading import Thread, Lock
 
 
-class ScreenshotMaster(threading.Thread):
+class ScreenCapture(threading.Thread):
     stopped = True
     lock = None
     screenshot = None

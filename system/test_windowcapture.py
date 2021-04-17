@@ -1,4 +1,4 @@
-from screenshot_service import ScreenshotMaster
+from screen_capture import ScreenshotMaster
 import cv2
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ import os
 import cv2
 import time
 from screen_analyzer import ScreenAnalyzer
-from screenshot_service import ScreenshotMaster
+from screen_capture import ScreenshotMaster
 
 if __name__ == '__main__':
     script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in

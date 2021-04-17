@@ -1,7 +1,7 @@
 from fisher.fishing_service import FishingService
 from system.telegram import Telegram
 from system.l2window import L2window
-from system.screenshot_service import ScreenshotMaster
+from system.screen_capture import ScreenCapture
 from system.action_queue import ActionQueue
 import sys
 
@@ -25,11 +25,11 @@ def input_number(message):
 
 
 if __name__ == '__main__':
-    ScreenshotMaster()
+    ScreenCapture()
     print('PROGRAM start-------------------------------------')
     queue = ActionQueue()
     queue.start()
-    screen_analyzer = ScreenshotMaster()
+    screen_analyzer = ScreenCapture()
     screen_analyzer.start()
 
     while True:
