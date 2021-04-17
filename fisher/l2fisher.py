@@ -16,7 +16,7 @@ class Fisher(threading.Thread):
     def __init__(self, fishing_window, fisher_number, number_of_fishers, q):
         self.send_message(f'TEST fisher {fisher_number} calling')
         threading.Thread.__init__(self)
-        # self.daemon = True
+
         self.exit = threading.Event()
         self.fishing_window = fishing_window
         self.fisher_number = fisher_number
@@ -26,11 +26,10 @@ class Fisher(threading.Thread):
         self.screen_master = fishing_window.screen_analyzer
 
     def run(self):
-        # self.send_message(f'TEST fisher {self.fisher_number} run_loop() calling')
         time.sleep(3)
         count = 0
         self.start_fishing()
-        #while not self.stopped:
+
         while not self.exit.is_set():
             self.test_action(count)
             time.sleep(1)
@@ -41,7 +40,6 @@ class Fisher(threading.Thread):
                 cv2.waitKey(1)
             if count > 3:
                 self.current_state = 1
-                print('100% closing fisher')
                 return
 
         self.current_state = 2
@@ -51,7 +49,6 @@ class Fisher(threading.Thread):
 
     def test_action(self, count):
         self.q.new_task(count, self.fisher_number)
-        # print(f'fisher {self.fisher_number} is fishing count {count}\n')
 
     @classmethod
     def send_message(cls, message):
@@ -63,7 +60,6 @@ class Fisher(threading.Thread):
 
     def stop_fishing(self):
         self.send_message(f'TEST fisher {self.fisher_number} has finished fishing\n')
-        #self.stopped = True
         self.exit.set()
 
     def pumping(self):

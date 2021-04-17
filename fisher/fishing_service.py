@@ -81,9 +81,6 @@ class FishingService:
                 fisher.stop_fishing()
                 fisher.join()
 
-        cls.send_message(f'TEST FishingService stop_fishing() ending')
-        # cls.q.stop()
-        # cls.screen_analyzer.stop()
         del cls.fishers
 
     @classmethod

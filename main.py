@@ -53,9 +53,7 @@ if __name__ == '__main__':
             windows.append(L2window(i, screen_analyzer))
 
         windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
-        fishing_service = FishingService(m, windows_f, queue)
-        # for fisher in fishing_service.fishers:
-        #     fisher.stop_fishing()
+        FishingService(m, windows_f, queue)
 
         queue.stop()
         screen_analyzer.stop()
