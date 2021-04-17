@@ -1,6 +1,7 @@
 from fisher.fishing_service import FishingService
 from system.telegram import Telegram
 from system.l2window import L2window
+from system.screenshot_service import ScreenshotMaster
 import sys
 
 
@@ -23,7 +24,7 @@ def input_number(message):
 
 
 if __name__ == '__main__':
-    q = False
+    ScreenshotMaster()
     print('PROGRAM start-------------------------------------')
     while True:
 
@@ -47,14 +48,11 @@ if __name__ == '__main__':
 
         windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
         FishingService(m, windows_f)
-
-        if q:  # conditions?
-            sys.exit(0)
-
-        print()
-        answer = input('You want to restart the program (type yes) ')
-        if answer != 'yes':
-            break
-        print('PROGRAM restart-------------------------------------')
-        print()
+        sys.exit('PROGRAM ends ......... BYE BYE BYE BYE BYE BYE')
+        # print()
+        # answer = input('You want to restart the program (type yes) ')
+        # if answer != 'yes':
+        #     sys.exit('BYE BYE BYE BYE BYE BYE')
+        # print('PROGRAM restart-------------------------------------')
+        # print()
     # fishing_service.startFishing()

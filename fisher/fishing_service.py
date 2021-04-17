@@ -1,4 +1,5 @@
 import time
+import threading
 
 from fisher.l2fisher import Fisher
 from system.action_queue import *
@@ -10,7 +11,6 @@ from system.action_queue import ActionQueue
 # self.send_message(f'{self!r}')
 
 class FishingService:
-
     number_of_fishers = 0
     fishers = []
     fishing_windows = []
@@ -27,16 +27,24 @@ class FishingService:
         self.send_message(f'TEST FishingService calling')
 
         for i in range(number_of_fishers):
-            w_fishing = FishingWindow(i)
-            self.fishing_windows.append(w_fishing)
-            self.fishers.append(Fisher(self.fishing_windows[i], i))
+            x = windows[i].left_top_x
+            y = windows[i].left_top_y
+            width = windows[i].width
+            height = windows[i].height
+
+            temp_fishing_window = FishingWindow(x, y, width, height)
+            self.fishing_windows.append(temp_fishing_window)
+
+            temp_fisher = Fisher(temp_fishing_window, i, number_of_fishers)
+            temp_fisher.start()
+            self.fishers.append(temp_fisher)
 
         self.number_of_fishers = number_of_fishers
 
         self.start_fishing()
 
     def __del__(self):
-        self.send_message("closing fishing")
+        self.send_message("closing fishing service")
 
         del self
 
@@ -54,31 +62,33 @@ class FishingService:
             for fisher in fishers_list:
                 fisher.start_fishing()
 
-
         cls.run_loop()
 
     @classmethod
     def stop_fishing(cls, fishers_list=None):
-        # cls.send_message(f'TEST FishingService stop_fishing() calling')
+        cls.send_message(f'TEST FishingService stop_fishing() calling')
         if fishers_list is None:
             for fisher in cls.fishers:
                 fisher.stop_fishing()
-                del fisher
+                fisher.join()
+
         else:
             for fisher in fishers_list:
                 fisher.stop_fishing()
-                del fisher
+                fisher.join()
+
+        del cls.fishers
 
     @classmethod
     def fisher_response(cls, response):
-        # cls.send_message(f'TEST FishingService fisher_response(response) calling')
 
         if response == 0:  # OK
-            cls.send_message('fisher is OK')
+            pass
         if response == 1:  # stopped fishing
-            cls.send_message('fisher is NOT FISHING')
+            cls.send_message(f'TEST FishingService fisher_response(response) calling')
+            cls.raise_error()
         if response == 2:  # fatal problem
-            cls.send_message('action 2')
+            cls.send_message(f'TEST FishingService fisher_response(response) calling')
             cls.raise_error()
 
     @classmethod
@@ -87,12 +97,12 @@ class FishingService:
         while True:
             for fisher in cls.fishers:
                 cls.fisher_response(fisher.current_state)
-                if cls.raised_error:
-                    cls.stop_fishing()
-                    break
+
+            if cls.raised_error:
+                cls.stop_fishing()
+                break
 
     @classmethod
     def raise_error(cls):
+        cls.send_message(f'TEST raise_error calling')
         cls.raised_error = True
-
-

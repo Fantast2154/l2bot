@@ -3,12 +3,10 @@ from system.l2window import L2window
 
 
 class FishingWindow(L2window):
-    def __init__(self):
-        super().__init__(self, i)
+    def __init__(self, x_left_top, y_left_top, width, height):
         self.send_message(f'TEST FishingWindow(L2window) calling')
-
-        self.left_top_x = parent.left
-        self.left_top_y = y
+        self.left_top_x = x_left_top
+        self.left_top_y = y_left_top
         self.width = width
         self.height = height
 
