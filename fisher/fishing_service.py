@@ -33,7 +33,6 @@ class FishingService:
             width = windows[fisher_id].width
             height = windows[fisher_id].height
             win_capture = windows[fisher_id].win_capture
-
             temp_fishing_window = FishingWindow(x, y, width, height, fisher_id, win_capture)
             self.fishing_windows.append(temp_fishing_window)
 

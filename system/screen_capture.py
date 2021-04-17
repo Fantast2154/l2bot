@@ -147,3 +147,4 @@ class ScreenCapture(threading.Thread):
     def stop(self):
         self.send_message(f'TEST ScreenshotMaster has finished its work\n')
         self.exit.set()
+

@@ -34,10 +34,6 @@ class Fisher(threading.Thread):
             self.test_action(count)
             time.sleep(1)
             count += 1
-            if count == 3:
-                s = self.screen_master.get_screenshot()
-                cv2.imshow('Test', s)
-                cv2.waitKey(1)
             if count > 3:
                 self.current_state = 1
                 return

@@ -4,6 +4,7 @@ from system.l2window import L2window
 from system.screen_capture import ScreenCapture
 from system.action_queue import ActionQueue
 import sys
+import time
 
 
 def message_gui(message):
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     queue.start()
     win_capture = ScreenCapture()
     win_capture.start()
-
+    time.sleep(3)
     while True:
 
         # n = input_number('number of windows: ')

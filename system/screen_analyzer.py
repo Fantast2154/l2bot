@@ -3,7 +3,15 @@ import cv2 as cv
 from threading import Thread, Lock
 
 
-class ScreenAnalyzer:
+class DigitFinder:
+    pass
+
+
+class TimeRecognition:
+    pass
+
+
+class Vision:
     searching_image = None
 
     # THREADS EPTA
@@ -127,3 +135,5 @@ class ScreenAnalyzer:
 
             except:
                 continue
+
+
