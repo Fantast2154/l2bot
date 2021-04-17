@@ -22,7 +22,6 @@ class ActionQueue(threading.Thread):
         threading.Thread.__init__(self)
         self.exit = threading.Event()
         self.actions_list = queue.Queue()
-        self.self_exit = False
 
     def new_task(self, action, priority='Normal', speed='High'):
         self.actions_list.put(action)

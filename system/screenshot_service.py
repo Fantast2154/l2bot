@@ -1,13 +1,31 @@
-class ScreenshotMaster:
+import threading
+import time
+
+
+class ScreenshotMaster(threading.Thread):
     screenshot = 0
 
     def __init__(self):
-        screenshot = 0
+        threading.Thread.__init__(self)
+        self.exit = threading.Event()
+        self.screenshot = 0
+
+    @classmethod
+    def send_message(cls, message):
+        print(message)
+
+    def start_capturing(self):
+        self.send_message(f'TEST ScreenshotMaster starts\n')
 
     def run(self):
-        # while True:
-            # self.capture_screen()
-        pass
+        self.start_capturing()
+        while not self.exit.is_set():
+            self.capture_screen()
+            time.sleep(1)
+
+    def stop(self):
+        self.send_message(f'TEST ScreenshotMaster has finished its work\n')
+        self.exit.set()
 
     @classmethod
     def capture_screen(cls):
