@@ -44,6 +44,7 @@ class FishingWindow(L2window):
             ['send_button', 'images/send_button.jpg', 0.8],
             ['confirm_button', 'images/confirm_button.jpg', 0.8],
             ['claim_items_button', 'images/claim_items_button.jpg', 0.8]]
+
         self.vision_catcheditem_pos = [None] * 4
         self.init_images()
         self.init_search()
@@ -54,7 +55,10 @@ class FishingWindow(L2window):
 
     def init_images(self):
         for obj in self.temp:
-            self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]
+            try:
+                self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]
+            except:
+                print('Error finding images')
 
     def init_search(self):
         self.screenshot = self.win_capture.get_screenshot()
