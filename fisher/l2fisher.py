@@ -6,24 +6,27 @@ import cv2
 class Fisher(threading.Thread):
 
     fishing_window = None
-    fisher_number = None
+    fisher_id = None
     number_of_fishers = None
     current_state = None
     stopped = None
     q = None
     screen_master = None
 
-    def __init__(self, fishing_window, fisher_number, number_of_fishers, q):
-        self.send_message(f'TEST fisher {fisher_number} calling')
+    def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
+        self.send_message(f'TEST fisher {fisher_id} created')
         threading.Thread.__init__(self)
 
         self.exit = threading.Event()
         self.fishing_window = fishing_window
-        self.fisher_number = fisher_number
+        self.fisher_id = fisher_id
         self.number_of_fishers = number_of_fishers
         self.current_state = 0
         self.q = q
         self.screen_master = fishing_window.win_capture
+
+    def __del__(self):
+        self.send_message(f"TEST fisher {self.fisher_id} destroyed")
 
     def run(self):
         time.sleep(3)
@@ -44,18 +47,18 @@ class Fisher(threading.Thread):
         return self.current_state
 
     def test_action(self, count):
-        self.q.new_task(count, self.fisher_number)
+        self.q.new_task(count, self.fisher_id)
 
     @classmethod
     def send_message(cls, message):
         print(message)
 
     def start_fishing(self):
-        self.send_message(f'TEST fisher {self.fisher_number} starts fishing\n')
+        self.send_message(f'TEST fisher {self.fisher_id} starts fishing\n')
         self.stopped = False
 
     def stop_fishing(self):
-        self.send_message(f'TEST fisher {self.fisher_number} has finished fishing\n')
+        self.send_message(f'TEST fisher {self.fisher_id} has finished fishing\n')
         self.exit.set()
 
     def pumping(self):

@@ -25,7 +25,7 @@ class FishingService:
         return super(FishingService, cls).__new__(cls)
 
     def __init__(self, number_of_fishers, windows, q):
-        self.send_message(f'TEST FishingService calling')
+        self.send_message(f'TEST FishingService created')
 
         for fisher_id in range(number_of_fishers):
             x = windows[fisher_id].left_top_x
@@ -37,7 +37,7 @@ class FishingService:
             self.fishing_windows.append(temp_fishing_window)
 
             temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
-            temp_fisher.start()
+            # temp_fisher.start()
 
             self.fishers.append(temp_fisher)
             self.win_capture = win_capture
@@ -47,7 +47,7 @@ class FishingService:
         self.start_fishing()
 
     def __del__(self):
-        self.send_message("closing fishing service")
+        self.send_message("TEST FishingService destroyed")
 
         del self
 
@@ -60,10 +60,12 @@ class FishingService:
         cls.send_message(f'TEST FishingService start_fishing() calling')
         if fishers_list is None:
             for fisher in cls.fishers:
-                fisher.start_fishing()
+                fisher.start()
+                # fisher.start_fishing()
         else:
             for fisher in fishers_list:
-                fisher.start_fishing()
+                fisher.start()
+                # fisher.start_fishing()
 
         cls.run_loop()
 
@@ -73,14 +75,15 @@ class FishingService:
         if fishers_list is None:
             for fisher in cls.fishers:
                 fisher.stop_fishing()
-                fisher.join()
+                # fisher.join()
 
         else:
             for fisher in fishers_list:
                 fisher.stop_fishing()
-                fisher.join()
+                # fisher.join()
 
         del cls.fishers
+        del cls.fishing_windows
 
     @classmethod
     def fisher_response(cls, response):

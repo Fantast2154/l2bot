@@ -19,6 +19,7 @@ class ActionQueue(threading.Thread):
     # speed_list = []
 
     def __init__(self):
+        self.send_message(f'TEST Queue created\n')
         threading.Thread.__init__(self)
         self.exit = threading.Event()
         self.actions_list = queue.Queue()
@@ -38,10 +39,10 @@ class ActionQueue(threading.Thread):
 
     @classmethod
     def start_queueing(cls):
-        cls.send_message(f'TEST queue starts\n')
+        pass
 
     def stop(self):
-        self.send_message(f'TEST queue has finished its work\n')
+        self.send_message(f'TEST Queue destroyed\n')
         self.exit.set()
 
     def run(self):

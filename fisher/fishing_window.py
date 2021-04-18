@@ -8,16 +8,17 @@ class FishingWindow(L2window):
     screenshot = None
     win_capture = None
 
-    def __init__(self, x_left_top, y_left_top, width, height, i, win_capture):
-        self.send_message(f'TEST FishingWindow(L2window) calling')
+    def __init__(self, x_left_top, y_left_top, width, height, window_id, win_capture):
+        self.send_message(f'TEST FishingWindow {window_id} created')
         self.left_top_x = x_left_top
         self.left_top_y = y_left_top
         self.width = width
         self.height = height
         self.win_capture = win_capture
         self.screenshot = win_capture.get_screenshot()
+        self.window_id = window_id
 
-        self.temp = [
+        self.image_database = [
             ['fishing', 'images/fishing.jpg', 0.8],
             ['pumping', 'images/pumping.jpg', 0.87],
             ['reeling', 'images/reeling.jpg', 0.87],
@@ -43,18 +44,25 @@ class FishingWindow(L2window):
             ['sendmail_button', 'images/sendmail_button.jpg', 0.8],
             ['send_button', 'images/send_button.jpg', 0.8],
             ['confirm_button', 'images/confirm_button.jpg', 0.8],
-            ['claim_items_button', 'images/claim_items_button.jpg', 0.8]]
+            ['claim_items_button', 'images/claim_items_button.jpg', 0.8],
+            ['catched_item_0', 'images/catcheditem1.jpg', 0.7],
+            ['catched_item_1', 'images/catcheditem2.jpg', 0.7],
+            ['catched_item_2', 'images/catcheditem3.jpg', 0.7],
+            ['catched_item_3', 'images/catcheditem4.jpg', 0.7]]
 
         self.vision_catcheditem_pos = [None] * 4
-        self.init_images()
-        self.init_search()
+        # self.init_images()
+        # self.init_search()
+
+    def __del__(self):
+        self.send_message(f"TEST FishingWindow {self.window_id} destroyed")
 
     @classmethod
     def send_message(cls, message):
         print(message)
 
     def init_images(self):
-        for obj in self.temp:
+        for obj in self.image_database:
             try:
                 self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]
             except:

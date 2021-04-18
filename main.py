@@ -56,7 +56,13 @@ if __name__ == '__main__':
         FishingService(m, windows_f, queue)
 
         queue.stop()
+        queue.join()
         win_capture.stop()
+        win_capture.join()
+
+        del windows
+
+
 
         sys.exit('PROGRAM ends ......... BYE BYE BYE BYE BYE BYE')
         # print()

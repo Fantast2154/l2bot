@@ -26,6 +26,7 @@ class ScreenCapture(threading.Thread):
     offset_y = 0
 
     def __init__(self, window_name=None):
+        self.send_message(f'TEST ScreenshotMaster created\n')
         threading.Thread.__init__(self)
         self.exit = threading.Event()
         self.screenshot = 0
@@ -63,6 +64,9 @@ class ScreenCapture(threading.Thread):
             # images into actual screen positions
             self.offset_x = window_rect[0] + self.cropped_x
             self.offset_y = window_rect[1] + self.cropped_y
+
+    def __del__(self):
+        self.send_message(f'TEST ScreenshotMaster destroyed')
 
     # @classmethod
     def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
@@ -136,7 +140,7 @@ class ScreenCapture(threading.Thread):
         print(message)
 
     def start_capturing(self):
-        self.send_message(f'TEST ScreenshotMaster starts\n')
+        pass
 
     def run(self):
         self.start_capturing()
@@ -145,6 +149,6 @@ class ScreenCapture(threading.Thread):
             # time.sleep(1)
 
     def stop(self):
-        self.send_message(f'TEST ScreenshotMaster has finished its work\n')
+        # self.send_message(f'TEST ScreenshotMaster stopped\n')
         self.exit.set()
 
