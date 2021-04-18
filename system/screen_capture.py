@@ -25,6 +25,8 @@ class ScreenCapture(threading.Thread):
     offset_x = 0
     offset_y = 0
 
+    windows_param = []
+
     def __init__(self, window_name=None):
         self.send_message(f'TEST ScreenshotMaster created\n')
         threading.Thread.__init__(self)
@@ -124,13 +126,18 @@ class ScreenCapture(threading.Thread):
 
         return img
 
-    @staticmethod
-    def list_window_names():
+    def list_window_names(self):
+        temp = []
         def winEnumHandler(hwnd, ctx):
             if win32gui.IsWindowVisible(hwnd):
-                print(hex(hwnd), win32gui.GetWindowText(hwnd))
+                # temp.append([hex(hwnd), win32gui.GetWindowText(hwnd)])
+                temp.append([hwnd, win32gui.GetWindowText(hwnd)])
 
         win32gui.EnumWindows(winEnumHandler, None)
+        self.windows_param = temp
+
+    def get_windows_param(self):
+        return self.windows_param
 
     def get_screenshot(self):
         return self.screenshot
