@@ -8,12 +8,9 @@ class FishingWindow(L2window):
     screenshot = None
     win_capture = None
 
-    def __init__(self, x_left_top, y_left_top, width, height, window_id, win_capture):
+    def __init__(self, window_id, win_capture, window_name, hwnd):
+        super().__init__(window_id, win_capture, window_name, hwnd)
         self.send_message(f'TEST FishingWindow {window_id} created')
-        self.left_top_x = x_left_top
-        self.left_top_y = y_left_top
-        self.width = width
-        self.height = height
         self.win_capture = win_capture
         self.screenshot = win_capture.get_screenshot()
         self.window_id = window_id
@@ -56,6 +53,10 @@ class FishingWindow(L2window):
 
     def __del__(self):
         self.send_message(f"TEST FishingWindow {self.window_id} destroyed")
+
+    def activate_window(self):
+        return super().set_foreground()
+
 
     @classmethod
     def send_message(cls, message):

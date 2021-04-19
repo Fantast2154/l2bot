@@ -83,7 +83,10 @@ if __name__ == '__main__':
     # n = input_number('number of l2 windows: ')
     n = len(name_list)
     print('number of l2 windows:', n)
-    m = 2  # m = input_number('')
+    if n >= 2:
+        m = 2  # m = input_number('')
+    else:
+        m = n
     print('number of fishers: ', m)
 
     if m > n:
@@ -91,11 +94,11 @@ if __name__ == '__main__':
 
     if m < 1 or m > 2:
         message_gui('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY 1 OR 2 FISHERS! KEEP CALM!')
+        sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
     windows = []
     for i in range(n):
         windows.append(L2window(i, win_capture, name_list[i], hash_list[i]))
-
     # w = WindowMgr()
     # w.find_window_wildcard(window_name)
     # w.set_foreground()

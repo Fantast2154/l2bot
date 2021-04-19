@@ -47,7 +47,7 @@ class Fisher(threading.Thread):
         return self.current_state
 
     def test_action(self, count):
-        self.q.new_task(count, self.fisher_id)
+        self.q.new_task(count, self.fishing_window)
 
     @classmethod
     def send_message(cls, message):

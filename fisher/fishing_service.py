@@ -28,12 +28,11 @@ class FishingService:
         self.send_message(f'TEST FishingService created')
 
         for fisher_id in range(number_of_fishers):
-            x = windows[fisher_id].left_top_x
-            y = windows[fisher_id].left_top_y
-            width = windows[fisher_id].width
-            height = windows[fisher_id].height
+
             win_capture = windows[fisher_id].win_capture
-            temp_fishing_window = FishingWindow(x, y, width, height, fisher_id, win_capture)
+            window_name = windows[fisher_id].window_name
+            hwnd = windows[fisher_id].hwnd
+            temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd)
             self.fishing_windows.append(temp_fishing_window)
 
             temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
