@@ -1,6 +1,7 @@
 import time
 from system.screen_capture import ScreenCapture
-import win32gui, win32com.client
+from test_fisher import TestFisher
+from multiprocessing import Queue
 
 
 def get_l2windows_param(wincap):
@@ -17,14 +18,17 @@ def get_l2windows_param(wincap):
     return name_list, hash_list
 
 
-shell = win32com.client.Dispatch("WScript.Shell")
-shell.SendKeys('%')
-
+q = Queue()
 wincap = ScreenCapture()
 
 name_list, hash_list = get_l2windows_param(wincap)
 print(hash_list)
 
-for hwnd in hash_list * 100:
-    time.sleep(0.03)
-    win32gui.SetForegroundWindow(hwnd)
+fisher_1 = TestFisher('fisher_1', hash_list[0], q)
+fisher_2 = TestFisher('fisher_2', hash_list[1], q)
+
+fisher_1.start()
+fisher_2.start()
+
+q.get()
+q.get_nowait()
