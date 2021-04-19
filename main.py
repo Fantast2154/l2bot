@@ -27,8 +27,6 @@ def input_number(message):
             return userInput
 
 
-
-
 # def enumHandler2(hwnd, lParam):
 #     if win32gui.IsWindowVisible(hwnd):
 #         if 'Asterios' in win32gui.GetWindowText(hwnd):
@@ -105,14 +103,18 @@ if __name__ == '__main__':
     #     enumHandler2(hwnd, None)
     #     time.sleep(3)
 
-
     queue.start()
     win_capture.start()
 
     delay = 3
-    time_temp = time.time()
-    while time.time() - time_temp < delay:
-        print('The fishing will start in ........ ', delay - (time.time() - time_temp))
+
+    #time_temp = time.time()
+    #while time.time() - time_temp <= delay:
+    #    print('The fishing will start in ........ ', round(delay - (time.time() - time_temp), 1))
+    #    time.sleep(0.5)
+
+    for i in range(delay):
+        print('The fishing will start in ........ ', delay - i)
         time.sleep(0.5)
 
     windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS

@@ -135,5 +135,3 @@ class Vision:
 
             except:
                 continue
-
-

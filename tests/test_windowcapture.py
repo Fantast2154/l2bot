@@ -1,6 +1,6 @@
 import time
 
-from screen_capture import ScreenCapture
+from system.screen_capture import ScreenCapture
 from fisher.fishing_window import FishingWindow
 import cv2
 
