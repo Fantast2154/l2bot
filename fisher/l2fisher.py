@@ -41,7 +41,7 @@ class Fisher(threading.Thread):
 
         while not self.exit.is_set():
 
-            time.sleep(1)
+            time.sleep(0.1)
 
             if count < 5:
                 self.test_action(count)

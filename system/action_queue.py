@@ -1,3 +1,4 @@
+from system.action_service import ActionService
 import time
 import queue
 import threading
@@ -43,14 +44,14 @@ class ActionQueue(threading.Thread):
     def task_execution(self, count, window, priority='Normal', action_rate='High'):
 
         self.lock.acquire()
-        time.sleep(0.05)
+        time.sleep(0.01)
         try:
             print(f'queue is doing execution {count}. Window {window.window_id} hwnd = {window.hwnd} is active\n')
             self.shell.SendKeys('%')
             win32gui.SetForegroundWindow(window.hwnd)
         except:
             print('TEST queue window activation error')
-        time.sleep(0.05)
+        time.sleep(0.01)
         self.lock.release()
 
 
@@ -85,6 +86,6 @@ class ActionQueue(threading.Thread):
 
                     # self.queue_list.get()
                     self.task_execution(self.queue_list.get(), window)
-
+                    time.sleep(0.01)
                 finally:
-                    time.sleep(0.5)
+                    pass
