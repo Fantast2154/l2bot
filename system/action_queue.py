@@ -1,10 +1,11 @@
 from system.action_service import ActionService
 import time
-import queue
+from multiprocessing import Queue
 import threading
 from threading import Lock
 import win32gui
 import win32com.client
+
 
 class CommandQueue:
     def __init__(self):
@@ -15,6 +16,8 @@ class CommandQueue:
 
 
 class ActionQueue(threading.Thread):
+    shell = win32com.client.Dispatch("WScript.Shell")
+    shell.SendKeys('%')
 
     number = None
 
@@ -30,20 +33,16 @@ class ActionQueue(threading.Thread):
         self.action_service = ActionService(wincap)
         self.lock = Lock()
         self.exit = threading.Event()
-        self.queue_list = queue.Queue()
-        self.shell = win32com.client.Dispatch("WScript.Shell")
+        self.queue_list = Queue()
 
     def activate_l2windows(self, windows):
         try:
             for window in windows:
-                time.sleep(0.01)
                 self.lock.acquire()
                 time.sleep(0.5)
-                self.shell.SendKeys('%')
                 win32gui.SetForegroundWindow(window.hwnd)
                 time.sleep(0.5)
                 self.lock.release()
-                time.sleep(0.01)
         except:
             print('TEST queue window activation error')
 
@@ -65,31 +64,27 @@ class ActionQueue(threading.Thread):
         # self.action_rate_list.insert(0, action_rate)
 
     def task_execution(self, count, action, params, window, action_rate='High'):
-        #try:
+        # try:
 
         self.lock.acquire()
-        time.sleep(0.01)
         print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
-        self.shell.SendKeys('%')
         win32gui.SetForegroundWindow(window.hwnd)
-        time.sleep(0.01)
         self.lock.release()
 
         if action == 'mouse':
-            print('EBANIY RRROT', params)
-
             if len(params) != 6:
                 return
             print(params)
             self.action_service.mouse_master(params)
+
         if action == 'keyboard':
             if len(params) != 2:
                 return
             self.action_service.keyboard_master(params)
         time.sleep(0.01)
-        #except:
-            #print('TEST queue window activation error')
-        
+        # except:
+        # print('TEST queue window activation error')
+
     @classmethod
     def start_queueing(cls):
         pass

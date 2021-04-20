@@ -64,8 +64,8 @@ if __name__ == '__main__':
         sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
     windows = []
-    for i in range(n):
-        windows.append(L2window(i, win_capture, name_list[i], hash_list[i]))
+    for window_number in range(n):
+        windows.append(L2window(window_number, win_capture, name_list[window_number], hash_list[window_number]))
 
     queue.start()
     win_capture.start()
