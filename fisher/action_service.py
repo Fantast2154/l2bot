@@ -3,6 +3,7 @@ import pyautogui
 import random
 import win32api
 import win32con
+import keyboard
 from threading import Thread, Lock
 
 
@@ -12,7 +13,12 @@ class ActionService:
     def __init__(self, wincap):
         self.wincap = wincap
 
-    def mouse_move_shefer_edition(self, params):
+    def keyboard_master(self, key, hold_time):
+        keyboard.press(key)
+        time.sleep(hold_time)
+        keyboard.release(key)
+
+    def mouse_master(self, params):
         [points, click, button, slow, double, alt_double] = params
 
         offset_x = self.wincap.offset_x,
@@ -90,6 +96,7 @@ class ActionService:
                 time.sleep(0.1)
                 pyautogui.mouseUp(button='right')
                 time.sleep(0.3)
+
             elif alt_double:
                 self.mouse_alt_double_click(self, [(x, y)])
         else:
@@ -98,7 +105,6 @@ class ActionService:
             time.sleep(1)
 
         self.lock.release()
-
 
     def skills_thread_processing(self, skill_pos, click=True, button='LEFT', slow=False, double=False):
         offset_x = self.wincap.offset_x
@@ -238,6 +244,3 @@ class ActionService:
 
     # def mouse_click(self, point, click=True, button='LEFT', slow=False):  # add da
     #   pass
-
-    def keyboard_press_hold_release(self, hold_time):
-        pass
