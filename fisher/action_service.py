@@ -12,6 +12,90 @@ class ActionService:
     def __init__(self, wincap):
         self.wincap = wincap
 
+    def mouse_move_shefer_edition(self, params):
+        [points, click, button, slow, double] = params
+
+        offset_x = self.wincap.offset_x,
+        offset_y = self.wincap.offset_y
+
+        game_x = offset_x
+        game_y = offset_y
+
+        if points is None:
+            return
+
+        elif len(points) == 0:
+            return
+
+        elif len(points) > 1:
+            for point in points:
+                (x_temp, y_temp) = point
+
+        else:
+            [(x_temp, y_temp)] = points
+
+        a = random.randint(-3, 3)
+        b = random.randint(-3, 3)
+
+        x = game_x + x_temp + a
+        y = game_y + y_temp + b
+
+        self.lock.acquire()
+        if click:
+            if button == 'LEFT' and not slow:
+                time.sleep(0.01)
+                pyautogui.moveTo(x, y)
+                time.sleep(0.02)
+                pyautogui.mouseDown()
+                time.sleep(0.02)
+                pyautogui.mouseUp()
+                time.sleep(0.03)
+
+                if double:
+                    time.sleep(0.01)
+                    pyautogui.moveTo(x, y)
+                    time.sleep(0.02)
+                    pyautogui.mouseDown()
+                    time.sleep(0.02)
+                    pyautogui.mouseUp()
+                    time.sleep(0.02)
+                    pyautogui.mouseDown()
+                    time.sleep(0.02)
+                    pyautogui.mouseUp()
+
+            elif button == 'LEFT' and slow:
+                time.sleep(0.1)
+                pyautogui.moveTo(x, y)
+                time.sleep(0.3)
+                pyautogui.mouseDown()
+                time.sleep(0.1)
+                pyautogui.mouseUp()
+                time.sleep(0.3)
+
+            elif button == 'RIGHT' and not slow:
+                time.sleep(0.06)
+                pyautogui.moveTo(x, y)
+                time.sleep(0.1)
+                pyautogui.mouseDown(button='right')
+                time.sleep(0.02)
+                pyautogui.mouseUp(button='right')
+                time.sleep(0.1)
+
+            elif button == 'RIGHT' and slow:
+                time.sleep(0.1)
+                pyautogui.moveTo(x, y)
+                time.sleep(0.3)
+                pyautogui.mouseDown(button='right')
+                time.sleep(0.1)
+                pyautogui.mouseUp(button='right')
+                time.sleep(0.3)
+        else:
+            time.sleep(0.01)
+            pyautogui.moveTo(x, y)
+            time.sleep(1)
+
+        self.lock.release()
+
     def mouse_move(self, points, click=True, button='LEFT', slow=False, double=False):
         offset_x = self.wincap.offset_x,
         offset_y = self.wincap.offset_y
