@@ -8,10 +8,11 @@ from threading import Thread, Lock
 
 
 class ActionService:
-    lock = Lock()
+
 
     def __init__(self, wincap):
         self.wincap = wincap
+        self.lock = Lock()
 
     def keyboard_master(self, params):
 
@@ -22,7 +23,7 @@ class ActionService:
         keyboard.release(key)
 
     def mouse_master(self, params):
-        print('EBANIY RRROT MOUSE', params)
+        # print('EBANIY RRROT MOUSE', params)
         [points, click, button, slow, double, alt_double] = params
 
         offset_x = self.wincap.offset_x
@@ -47,10 +48,10 @@ class ActionService:
         a = random.randint(-3, 3)
         b = random.randint(-3, 3)
 
-        print('EBANIY RRROT X_temp y_temp', x_temp, y_temp)
+
         x = game_x + x_temp + a
         y = game_y + y_temp + b
-
+        print(f'[{x}, {y}]')
         self.lock.acquire()
 
         if click:

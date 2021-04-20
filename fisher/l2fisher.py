@@ -32,11 +32,11 @@ class Fisher(threading.Thread):
         self.q.new_task(count, self.fishing_window)
 
     def run(self):
-        count = 0
+        count = -1
         self.start_fishing()
 
         while not self.exit.is_set():
-
+            count += 1
             time.sleep(0.3)
             self.fishing_window.update_screenshot()
             if count < 15:
@@ -45,16 +45,14 @@ class Fisher(threading.Thread):
                     self.pumping(count)
                 if rand == 2:
                     self.reeling(count)
-            if count > 70:
+            if count > 30:
                 self.current_state = 1
                 return
-            count += 1
+
         self.current_state = 2
 
     def get_status(self):
         return self.current_state
-
-
 
     @classmethod
     def send_message(cls, message):

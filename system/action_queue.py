@@ -6,13 +6,6 @@ from threading import Lock
 import win32gui
 import win32com.client
 
-class CommandQueue:
-    def __init__(self):
-        pass
-
-    # def command(self, type, window, coordinates=None, key=None):
-    #     if type == 'mouse'
-
 
 class ActionQueue(threading.Thread):
 
@@ -32,6 +25,7 @@ class ActionQueue(threading.Thread):
         self.exit = threading.Event()
         self.queue_list = queue.Queue()
         self.shell = win32com.client.Dispatch("WScript.Shell")
+        self.shell.SendKeys('%')
 
     def activate_l2windows(self, windows):
         try:
@@ -52,10 +46,7 @@ class ActionQueue(threading.Thread):
         print(message)
 
     def new_task(self, count, action, action_param, window, priority='Normal', action_rate='High'):
-        if action == 'mouse' or action == 'keyboard':
-            pass
-        else:
-            return
+        print('TEST queue added')
         self.queue_list.put(count)
         self.actions.append(action)
         self.action_params.append(action_param)
@@ -64,23 +55,27 @@ class ActionQueue(threading.Thread):
         self.action_rate_list.append(action_rate)
         # self.action_rate_list.insert(0, action_rate)
 
+    def new_mouse_task(self):
+        pass
+
+    def new_keyboard_task(self):
+        pass
+
     def task_execution(self, count, action, params, window, action_rate='High'):
         #try:
 
         self.lock.acquire()
         time.sleep(0.01)
         print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
-        self.shell.SendKeys('%')
+
         win32gui.SetForegroundWindow(window.hwnd)
         time.sleep(0.01)
-        self.lock.release()
 
         if action == 'mouse':
-            print('EBANIY RRROT', params)
 
             if len(params) != 6:
                 return
-            print(params)
+            # print(params)
             self.action_service.mouse_master(params)
         if action == 'keyboard':
             if len(params) != 2:
@@ -89,6 +84,7 @@ class ActionQueue(threading.Thread):
         time.sleep(0.01)
         #except:
             #print('TEST queue window activation error')
+        self.lock.release()
         
     @classmethod
     def start_queueing(cls):
