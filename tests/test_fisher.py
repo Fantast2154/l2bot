@@ -18,7 +18,6 @@ class TestFisher(threading.Thread):
         self.q = q
         self.test_window = test_window
 
-
     def mouse_move(self, action):
         self.lock.acquire()
         if action == 'pump':
@@ -31,7 +30,7 @@ class TestFisher(threading.Thread):
     def window_set_active(self, hwnd):
         self.lock.acquire()
         win32gui.SetForegroundWindow(hwnd)
-        #time.sleep(0.03)
+        time.sleep(0.1)
         self.lock.release()
 
     def run(self):
@@ -41,7 +40,7 @@ class TestFisher(threading.Thread):
             try:
                 action = random.choice(self.random_actions)
                 print(f'{self.fisher_name} is doing {action} ')
-                #self.q.put(self.mouse_move(action))
+                # self.q.put(self.mouse_move(action))
                 self.q.put(self.window_set_active(self.test_window))
             except:
                 break

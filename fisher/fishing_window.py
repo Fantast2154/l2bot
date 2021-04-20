@@ -55,8 +55,7 @@ class FishingWindow(L2window):
         self.send_message(f"TEST FishingWindow {self.window_id} destroyed")
 
     def activate_window(self):
-        return super().set_foreground()
-
+        return super().window_set_active()
 
     @classmethod
     def send_message(cls, message):

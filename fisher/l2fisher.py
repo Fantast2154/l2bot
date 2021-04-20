@@ -1,5 +1,7 @@
 import threading
+from threading import Lock
 import time
+import win32gui
 import cv2
 
 
@@ -16,7 +18,6 @@ class Fisher(threading.Thread):
     def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
         self.send_message(f'TEST fisher {fisher_id} created')
         threading.Thread.__init__(self)
-
         self.exit = threading.Event()
         self.fishing_window = fishing_window
         self.fisher_id = fisher_id
@@ -28,26 +29,32 @@ class Fisher(threading.Thread):
     def __del__(self):
         self.send_message(f"TEST fisher {self.fisher_id} destroyed")
 
+    def test_action(self, count):
+        self.q.new_task(count, self.fishing_window)
+
     def run(self):
-        time.sleep(3)
+        delay = 3
+        print(f'The fisher {self.fisher_id} will start in ........ {delay} sec')
+        time.sleep(delay)
         count = 0
         self.start_fishing()
 
         while not self.exit.is_set():
-            self.test_action(count)
+
             time.sleep(1)
-            count += 1
-            if count > 3:
+
+            if count < 5:
+                self.test_action(count)
+            if count > 10:
                 self.current_state = 1
                 return
-
+            count += 1
         self.current_state = 2
 
     def get_status(self):
         return self.current_state
 
-    def test_action(self, count):
-        self.q.new_task(count, self.fishing_window)
+
 
     @classmethod
     def send_message(cls, message):

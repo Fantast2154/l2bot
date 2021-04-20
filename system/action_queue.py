@@ -1,7 +1,9 @@
 import time
 import queue
 import threading
-
+from threading import Lock
+import win32gui
+import win32com.client
 
 class CommandQueue:
     def __init__(self):
@@ -15,34 +17,42 @@ class ActionQueue(threading.Thread):
 
     number = None
     priority_list = []
-    windows_list = []
+    windows = []
     actions = []
     action_rate_list = []
-
-    # speed_list = []
 
     def __init__(self):
         self.send_message(f'TEST Queue created\n')
         threading.Thread.__init__(self)
+        self.lock = Lock()
         self.exit = threading.Event()
-        self.actions_list = queue.Queue()
+        self.queue_list = queue.Queue()
+        self.shell = win32com.client.Dispatch("WScript.Shell")
 
-    def new_task(self, action, window, priority='Normal', action_rate='High'):
-        self.actions_list.put(action)
-        self.windows_list.insert(0, window)
-        self.actions.insert(0, action)
-        self.priority_list.insert(0, priority)
+    def new_task(self, count, window, priority='Normal', action_rate='High'):
+        self.queue_list.put(count)
+        self.windows.append(window)
+        self.priority_list.append(priority)
         self.action_rate_list.append(action_rate)
+        # self.action_rate_list.insert(0, action_rate)
 
     @classmethod
     def send_message(cls, message):
         print(message)
 
-    @classmethod
-    def task_execution(cls, action, window, priority='Normal', speed='High'):
-        print(f'queue is doing execution {action} from fisher {window.window_id}\n')
-        window.activate_window()
-        print(f'Window {window.window_id} is active\n')
+    def task_execution(self, count, window, priority='Normal', action_rate='High'):
+
+        self.lock.acquire()
+        time.sleep(0.05)
+        try:
+            print(f'queue is doing execution {count}. Window {window.window_id} hwnd = {window.hwnd} is active\n')
+            self.shell.SendKeys('%')
+            win32gui.SetForegroundWindow(window.hwnd)
+        except:
+            print('TEST queue window activation error')
+        time.sleep(0.05)
+        self.lock.release()
+
 
     @classmethod
     def start_queueing(cls):
@@ -54,20 +64,27 @@ class ActionQueue(threading.Thread):
 
     def run(self):
         self.start_queueing()
+
         while not self.exit.is_set():
-            while not self.actions_list.empty():
+            while not self.queue_list.empty():
                 try:
                     # priority = self.priority_list[0]
-                    window = self.windows_list[0]
+                    if self.windows[0]:
+                        window = self.windows[0]
+                    else:
+                        continue
                     # action = self.actions[0]
 
                     # del self.priority_list[0]
-                    del self.windows_list[0]
+
+                    del self.windows[0]
                     # del self.actions[0]
 
                     # speed = self.speed_list[0]
-                    # self.task_execution(self.actions_list.get(), priority, speed)
+                    # self.task_execution(self.queue_list.get(), priority, speed)
 
-                    self.task_execution(self.actions_list.get(), window)
+                    # self.queue_list.get()
+                    self.task_execution(self.queue_list.get(), window)
+
                 finally:
-                    time.sleep(0.1)
+                    time.sleep(0.5)
