@@ -14,7 +14,7 @@ from threading import Lock
 
 class L2window:
 
-    def __init__(self, window_id, win_capture, window_name, hwnd):
+    def __init__(self, window_id, wincap, window_name, hwnd):
         self.send_message(f'TEST L2window {window_id} created')
         self.window_id = window_id
         x = 0
@@ -29,7 +29,7 @@ class L2window:
         self.window_name = window_name
         self.hwnd = hwnd
         # self._handle = None
-        self.win_capture = win_capture
+        self.wincap = wincap
 
         self.enum_handler()
 
@@ -41,12 +41,6 @@ class L2window:
             if self.window_name in win32gui.GetWindowText(self.hwnd):
                 win32gui.MoveWindow(self.hwnd, self.left_top_x, self.left_top_y, self.width, self.height, True)
 
-    def window_set_active(self):
-        print(self.hwnd)
-
-        win32gui.SetForegroundWindow(self.hwnd)
-        #time.sleep(0.03)
-        # self.lock.release()
 
     @classmethod
     def send_message(cls, message):

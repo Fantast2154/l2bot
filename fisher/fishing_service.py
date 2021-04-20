@@ -26,10 +26,10 @@ class FishingService:
 
     def __init__(self, number_of_fishers, windows, q):
         self.send_message(f'TEST FishingService created')
-
+        q.activate_l2windows(windows)
         for fisher_id in range(number_of_fishers):
 
-            win_capture = windows[fisher_id].win_capture
+            win_capture = windows[fisher_id].wincap
             window_name = windows[fisher_id].window_name
             hwnd = windows[fisher_id].hwnd
             temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd)

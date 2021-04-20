@@ -41,8 +41,9 @@ def get_l2windows_param(wincap, l2window_name):
 if __name__ == '__main__':
 
     print('PROGRAM start--------------------------------------')
-    queue = ActionQueue()
     win_capture = ScreenCapture()
+    queue = ActionQueue(win_capture)
+
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
     name_list, hash_list = get_l2windows_param(win_capture, l2window_name)
 

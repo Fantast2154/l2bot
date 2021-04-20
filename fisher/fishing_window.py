@@ -8,11 +8,11 @@ class FishingWindow(L2window):
     screenshot = None
     win_capture = None
 
-    def __init__(self, window_id, win_capture, window_name, hwnd):
-        super().__init__(window_id, win_capture, window_name, hwnd)
+    def __init__(self, window_id, wincap, window_name, hwnd):
+        super().__init__(window_id, wincap, window_name, hwnd)
         self.send_message(f'TEST FishingWindow {window_id} created')
-        self.win_capture = win_capture
-        self.screenshot = win_capture.get_screenshot()
+        self.wincap = wincap
+        self.screenshot = wincap.get_screenshot()
         self.window_id = window_id
 
         self.image_database = [
@@ -54,6 +54,9 @@ class FishingWindow(L2window):
     def __del__(self):
         self.send_message(f"TEST FishingWindow {self.window_id} destroyed")
 
+    def update_screenshot(self):
+        self.screenshot = self.wincap.get_screenshot()
+
     def activate_window(self):
         return super().window_set_active()
 
@@ -69,7 +72,7 @@ class FishingWindow(L2window):
                 print('Error finding images')
 
     def init_search(self):
-        self.screenshot = self.win_capture.get_screenshot()
+        self.screenshot = self.wincap.get_screenshot()
 
         for key in self.library:
             self.library[key][1] = self.library[key][0].find(self.screenshot)

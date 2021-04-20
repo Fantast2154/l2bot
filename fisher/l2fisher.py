@@ -14,7 +14,6 @@ class Fisher(threading.Thread):
     current_state = None
     stopped = None
     q = None
-    screen_master = None
 
     def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
         self.send_message(f'TEST fisher {fisher_id} created')
@@ -25,7 +24,6 @@ class Fisher(threading.Thread):
         self.number_of_fishers = number_of_fishers
         self.current_state = 0
         self.q = q
-        self.screen_master = fishing_window.win_capture
 
     def __del__(self):
         self.send_message(f"TEST fisher {self.fisher_id} destroyed")
@@ -39,8 +37,8 @@ class Fisher(threading.Thread):
 
         while not self.exit.is_set():
 
-            time.sleep(0.1)
-
+            time.sleep(0.3)
+            self.fishing_window.update_screenshot()
             if count < 15:
                 rand = random.randint(1, 2)
                 if rand == 1:
@@ -74,10 +72,10 @@ class Fisher(threading.Thread):
         self.exit.set()
 
     def pumping(self, count):
-        self.q.new_task(count, 'pumping', self.fishing_window)
+        self.q.new_task(count, 'mouse', [[(100, 100)], True, 'LEFT', False, False, False], self.fishing_window)
 
     def reeling(self, count):
-        self.q.new_task(count, 'reeling', self.fishing_window)
+        self.q.new_task(count, 'mouse', [[(500, 500)], True, 'LEFT', False, False, False], self.fishing_window)
 
     def turn_on_soski(self):
         pass
