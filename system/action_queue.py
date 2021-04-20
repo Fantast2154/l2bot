@@ -65,29 +65,30 @@ class ActionQueue(threading.Thread):
         # self.action_rate_list.insert(0, action_rate)
 
     def task_execution(self, count, action, params, window, action_rate='High'):
-        try:
+        #try:
 
-            self.lock.acquire()
-            time.sleep(0.01)
-            print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
-            self.shell.SendKeys('%')
-            win32gui.SetForegroundWindow(window.hwnd)
-            time.sleep(0.01)
-            self.lock.release()
+        self.lock.acquire()
+        time.sleep(0.01)
+        print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
+        self.shell.SendKeys('%')
+        win32gui.SetForegroundWindow(window.hwnd)
+        time.sleep(0.01)
+        self.lock.release()
 
-            if action == 'mouse':
+        if action == 'mouse':
+            print('EBANIY RRROT', params)
 
-                if len(params) != 6:
-                    return
-                print(params)
-                self.action_service.mouse_master(params)
-            if action == 'keyboard':
-                if len(params) != 2:
-                    return
-                self.action_service.keyboard_master(params)
-            time.sleep(0.01)
-        except:
-            print('TEST queue window activation error')
+            if len(params) != 6:
+                return
+            print(params)
+            self.action_service.mouse_master(params)
+        if action == 'keyboard':
+            if len(params) != 2:
+                return
+            self.action_service.keyboard_master(params)
+        time.sleep(0.01)
+        #except:
+            #print('TEST queue window activation error')
         
     @classmethod
     def start_queueing(cls):
