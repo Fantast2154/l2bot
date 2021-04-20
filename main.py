@@ -76,11 +76,13 @@ if __name__ == '__main__':
 
     windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
     FishingService(m, windows_f, queue)
-    queue.join()
-    win_capture.join()
     queue.stop()
-
+    queue.join()
     win_capture.stop()
+    win_capture.join()
+
+
+
 
 
     del windows

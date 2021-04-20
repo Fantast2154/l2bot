@@ -73,14 +73,13 @@ class FishingService:
         if fishers_list is None:
             for fisher in cls.fishers:
                 fisher.stop_fishing()
-                fisher.join()
+                # fisher.join()
 
         else:
             for fisher in fishers_list:
                 fisher.stop_fishing()
-                fisher.join()
+                # fisher.join()
 
-        time.sleep(3)
         del cls.fishers
         del cls.fishing_windows
 
