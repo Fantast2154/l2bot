@@ -1,4 +1,5 @@
 import threading
+import random
 from threading import Lock
 import time
 import win32gui
@@ -33,9 +34,6 @@ class Fisher(threading.Thread):
         self.q.new_task(count, self.fishing_window)
 
     def run(self):
-        delay = 3
-        print(f'The fisher {self.fisher_id} will start in ........ {delay} sec')
-        time.sleep(delay)
         count = 0
         self.start_fishing()
 
@@ -43,9 +41,13 @@ class Fisher(threading.Thread):
 
             time.sleep(0.1)
 
-            if count < 5:
-                self.test_action(count)
-            if count > 10:
+            if count < 15:
+                rand = random.randint(1, 2)
+                if rand == 1:
+                    self.pumping(count)
+                if rand == 2:
+                    self.reeling(count)
+            if count > 70:
                 self.current_state = 1
                 return
             count += 1
@@ -61,6 +63,9 @@ class Fisher(threading.Thread):
         print(message)
 
     def start_fishing(self):
+        delay = 3
+        print(f'The fisher {self.fisher_id} will start in ........ {delay} sec')
+        time.sleep(delay)
         self.send_message(f'TEST fisher {self.fisher_id} starts fishing\n')
         self.stopped = False
 
@@ -68,11 +73,11 @@ class Fisher(threading.Thread):
         self.send_message(f'TEST fisher {self.fisher_id} has finished fishing\n')
         self.exit.set()
 
-    def pumping(self):
-        pass
+    def pumping(self, count):
+        self.q.new_task(count, 'pumping', self.fishing_window)
 
-    def reeling(self):
-        pass
+    def reeling(self, count):
+        self.q.new_task(count, 'reeling', self.fishing_window)
 
     def turn_on_soski(self):
         pass

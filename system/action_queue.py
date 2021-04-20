@@ -30,23 +30,25 @@ class ActionQueue(threading.Thread):
         self.queue_list = queue.Queue()
         self.shell = win32com.client.Dispatch("WScript.Shell")
 
-    def new_task(self, count, window, priority='Normal', action_rate='High'):
+    @classmethod
+    def send_message(cls, message):
+        print(message)
+
+    def new_task(self, count, action, window, priority='Normal', action_rate='High'):
         self.queue_list.put(count)
+        self.actions.append(action)
         self.windows.append(window)
         self.priority_list.append(priority)
         self.action_rate_list.append(action_rate)
         # self.action_rate_list.insert(0, action_rate)
 
-    @classmethod
-    def send_message(cls, message):
-        print(message)
-
-    def task_execution(self, count, window, priority='Normal', action_rate='High'):
+    def task_execution(self, count, action, window, priority='Normal', action_rate='High'):
 
         self.lock.acquire()
+        print(action)
         time.sleep(0.01)
         try:
-            print(f'queue is doing execution {count}. Window {window.window_id} hwnd = {window.hwnd} is active\n')
+            print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
             self.shell.SendKeys('%')
             win32gui.SetForegroundWindow(window.hwnd)
         except:
@@ -72,6 +74,7 @@ class ActionQueue(threading.Thread):
                     # priority = self.priority_list[0]
                     if self.windows[0]:
                         window = self.windows[0]
+                        action = self.actions[0]
                     else:
                         continue
                     # action = self.actions[0]
@@ -79,13 +82,14 @@ class ActionQueue(threading.Thread):
                     # del self.priority_list[0]
 
                     del self.windows[0]
+                    del self.actions[0]
                     # del self.actions[0]
 
                     # speed = self.speed_list[0]
                     # self.task_execution(self.queue_list.get(), priority, speed)
 
                     # self.queue_list.get()
-                    self.task_execution(self.queue_list.get(), window)
+                    self.task_execution(self.queue_list.get(), action, window)
                     time.sleep(0.01)
                 finally:
                     pass
