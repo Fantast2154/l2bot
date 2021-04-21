@@ -5,6 +5,7 @@ import threading
 from threading import Lock
 import win32gui
 import win32com.client
+import pyautogui
 
 
 class ActionQueue(threading.Thread):
@@ -26,6 +27,8 @@ class ActionQueue(threading.Thread):
         self.queue_list = queue.Queue()
         self.shell = win32com.client.Dispatch("WScript.Shell")
         self.shell.SendKeys('%')
+        self.offset_x = wincap.offset_x
+        self.offset_y = wincap.offset_y
 
     def activate_l2windows(self, windows):
         try:
@@ -45,15 +48,12 @@ class ActionQueue(threading.Thread):
     def send_message(cls, message):
         print(message)
 
-    def new_task(self, count, action, action_param, window, priority='Normal', action_rate='High'):
-        print('TEST queue added')
-        self.queue_list.put(count)
-        self.actions.append(action)
-        self.action_params.append(action_param)
-        self.windows.append(window)
-        self.priority_list.append(priority)
-        self.action_rate_list.append(action_rate)
-        # self.action_rate_list.insert(0, action_rate)
+    def new_task(self, coordinates, hwnd):
+        print('Qsize = ', self.queue_list.qsize())
+        self.windows.append(hwnd)
+        self.queue_list.put(coordinates)
+        print(coordinates, hwnd)
+        print()
 
     def new_mouse_task(self):
         pass
@@ -61,31 +61,24 @@ class ActionQueue(threading.Thread):
     def new_keyboard_task(self):
         pass
 
-    def task_execution(self, count, action, params, window, action_rate='High'):
+    def task_execution(self, coordinates, hwnd):
         #try:
 
         self.lock.acquire()
-        time.sleep(0.01)
-        print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
 
-        win32gui.SetForegroundWindow(window.hwnd)
-        time.sleep(0.01)
+        win32gui.SetForegroundWindow(hwnd)
 
-        if action == 'mouse':
-
-            if len(params) != 6:
-                return
-            # print(params)
-            self.action_service.mouse_master(params)
-        if action == 'keyboard':
-            if len(params) != 2:
-                return
-            self.action_service.keyboard_master(params)
-        time.sleep(0.01)
-        #except:
-            #print('TEST queue window activation error')
+        [(x_temp, y_temp)] = coordinates
+        x = x_temp + self.offset_x
+        y = y_temp + self.offset_y
+        pyautogui.moveTo(x, y)
+        time.sleep(0.02)
+        pyautogui.mouseDown()
+        time.sleep(0.02)
+        pyautogui.mouseUp()
+        time.sleep(0.03)
         self.lock.release()
-        
+
     @classmethod
     def start_queueing(cls):
         pass
@@ -103,23 +96,13 @@ class ActionQueue(threading.Thread):
                     # priority = self.priority_list[0]
                     if self.windows[0]:
                         window = self.windows[0]
-                        action = self.actions[0]
-                        action_param = self.action_params[0]
+                        # action_param = self.action_params[0]
                     else:
                         continue
-                    # action = self.actions[0]
-
-                    # del self.priority_list[0]
 
                     del self.windows[0]
-                    del self.actions[0]
-                    # del self.actions[0]
 
-                    # speed = self.speed_list[0]
-                    # self.task_execution(self.queue_list.get(), priority, speed)
-
-                    # self.queue_list.get()
-                    self.task_execution(self.queue_list.get(), action, action_param, window)
-                    time.sleep(0.01)
+                    action_param = 1
+                    self.task_execution(self.queue_list.get(), window)
                 finally:
                     pass
