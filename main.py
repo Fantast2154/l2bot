@@ -1,9 +1,7 @@
 from fisher.fishing_service import FishingService
 from system.telegram import Telegram
 from system.l2window import L2window
-from system.screen_capture import ScreenCapture
-# from system.action_queue import ActionQueue
-from tests.test_queue_shefer import ActionQueue
+from system.window_capture import WindowCapture
 import sys
 import time
 
@@ -42,17 +40,15 @@ def get_l2windows_param(wincap, l2window_name):
 if __name__ == '__main__':
 
     print('PROGRAM start--------------------------------------')
-    win_capture = ScreenCapture()
-    # queue = ActionQueue(win_capture)
+    win_capture = WindowCapture()
 
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
     name_list, hash_list = get_l2windows_param(win_capture, l2window_name)
 
-    # n = input_number('number of l2 windows: ')
     n = len(name_list)
     print('number of l2 windows:', n)
     if n >= 2:
-        m = 2  # m = input_number('')
+        m = 2
     else:
         m = n
     print('number of fishers: ', m)
@@ -66,10 +62,9 @@ if __name__ == '__main__':
 
     windows = []
     for i in range(n):
-        windows.append(L2window(i, win_capture, name_list[i], hash_list[i]))
+        windows.append(L2window(i, name_list[i], hash_list[i]))
 
     win_capture.set_windows(windows)
-    # queue.start()
     win_capture.start()
 
     delay = 3
@@ -78,15 +73,10 @@ if __name__ == '__main__':
         time.sleep(1)
 
     windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
+
     FishingService(m, windows_f)
-    # queue.stop()
-    # queue.join()
     win_capture.stop()
     win_capture.join()
-
-
-
-
 
     del windows
 
