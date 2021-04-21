@@ -1,6 +1,6 @@
 import time
 from queue import Queue
-from tests.fisher_test_sh import Fisher
+from fisher.l2fisher import Fisher
 
 
 class FishingService:
@@ -8,13 +8,13 @@ class FishingService:
     raised_error = False
     win_capture = None
 
-    def __init__(self, windows, screen_cap):
+    def __init__(self, windows, wincap):
         self.send_message(f'TEST FishingService created')
         self.number_of_fishers = len(windows)
         self.q = Queue()
-        self.wincap = screen_cap
+        self.wincap = wincap
         for window in windows:
-            temp_fisher = Fisher(window, screen_cap, self.q)
+            temp_fisher = Fisher(window, wincap, self.q)
             self.fishers.append(temp_fisher)
 
         self.start_fishing()
@@ -53,30 +53,30 @@ class FishingService:
 
         del cls.fishers
 
-    @classmethod
-    def fisher_response(cls, response):
-
-        if response == 0:  # OK
-            pass
-        if response == 1:  # stopped fishing
-            cls.send_message(f'TEST FishingService fisher_response(response) calling')
-            cls.raise_error()
-        if response == 2:  # fatal problem
-            cls.send_message(f'TEST FishingService fisher_response(response) calling')
-            cls.raise_error()
+    # @classmethod
+    # def fisher_response(cls, response):
+    #
+    #     if response == 0:  # OK
+    #         pass
+    #     if response == 1:  # stopped fishing
+    #         cls.send_message(f'TEST FishingService fisher_response(response) calling')
+    #         cls.raise_error()
+    #     if response == 2:  # fatal problem
+    #         cls.send_message(f'TEST FishingService fisher_response(response) calling')
+    #         cls.raise_error()
 
     def run_loop(self):
         # self.send_message(f'TEST FishingService run_loop() calling')
         while True:
             if self.q.qsize() > 0:
+                # print('Qsize = ', self.q.qsize())
                 self.q.get()
-            time.sleep(2)
             for fisher in self.fishers:
                 if not fisher.fishing_is_active:
                     fisher.fishing()
-                    if fisher.fishing_window():
-                        if fisher.clock() and (fisher.red_bar() or fisher.blue_bar()):
-                            pass
+                    # if fisher.fishing_window():
+                    #     if fisher.clock() and (fisher.red_bar() or fisher.blue_bar()):
+                    #         pass
 
             # for fisher in self.fishers:
             #     self.fisher_response(fisher.current_state)

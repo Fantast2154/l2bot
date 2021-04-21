@@ -38,15 +38,13 @@ class L2window:
 
     def activate_window(self):
         try:
-            time.sleep(0.01)
             self.lock.acquire()
-            time.sleep(0.5)
-            win32gui.SetForegroundWindow(self.hwnd)
-            time.sleep(0.5)
-            self.lock.release()
             time.sleep(0.01)
+            win32gui.SetForegroundWindow(self.hwnd)
+            time.sleep(0.01)
+            self.lock.release()
         except:
-            print('TEST queue window activation error')
+            print(f'TEST window {self.window_id} activation error')
 
     @classmethod
     def send_message(cls, message):

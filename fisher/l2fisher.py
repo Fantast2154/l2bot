@@ -8,7 +8,7 @@ import pyautogui
 from system.screen_analyzer import *
 
 
-class Fisher():
+class Fisher:
 
     stopped = None
     library = {}
@@ -64,8 +64,9 @@ class Fisher():
         self.send_message(f"TEST fisher {self.fisher_id} destroyed")
 
     def mouse_move(self, points, click=True, button='LEFT', slow=False, double=False):
-        print(points)
-        print(type(points))
+        self.window.activate_window()
+        # print(points)
+        # print(type(points))
         offset_x = self.wincap.offset_x
         offset_y = self.wincap.offset_y
 
@@ -93,10 +94,16 @@ class Fisher():
         self.lock.release()
 
     def skills_thread_processing(self, skill_pos, click=True, button='LEFT', slow=False, double=False):
-
+        self.window.activate_window()
         t = Thread(target=self.mouse_move, args=[skill_pos])
         # t.daemon = True
         t.start()
+
+    def fisher_action(self):
+        pass
+
+    def update_screen(self):
+        return self.wincap.get_screenshot(self.fisher_id)
 
     @classmethod
     def send_message(cls, message):
@@ -112,12 +119,12 @@ class Fisher():
                 # print('Error finding images')
 
     def init_search(self):
-        self.screenshot = self.wincap.get_screenshot(self.window)
         try:
             for key in self.library:
-                self.library[key][1] = self.library[key][0].find(self.screenshot)
+                self.library[key][1] = self.library[key][0].find(self.update_screen())
         except:
             pass
+
 
     def get_status(self):
         return self.current_state
@@ -130,6 +137,7 @@ class Fisher():
         # for i in range(delay):
         #     print(f'Fisher {self.fisher_id} will start in ........ {delay - i} sec')
         #     time.sleep(1)
+        # self.init_search()
         self.send_message(f'TEST fisher {self.fisher_id} starts fishing\n')
 
         # before start fishing
@@ -147,11 +155,13 @@ class Fisher():
             return True
 
     def fishing(self):
-        print('fishing')
-        self.q.put(self.skills_thread_processing([(100, 100)]))
+        # print('fishing')
+        x = self.window.left_top_x + 100
+        y = self.window.left_top_y + 100
+        self.q.put(self.mouse_move([(x, y)]))
 
     def fishing_window(self):
-
+        # find window
         self.fishing_is_active = True
         return [(50, 50)]
 

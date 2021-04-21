@@ -2,6 +2,7 @@ from fisher.fishing_service import FishingService
 from system.telegram import Telegram
 from system.l2window import L2window
 from system.window_capture import WindowCapture
+import telebot
 import sys
 import time
 
@@ -74,7 +75,7 @@ if __name__ == '__main__':
 
     windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
 
-    FishingService(m, windows_f)
+    FishingService(windows_f, win_capture)
     win_capture.stop()
     win_capture.join()
 
