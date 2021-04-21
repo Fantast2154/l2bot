@@ -38,11 +38,10 @@ class L2window:
 
     def activate_window(self):
         try:
-            self.lock.acquire()
-            time.sleep(0.01)
+            # self.lock.acquire()
             win32gui.SetForegroundWindow(self.hwnd)
             time.sleep(0.01)
-            self.lock.release()
+            # self.lock.release()
         except:
             print(f'TEST window {self.window_id} activation error')
 

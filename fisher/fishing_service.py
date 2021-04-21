@@ -68,12 +68,31 @@ class FishingService:
     def run_loop(self):
         # self.send_message(f'TEST FishingService run_loop() calling')
         while True:
+
             if self.q.qsize() > 0:
-                print('Qsize = ', self.q.qsize())
+                # print('Qsize = ', self.q.qsize())
                 self.q.get()
+                continue
+
+            time.sleep(2)
+
             for fisher in self.fishers:
-                if not fisher.fishing_is_active:
+                if fisher.day_time:
+                    print(f'fisher {fisher.fisher_id} day time')
+                    # fisher.update_day_screen()
+                elif not fisher.day_time:
+                    fisher.update_night_screen()
+
+            for fisher in self.fishers:
+                if not fisher.fishing_window() and fisher.resting() > fisher.max_rest_time:
+                    fisher.timer_start_fishing = time.time()
+                    x = fisher.window.left_top_x + 100
+                    y = fisher.window.left_top_y + 100
+                    fisher.fishing_window_pos = [(x, y)]
                     fisher.fishing()
+
+
+
                     # if fisher.fishing_window():
                     #     if fisher.clock() and (fisher.red_bar() or fisher.blue_bar()):
                     #         pass

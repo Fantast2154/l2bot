@@ -2,10 +2,12 @@ import threading
 import random
 from threading import Lock
 import time
-import win32gui
 import cv2
 import pyautogui
+import keyboard
 from system.screen_analyzer import *
+import win32api
+import win32con
 
 
 class Fisher:
@@ -13,8 +15,25 @@ class Fisher:
     stopped = None
     library = {}
     last_buff_time = time.time()
-
     fishing_is_active = 0
+    screenshot = None
+    screenshot_fishing_window = None
+    screenshot_fishing_blue_bar = None
+    screenshot_fishing_red_bar = None
+    screenshot_fishing_clock = None
+
+    # timers
+    timer_start_fishing = 0
+
+    #pos
+    clock_pos = None
+    fishing_window_pos = None
+    red_bar_pos = None
+    blue_bar_pos = None
+
+    #fishing_params
+    day_time = True
+    max_rest_time = 1
 
     def __init__(self, window, wincap, q):
         self.send_message(f'TEST fisher {window.window_id} created')
@@ -24,6 +43,7 @@ class Fisher:
         self.current_state = 0
         self.lock = Lock()
         self.q = q
+        self.counter = 0
 
         self.image_database = [
         ['fishing', '../images/fishing.jpg', 0.8],
@@ -59,6 +79,8 @@ class Fisher:
 
         self.fishing_is_active = False
         self.init_images()
+        self.init_params()
+
 
     def __del__(self):
         self.send_message(f"TEST fisher {self.fisher_id} destroyed")
@@ -81,15 +103,16 @@ class Fisher:
         x = game_x + x_temp + a
         y = game_y + y_temp + b
 
-        self.lock.acquire()
+        # self.lock.acquire()
 
-        pyautogui.moveTo(x, y)
-        time.sleep(0.01)
-        # pyautogui.mouseDown()
-        time.sleep(0.01)
-        # pyautogui.mouseUp()
+        # keyboard.send('k')
+        win32api.SetCursorPos((x, y))
+        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
 
-        self.lock.release()
+
+
+        # self.lock.release()
 
     def skills_thread_processing(self, skill_pos, click=True, button='LEFT', slow=False, double=False):
         self.window.activate_window()
@@ -100,8 +123,20 @@ class Fisher:
     def fisher_action(self):
         pass
 
-    def update_screen(self):
-        return self.wincap.get_screenshot(self.fisher_id)
+    def update_full_screen(self):
+        self.screenshot = self.wincap.get_screenshot(self.fisher_id)
+        return self.screenshot
+
+    def update_day_screen(self):
+        self.screenshot_fishing_window = self.wincap.get_screenshot(self.fisher_id)
+        self.screenshot_fishing_clock = self.wincap.get_screenshot(self.fisher_id)
+        self.screenshot_fishing_blue_bar = self.wincap.get_screenshot(self.fisher_id)
+
+    def update_night_screen(self):
+        self.screenshot_fishing_window = self.wincap.get_screenshot(self.fisher_id)
+        self.screenshot_fishing_clock = self.wincap.get_screenshot(self.fisher_id)
+        self.screenshot_fishing_blue_bar = self.wincap.get_screenshot(self.fisher_id)
+        self.screenshot_fishing_red_bar = self.wincap.get_screenshot(self.fisher_id)
 
     @classmethod
     def send_message(cls, message):
@@ -119,16 +154,24 @@ class Fisher:
     def init_search(self):
         try:
             for key in self.library:
-                self.library[key][1] = self.library[key][0].find(self.update_screen())
+                self.library[key][1] = self.library[key][0].find(self.update_full_screen())
         except:
             pass
 
+    def init_params(self):
+        self.day_time = True
+        self.max_rest_time = 1
+        self.timer_start_fishing = time.time()
+        self.fishing_window_pos = []
 
     def get_status(self):
         return self.current_state
 
     def overweight_baits_soski_correction(self, m_send_counter, m_receive_counter):
         pass
+
+    def resting(self):
+        return time.time() - self.timer_start_fishing
 
     def start_fishing(self):
         # delay = 3
@@ -157,11 +200,14 @@ class Fisher:
         x = self.window.left_top_x + 100
         y = self.window.left_top_y + 100
         self.q.put(self.mouse_move([(x, y)]))
+        print(f'fisher {self.fisher_id} is fishing')
 
     def fishing_window(self):
+        # get screenshot
         # find window
         self.fishing_is_active = True
-        return [(50, 50)]
+
+        return self.fishing_window_pos
 
     def pumping(self, count):
         pass
@@ -169,11 +215,23 @@ class Fisher:
     def reeling(self, count):
         pass
 
+    def clock(self):
+        # get_screenshot
+        # find clock
+        self.clock_pos = None
+        return self.clock_pos
+
     def blue_bar(self):
-        pass
+        # get_screenshot
+        # find blue_bar
+        self.blue_bar_pos = None
+        return self.blue_bar_pos
 
     def red_bar(self):
-        pass
+        # get_screenshot
+        # find red_bar
+        self.red_bar_pos = None
+        return self.red_bar_pos
 
     def turn_on_soski(self):
         pass
