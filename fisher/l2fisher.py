@@ -83,13 +83,11 @@ class Fisher:
 
         self.lock.acquire()
 
-        time.sleep(0.01)
         pyautogui.moveTo(x, y)
-        time.sleep(0.02)
-        pyautogui.mouseDown()
-        time.sleep(0.02)
-        pyautogui.mouseUp()
-        time.sleep(0.03)
+        time.sleep(0.01)
+        # pyautogui.mouseDown()
+        time.sleep(0.01)
+        # pyautogui.mouseUp()
 
         self.lock.release()
 

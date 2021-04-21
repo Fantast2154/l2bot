@@ -69,7 +69,7 @@ class FishingService:
         # self.send_message(f'TEST FishingService run_loop() calling')
         while True:
             if self.q.qsize() > 0:
-                # print('Qsize = ', self.q.qsize())
+                print('Qsize = ', self.q.qsize())
                 self.q.get()
             for fisher in self.fishers:
                 if not fisher.fishing_is_active:
