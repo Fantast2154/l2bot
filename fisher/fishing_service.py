@@ -21,7 +21,6 @@ class FishingService:
 
     def __del__(self):
         self.send_message("TEST FishingService destroyed")
-
         del self
 
     @classmethod
@@ -51,8 +50,6 @@ class FishingService:
             for fisher in fishers_list:
                 fisher.stop_fishing()
 
-        del cls.fishers
-
     # @classmethod
     # def fisher_response(cls, response):
     #
@@ -66,7 +63,7 @@ class FishingService:
     #         cls.raise_error()
 
     def run_loop(self):
-        # self.send_message(f'TEST FishingService run_loop() calling')
+
         while True:
 
             if self.q.qsize() > 0:
@@ -74,37 +71,84 @@ class FishingService:
                 self.q.get()
                 continue
 
-            time.sleep(2)
+            self.fishers_update_fishingwindow_clock_bars()
 
-            for fisher in self.fishers:
-                if fisher.day_time:
-                    print(f'fisher {fisher.fisher_id} day time')
-                    # fisher.update_day_screen()
-                elif not fisher.day_time:
-                    fisher.update_night_screen()
+            self.fishers_check_fishingwindow()
 
-            for fisher in self.fishers:
-                if not fisher.fishing_window() and fisher.resting() > fisher.max_rest_time:
-                    fisher.timer_start_fishing = time.time()
-                    x = fisher.window.left_top_x + 100
-                    y = fisher.window.left_top_y + 100
-                    fisher.fishing_window_pos = [(x, y)]
-                    fisher.fishing()
+            self.fishers_check_clock_bars()
 
+    def fishers_update_fishingwindow_clock_bars(self):
+        for fisher in self.fishers:
+            if fisher.daytime():
+                pass
+                # print(f'TEST fisher {fisher.fisher_id} day time')
+                # fisher.update_day_screen()
+            else:
+                fisher.update_night_screen()
 
+    def fishers_check_fishingwindow(self):
+        for fisher in self.fishers:
+            if not fisher.fishing_window() and fisher.resting() > fisher.max_rest_time:
+                self.actions_while_not_fishing()
 
-                    # if fisher.fishing_window():
-                    #     if fisher.clock() and (fisher.red_bar() or fisher.blue_bar()):
-                    #         pass
+                time.sleep(2)  # test
+                print(f'TEST fisher {fisher.fisher_id} fishing_window check')
+                x = fisher.window.left_top_x + 100  # test
+                y = fisher.window.left_top_y + 100  # test
+                fisher.fishing_window_pos = [(x, y)]  # test
 
-            # for fisher in self.fishers:
-            #     self.fisher_response(fisher.current_state)
-            #
-            # if self.raised_error:
-            #     self.stop_fishing()
-            #     break
+                x = fisher.window.left_top_x + 111  # test
+                y = fisher.window.left_top_y + 111  # test
+                fisher.clock_pos = [(x, y)]  # test
 
-            # if fisher are not fishing
+                x = fisher.window.left_top_x + 222  # test
+                y = fisher.window.left_top_y + 222  # test
+                fisher.blue_bar_pos = [(x, y)]  # test
+
+                fisher.fishing()
+
+    def fishers_check_clock_bars(self):
+        for fisher in self.fishers:
+            if fisher.clock():
+                time.sleep(2)  # test
+                blue_bar_pos = fisher.blue_bar()
+                if fisher.daytime():
+                    if blue_bar_pos:
+                        for coordinates in blue_bar_pos:
+                            (fisher.x_border, fisher.y_border) = coordinates
+                            print(f'TEST coordinates blue = {coordinates}')
+                            fisher.q.put(fisher.mouse_move([(fisher.x_border, fisher.y_border)]))
+
+                            x = fisher.window.left_top_x + 100  # test
+                            y = fisher.window.left_top_y + 100  # test
+                            fisher.fishing_window_pos = [(x, y)]  # test
+                else:
+                    red_bar_pos = fisher.red_bar()
+                    if blue_bar_pos:
+                        for coordinates in blue_bar_pos:
+                            (fisher.x_border, fisher.y_border) = coordinates
+                            print(f'TEST coordinates blue = {coordinates}')
+                            fisher.q.put(fisher.mouse_move([(fisher.x_border, fisher.y_border)]))
+                    if red_bar_pos:
+                        for coordinates in red_bar_pos:
+                            (fisher.x_border, fisher.y_border) = coordinates
+                            print(f'TEST coordinates red = {coordinates}')
+
+    def actions_while_not_fishing(self):  # abf
+        self.fishers_abf_check_buff()
+        self.fishers_abf_check_soski_clicked()
+        self.fishers_abf_check_soski_baits_overweight()
+
+    def fishers_abf_check_buff(self):
+        for fisher in self.fishers:
+            if fisher.rebuff_time():
+                fisher.rebuff()
+
+    def fishers_abf_check_soski_baits_overweight(self):
+        pass
+
+    def fishers_abf_check_soski_clicked(self):
+        pass
 
     # @classmethod
     # def raise_error(cls):

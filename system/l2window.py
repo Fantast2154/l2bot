@@ -27,6 +27,7 @@ class L2window:
         self.height = height
 
         self.enum_handler()
+        self.activate_window()
 
     def __del__(self):
         self.send_message(f"TEST Window {self.window_id} destroyed")

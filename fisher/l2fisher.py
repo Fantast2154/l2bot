@@ -11,11 +11,9 @@ import win32con
 
 
 class Fisher:
-
     stopped = None
     library = {}
-    last_buff_time = time.time()
-    fishing_is_active = 0
+
     screenshot = None
     screenshot_fishing_window = None
     screenshot_fishing_blue_bar = None
@@ -24,16 +22,20 @@ class Fisher:
 
     # timers
     timer_start_fishing = 0
+    max_rest_time = 1
+    timer_last_buff = time.time()
 
-    #pos
+    # pos
     clock_pos = None
     fishing_window_pos = None
     red_bar_pos = None
     blue_bar_pos = None
 
-    #fishing_params
+    # fishing_params
     day_time = True
-    max_rest_time = 1
+    fishing_is_active = 0
+    x_border = 0
+    y_border = 0
 
     def __init__(self, window, wincap, q):
         self.send_message(f'TEST fisher {window.window_id} created')
@@ -46,41 +48,40 @@ class Fisher:
         self.counter = 0
 
         self.image_database = [
-        ['fishing', '../images/fishing.jpg', 0.8],
-        ['pumping', '../images/pumping.jpg', 0.87],
-        ['reeling', 'images/reeling.jpg', 0.87],
-        ['blue_bar', 'images/blue_bar2.jpg', 0.8],
-        ['clock', 'images/clock3.jpg', 0.8],
-        ['fishing_window', 'images/fishing_window.jpg', 0.7],
-        ['red_bar', 'images/red_bar3.jpg', 0.8],
-        ['cdbuff', 'images/cdbuff.jpg', 0.87],
-        ['bait', 'images/bait.jpg', 0.90],
-        ['colored', 'images/colored_2.jpg', 0.94],
-        ['luminous', 'images/luminous_2.jpg', 0.94],
-        ['soski', 'images/soski.jpg', 0.95],
-        ['soski_activated', 'images/soski_activated.jpg', 0.78],
-        ['map_button', 'images/map.jpg', 0.9],
-        ['sun', 'images/sun2.jpg', 0.7],
-        ['moon', 'images/moon2.jpg', 0.7],
-        ['disconnect_EN', 'images/disconnect_EN.jpg', 0.4],
-        ['menu', 'images/menu.jpg', 0.6],
-        ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
-        ['weight_icon', 'images/weight.jpg', 0.9],
-        ['login', 'images/login.jpg', 0.95],
-        ['mailbox', 'images/mailbox.jpg', 0.8],
-        ['sendmail_button', 'images/sendmail_button.jpg', 0.8],
-        ['send_button', 'images/send_button.jpg', 0.8],
-        ['confirm_button', 'images/confirm_button.jpg', 0.8],
-        ['claim_items_button', 'images/claim_items_button.jpg', 0.8],
-        ['catched_item_0', 'images/catcheditem1.jpg', 0.7],
-        ['catched_item_1', 'images/catcheditem2.jpg', 0.7],
-        ['catched_item_2', 'images/catcheditem3.jpg', 0.7],
-        ['catched_item_3', 'images/catcheditem4.jpg', 0.7]]
+            ['fishing', '../images/fishing.jpg', 0.8],
+            ['pumping', '../images/pumping.jpg', 0.87],
+            ['reeling', 'images/reeling.jpg', 0.87],
+            ['blue_bar', 'images/blue_bar2.jpg', 0.8],
+            ['clock', 'images/clock3.jpg', 0.8],
+            ['fishing_window', 'images/fishing_window.jpg', 0.7],
+            ['red_bar', 'images/red_bar3.jpg', 0.8],
+            ['cdbuff', 'images/cdbuff.jpg', 0.87],
+            ['bait', 'images/bait.jpg', 0.90],
+            ['colored', 'images/colored_2.jpg', 0.94],
+            ['luminous', 'images/luminous_2.jpg', 0.94],
+            ['soski', 'images/soski.jpg', 0.95],
+            ['soski_activated', 'images/soski_activated.jpg', 0.78],
+            ['map_button', 'images/map.jpg', 0.9],
+            ['sun', 'images/sun2.jpg', 0.7],
+            ['moon', 'images/moon2.jpg', 0.7],
+            ['disconnect_EN', 'images/disconnect_EN.jpg', 0.4],
+            ['menu', 'images/menu.jpg', 0.6],
+            ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
+            ['weight_icon', 'images/weight.jpg', 0.9],
+            ['login', 'images/login.jpg', 0.95],
+            ['mailbox', 'images/mailbox.jpg', 0.8],
+            ['sendmail_button', 'images/sendmail_button.jpg', 0.8],
+            ['send_button', 'images/send_button.jpg', 0.8],
+            ['confirm_button', 'images/confirm_button.jpg', 0.8],
+            ['claim_items_button', 'images/claim_items_button.jpg', 0.8],
+            ['catched_item_0', 'images/catcheditem1.jpg', 0.7],
+            ['catched_item_1', 'images/catcheditem2.jpg', 0.7],
+            ['catched_item_2', 'images/catcheditem3.jpg', 0.7],
+            ['catched_item_3', 'images/catcheditem4.jpg', 0.7]]
 
         self.fishing_is_active = False
         self.init_images()
         self.init_params()
-
 
     def __del__(self):
         self.send_message(f"TEST fisher {self.fisher_id} destroyed")
@@ -109,8 +110,6 @@ class Fisher:
         win32api.SetCursorPos((x, y))
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
-
-
 
         # self.lock.release()
 
@@ -162,7 +161,10 @@ class Fisher:
         self.day_time = True
         self.max_rest_time = 1
         self.timer_start_fishing = time.time()
+        self.timer_last_buff = time.time()
         self.fishing_window_pos = []
+        self.x_border = 0
+        self.y_border = 0
 
     def get_status(self):
         return self.current_state
@@ -179,52 +181,47 @@ class Fisher:
         #     print(f'Fisher {self.fisher_id} will start in ........ {delay - i} sec')
         #     time.sleep(1)
         # self.init_search()
-        self.send_message(f'TEST fisher {self.fisher_id} starts fishing\n')
+        self.send_message(f'TEST fisher {self.fisher_id} init\n')
 
         # before start fishing
-        #click buff
-        self.last_buff_time = time.time()
+        # click buff
+        self.rebuff()
 
     def stop_fishing(self):
         # before stop fishing
         self.send_message(f'TEST fisher {self.fisher_id} has finished fishing\n')
 
-    def buff_is_active(self):
-        if time.time() - self.last_buff_time < 30:
-            return False
-        else:
+    def rebuff_time(self):
+        if time.time() - self.timer_last_buff > 1140:
             return True
+        else:
+            return False
 
-    def fishing(self):
-        # print('fishing')
-        x = self.window.left_top_x + 100
-        y = self.window.left_top_y + 100
-        self.q.put(self.mouse_move([(x, y)]))
-        print(f'fisher {self.fisher_id} is fishing')
+    def rebuff(self):
+        self.send_message(f'TEST fisher {self.fisher_id} rebuff ---------------------------------\n')
 
     def fishing_window(self):
         # get screenshot
         # find window
-        self.fishing_is_active = True
-
+        # x = self.window.left_top_x + 111
+        # y = self.window.left_top_y + 111
+        # self.fishing_window_pos = [(x, y)]
+        # if self.fishing_window_pos:
+        #     self.timer_start_fishing = time.time()
+            # self.fishing_is_active = True
         return self.fishing_window_pos
-
-    def pumping(self, count):
-        pass
-
-    def reeling(self, count):
-        pass
 
     def clock(self):
         # get_screenshot
         # find clock
-        self.clock_pos = None
         return self.clock_pos
 
     def blue_bar(self):
         # get_screenshot
         # find blue_bar
-        self.blue_bar_pos = None
+        # x = self.window.left_top_x + 250
+        # y = self.window.left_top_y + 250
+        # self.blue_bar_pos = [(x, y)]
         return self.blue_bar_pos
 
     def red_bar(self):
@@ -232,6 +229,18 @@ class Fisher:
         # find red_bar
         self.red_bar_pos = None
         return self.red_bar_pos
+
+    def pumping(self, count):
+        pass
+
+    def fishing(self):
+        self.send_message(f'TEST fisher {self.fisher_id} CLICK start fishing\n')
+
+    def reeling(self, count):
+        pass
+
+    def daytime(self):
+        return self.day_time
 
     def turn_on_soski(self):
         pass
@@ -242,7 +251,7 @@ class Fisher:
     def choose_daily_bait(self):
         pass
 
-    def send_mail(self):
+    def change_bait(self):
         pass
 
     def send_trade(self):
@@ -251,8 +260,8 @@ class Fisher:
     def receive_trade(self):
         pass
 
-    def receive_mail(self):
+    def send_mail(self):
         pass
 
-    def change_bait(self):
+    def receive_mail(self):
         pass
