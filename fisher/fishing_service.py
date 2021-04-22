@@ -135,21 +135,37 @@ class FishingService:
                             print(f'TEST coordinates red = {coordinates}')
 
     def actions_while_not_fishing(self):  # abf
-        self.fishers_abf_check_buff()
-        self.fishers_abf_check_soski_clicked()
-        self.fishers_abf_check_soski_baits_overweight()
+        self.abf_check_buff()
+        self.abf_check_soski_clicked()
+        self.abf_check_fishing_problems()
+        self.abf_check_soski_baits_overweight()
 
-    def fishers_abf_check_buff(self):
+    def abf_check_buff(self):
         for fisher in self.fishers:
             if fisher.rebuff_time():
                 fisher.rebuff()
 
-    def fishers_abf_check_soski_baits_overweight(self):
+    def abf_check_soski_clicked(self):
         pass
 
-    def fishers_abf_check_soski_clicked(self):
+    def abf_check_fishing_problems(self):
+        for fisher in self.fishers:
+            if fisher.is_not_fishing_too_long():  # 20 secs
+                fisher.change_bait()
+
+    def abf_check_soski_baits_overweight(self):
+        for fisher in self.fishers:
+
+            dbaits_count = fisher.check_dbaits_count()
+            nbaits_count = fisher.check_nbaits_count()
+            soski_count = fisher.check_soski_count()
+            overweight = fisher.check_dbaits_count()
+
+    def abf_send_catched_fish(self):
         pass
 
+    def abf_receive_baits_soski(self):
+        pass
     # @classmethod
     # def raise_error(cls):
     #     cls.send_message(f'TEST raise_error calling')

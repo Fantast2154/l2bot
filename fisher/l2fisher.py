@@ -36,6 +36,11 @@ class Fisher:
     fishing_is_active = 0
     x_border = 0
     y_border = 0
+    current_bait = 0  # 0 = day, 1 = night
+    mail_send_constant = 800
+    mail_receive_constant = 1000
+    mail_send_counter = 0
+    mail_receive_counter = 0
 
     def __init__(self, window, wincap, q):
         self.send_message(f'TEST fisher {window.window_id} created')
@@ -85,6 +90,31 @@ class Fisher:
 
     def __del__(self):
         self.send_message(f"TEST fisher {self.fisher_id} destroyed")
+
+    def init_search(self):
+        try:
+            for key in self.library:
+                self.library[key][1] = self.library[key][0].find(self.update_full_screen())
+        except:
+            pass
+
+    def init_params(self):
+        self.day_time = True
+        self.max_rest_time = 1
+        self.timer_start_fishing = time.time()
+        self.timer_last_buff = time.time()
+        self.fishing_window_pos = []
+        self.x_border = 0
+        self.y_border = 0
+        self.current_bait = 0
+        self.mail_send_constant = 800
+        self.mail_receive_constant = 1000
+        self.mail_send_counter = 0
+        self.mail_receive_counter = 0
+
+    @classmethod
+    def send_message(cls, message):
+        print(message)
 
     def mouse_move(self, points, click=True, button='LEFT', slow=False, double=False):
         self.window.activate_window()
@@ -137,10 +167,6 @@ class Fisher:
         self.screenshot_fishing_blue_bar = self.wincap.get_screenshot(self.fisher_id)
         self.screenshot_fishing_red_bar = self.wincap.get_screenshot(self.fisher_id)
 
-    @classmethod
-    def send_message(cls, message):
-        print(message)
-
     def init_images(self):
         for obj in self.image_database:
             try:
@@ -150,26 +176,10 @@ class Fisher:
                 pass
                 # print('Error finding images')
 
-    def init_search(self):
-        try:
-            for key in self.library:
-                self.library[key][1] = self.library[key][0].find(self.update_full_screen())
-        except:
-            pass
-
-    def init_params(self):
-        self.day_time = True
-        self.max_rest_time = 1
-        self.timer_start_fishing = time.time()
-        self.timer_last_buff = time.time()
-        self.fishing_window_pos = []
-        self.x_border = 0
-        self.y_border = 0
-
     def get_status(self):
         return self.current_state
 
-    def overweight_baits_soski_correction(self, m_send_counter, m_receive_counter):
+    def mail_counters_correction(self):
         pass
 
     def resting(self):
@@ -186,10 +196,18 @@ class Fisher:
         # before start fishing
         # click buff
         self.rebuff()
+        self.choose_night_bait()
+        self.choose_day_bait()
 
     def stop_fishing(self):
         # before stop fishing
         self.send_message(f'TEST fisher {self.fisher_id} has finished fishing\n')
+
+    def is_not_fishing_too_long(self):
+        if time.time() - self.timer_start_fishing > 20:
+            return True
+        else:
+            return False
 
     def rebuff_time(self):
         if time.time() - self.timer_last_buff > 1140:
@@ -203,9 +221,6 @@ class Fisher:
     def fishing_window(self):
         # get screenshot
         # find window
-        # x = self.window.left_top_x + 111
-        # y = self.window.left_top_y + 111
-        # self.fishing_window_pos = [(x, y)]
         # if self.fishing_window_pos:
         #     self.timer_start_fishing = time.time()
             # self.fishing_is_active = True
@@ -243,25 +258,50 @@ class Fisher:
         return self.day_time
 
     def turn_on_soski(self):
-        pass
+        #check soski
+        return True
 
-    def choose_nigtly_bait(self):
-        pass
+    def choose_night_bait(self):
+        self.current_bait = 1
+        # click night bait
 
-    def choose_daily_bait(self):
-        pass
+    def choose_day_bait(self):
+        self.current_bait = 0
+        # click day bait
 
     def change_bait(self):
-        pass
+        if self.current_bait == 0:
+            self.current_bait = 1
+        else:
+            self.current_bait = 0
 
     def send_trade(self):
-        pass
+        return True
 
     def receive_trade(self):
-        pass
+        return True
 
     def send_mail(self):
-        pass
+        return True
 
     def receive_mail(self):
-        pass
+        return True
+
+    def open_close_bag(self):
+        return True
+
+    def check_overweight(self):
+        count = 100  # test
+        return count
+
+    def check_dbaits_count(self):
+        count = 100  # test
+        return count
+
+    def check_nbaits_count(self):
+        count = 100  # test
+        return count
+
+    def check_soski_count(self):
+        count = 100  # test
+        return count
