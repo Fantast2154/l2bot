@@ -5,17 +5,22 @@ from fisher.l2fisher import Fisher
 
 class FishingService:
     fishers = []
+    trader = None
     raised_error = False
     win_capture = None
 
-    def __init__(self, windows, wincap):
+    def __init__(self, windows, wincap, window_trader):
         self.send_message(f'TEST FishingService created')
         self.number_of_fishers = len(windows)
         self.q = Queue()
         self.wincap = wincap
+
         for window in windows:
             temp_fisher = Fisher(window, wincap, self.q)
             self.fishers.append(temp_fisher)
+
+        if window_trader:
+            self.trader = Fisher(window_trader, wincap, self.q)
 
         self.start_fishing()
 

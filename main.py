@@ -48,6 +48,11 @@ if __name__ == '__main__':
 
     n = len(name_list)
     print('number of l2 windows:', n)
+
+    if n == 0:
+        message_gui('THERE ARE NO L2 WINDOWS. STUPID BASTARD')
+        sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
+
     if n >= 2:
         m = 2
     else:
@@ -56,9 +61,10 @@ if __name__ == '__main__':
 
     if m > n:
         message_gui("I DON'T HAVE ENOUGH WINDOWS!")
+        sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
-    if m < 1 or m > 2:
-        message_gui('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY 1 OR 2 FISHERS! KEEP CALM!')
+    if n == 0:
+        message_gui('THERE ARE NO L2 WINDOWS. STUPID BASTARD')
         sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
     windows = []
@@ -74,8 +80,14 @@ if __name__ == '__main__':
         time.sleep(1)
 
     windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
+    if n > m:
+        window_trader = windows[m]
+    else:
+        window_trader = []
 
-    FishingService(windows_f, win_capture)
+    FishingService(windows_f, win_capture, window_trader)
+
+
     win_capture.stop()
     win_capture.join()
 

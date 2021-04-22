@@ -47,9 +47,10 @@ class Fisher:
         self.wincap = wincap
         self.window = window
         self.fisher_id = window.window_id
-        self.current_state = 0
-        self.lock = Lock()
         self.q = q
+        self.lock = Lock()
+        self.current_state = 0
+
         self.counter = 0
 
         self.image_database = [
@@ -223,7 +224,7 @@ class Fisher:
         # find window
         # if self.fishing_window_pos:
         #     self.timer_start_fishing = time.time()
-            # self.fishing_is_active = True
+        # self.fishing_is_active = True
         return self.fishing_window_pos
 
     def clock(self):
@@ -258,7 +259,7 @@ class Fisher:
         return self.day_time
 
     def turn_on_soski(self):
-        #check soski
+        # check soski
         return True
 
     def choose_night_bait(self):
@@ -305,3 +306,18 @@ class Fisher:
     def check_soski_count(self):
         count = 100  # test
         return count
+
+
+class Trader:
+
+    @classmethod
+    def send_message(cls, message):
+        print(message)
+
+    def __init__(self, window, wincap, q):
+        self.send_message(f'TEST trader {window.window_id} created')
+        self.wincap = wincap
+        self.window = window
+        self.trader_id = window.window_id
+        self.q = q
+        self.lock = Lock()
