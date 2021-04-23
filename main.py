@@ -45,7 +45,8 @@ if __name__ == '__main__':
 
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
     name_list, hash_list = get_l2windows_param(win_capture, l2window_name)
-
+    win_capture.windows_param = hash_list
+    print(hash_list)
     n = len(name_list)
     print('number of l2 windows:', n)
 
@@ -86,7 +87,6 @@ if __name__ == '__main__':
         window_trader = []
 
     FishingService(windows_f, win_capture, window_trader)
-
 
     win_capture.stop()
     win_capture.join()
