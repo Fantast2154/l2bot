@@ -41,13 +41,15 @@ def get_l2windows_param(wincap, l2window_name):
 if __name__ == '__main__':
 
     print('PROGRAM start--------------------------------------')
-    win_capture = WindowCapture()
-
+    win_capture = WindowCapture('Asterios')
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
-    name_list, hash_list = get_l2windows_param(win_capture, l2window_name)
+    '''  
     win_capture.windows_param = hash_list
     print(hash_list)
-    n = len(name_list)
+    '''
+    name_list, hash_list = get_l2windows_param(win_capture, l2window_name)
+
+    n = len(win_capture.game_windows)
     print('number of l2 windows:', n)
 
     if n == 0:
@@ -72,7 +74,7 @@ if __name__ == '__main__':
     for i in range(n):
         windows.append(L2window(i, name_list[i], hash_list[i]))
 
-    win_capture.set_windows(windows)
+    #win_capture.set_windows(windows)
     win_capture.start()
 
     delay = 3
