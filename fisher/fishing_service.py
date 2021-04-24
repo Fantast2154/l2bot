@@ -3,13 +3,18 @@ from queue import Queue
 from fisher.l2fisher import Fisher
 
 
+class Supplier:
+    def __init__(self, window_supplier, wincap, q):
+        pass
+
+
 class FishingService:
     fishers = []
-    trader = None
+    supplier = None
     raised_error = False
     win_capture = None
 
-    def __init__(self, windows, wincap, window_trader):
+    def __init__(self, windows, wincap, window_supplier):
         self.send_message(f'TEST FishingService created')
         self.number_of_fishers = len(windows)
         self.q = Queue()
@@ -19,8 +24,8 @@ class FishingService:
             temp_fisher = Fisher(window, wincap, self.q)
             self.fishers.append(temp_fisher)
 
-        if window_trader:
-            self.trader = Fisher(window_trader, wincap, self.q)
+        if window_supplier:
+            self.supplier = Supplier(window_supplier, wincap, self.q)
 
         self.start_fishing()
 
@@ -139,37 +144,38 @@ class FishingService:
                             (fisher.x_border, fisher.y_border) = coordinates
                             print(f'TEST coordinates red = {coordinates}')
 
-    def actions_while_not_fishing(self):  # abf
-        self.abf_check_buff()
-        self.abf_check_soski_clicked()
-        self.abf_check_fishing_problems()
-        self.abf_check_soski_baits_overweight()
+    def actions_while_not_fishing(self):
+        self.check_buff()
+        self.check_soski_clicked()
+        self.check_fishing_problems()
+        self.check_soski_baits_overweight()
 
-    def abf_check_buff(self):
+    def check_buff(self):
         for fisher in self.fishers:
             if fisher.rebuff_time():
                 fisher.rebuff()
 
-    def abf_check_soski_clicked(self):
+    def check_soski_clicked(self):
         pass
 
-    def abf_check_fishing_problems(self):
+    def check_fishing_problems(self):
         for fisher in self.fishers:
-            if fisher.is_not_fishing_too_long():  # 20 secs
+            if fisher.is_not_fishing_too_long():  # ~20 secs
                 fisher.change_bait()
 
-    def abf_check_soski_baits_overweight(self):
+    def check_soski_baits_overweight(self):
         for fisher in self.fishers:
-
+            if fisher.fishing_window():  # to all fishers: STOP FISHING
+                fisher.fishing()
+        for fisher in self.fishers:
             dbaits_count = fisher.check_dbaits_count()
             nbaits_count = fisher.check_nbaits_count()
             soski_count = fisher.check_soski_count()
             overweight = fisher.check_dbaits_count()
-
-    def abf_send_catched_fish(self):
+    def send_catched_fish(self):
         pass
 
-    def abf_receive_baits_soski(self):
+    def receive_baits_soski(self):
         pass
     # @classmethod
     # def raise_error(cls):

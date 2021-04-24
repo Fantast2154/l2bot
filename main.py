@@ -41,8 +41,9 @@ def get_l2windows_param(wincap, l2window_name):
 if __name__ == '__main__':
 
     print('PROGRAM start--------------------------------------')
-    win_capture = WindowCapture('Asterios')
-    l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
+    l2window_name = 'Asterios'
+    win_capture = WindowCapture(l2window_name)
+
     '''  
     win_capture.windows_param = hash_list
     print(hash_list)
@@ -84,11 +85,11 @@ if __name__ == '__main__':
 
     windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
     if n > m:
-        window_trader = windows[m]
+        window_supplier = windows[m]
     else:
-        window_trader = []
+        window_supplier = []
 
-    FishingService(windows_f, win_capture, window_trader)
+    FishingService(windows_f, win_capture, window_supplier)
 
     win_capture.stop()
     win_capture.join()

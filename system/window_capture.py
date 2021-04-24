@@ -8,7 +8,11 @@ from threading import Thread, Lock
 
 class WindowCapture(threading.Thread):
 
-    x_fishwin, y_fishwin, w_fishwin, h_fishwin = None, None, None, None
+    x_fishwin = []
+    y_fishwin = []
+    w_fishwin = []
+    h_fishwin = []
+
     accurate = False
     day_time = True
 
@@ -92,6 +96,13 @@ class WindowCapture(threading.Thread):
     def set_windows(self, windows_list):
         if windows_list:
             self.windows_list = windows_list
+
+    def set_fishing_window(self, id, x_fishwin, y_fishwin, w_fishwin, h_fishwin):
+        self.x_fishwin[id] = x_fishwin
+        self.y_fishwin[id] = y_fishwin
+        self.w_fishwin[id] = w_fishwin
+        self.h_fishwin[id] = h_fishwin
+
 
     def __del__(self):
         self.send_message(f'TEST ScreenshotMaster destroyed')
