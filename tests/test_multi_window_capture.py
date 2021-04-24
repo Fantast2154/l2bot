@@ -11,3 +11,7 @@ while not keyboard.is_pressed('q'):
         #print(len(wincap.imgs))
         cv2.imshow(f'{i}', img)
         cv2.waitKey(1)
+
+print('!')
+wincap.capture_screen()
+#wincap.start()

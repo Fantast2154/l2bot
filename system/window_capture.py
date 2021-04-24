@@ -7,6 +7,11 @@ from threading import Thread, Lock
 
 
 class WindowCapture(threading.Thread):
+
+    x_fishwin, y_fishwin, w_fishwin, h_fishwin = None, None, None, None
+    accurate = False
+    day_time = True
+
     stopped = True
     lock = None
     screenshot = []
@@ -32,7 +37,13 @@ class WindowCapture(threading.Thread):
         self.send_message(f'TEST ScreenshotMaster created\n')
         threading.Thread.__init__(self)
         self.exit = threading.Event()
-        self.screenshot = []
+        self.screenshots = []
+
+        self.fishing_window_pos_screenshots = []
+        self.clock_pos_screenshots = []
+        self.blue_bar_pos_screenshots = []
+        self.red_bar_pos_screenshots = []
+
         self.lock = Lock()
         self.imgs = []
         self.windows_param = []
@@ -87,14 +98,16 @@ class WindowCapture(threading.Thread):
 
     # @classmethod
     def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
+        #self.lock.acquire()
         self.imgs = []
-        #print('NUM', self.game_windows)
+        # print('NUM', self.game_windows)
         for game_window in self.game_windows:
             hwnd_l = game_window['hwnd']
             w = game_window['w']
             h = game_window['h']
             cropped_x = game_window['cropped_x']
             cropped_y = game_window['cropped_y']
+            #print('hwnd_l, w, h, cropped_x, cropped_y', hwnd_l, w, h, cropped_x, cropped_y)
             # get the window image data
             wDC = win32gui.GetWindowDC(hwnd_l)
             dcObj = win32ui.CreateDCFromHandle(wDC)
@@ -107,7 +120,7 @@ class WindowCapture(threading.Thread):
                 # dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
                 dataBitMap.CreateCompatibleBitmap(dcObj, ww, hh)
                 cDC.SelectObject(dataBitMap)
-                cDC.BitBlt((0, 0), (ww, hh), dcObj, (self.cropped_x + xx, self.cropped_y + yy), win32con.SRCCOPY)
+                cDC.BitBlt((0, 0), (ww, hh), dcObj, (cropped_x + xx, cropped_y + yy), win32con.SRCCOPY)
                 # cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
 
                 # convert the raw data into a format opencv can read
@@ -146,8 +159,9 @@ class WindowCapture(threading.Thread):
             # https://github.com/opencv/opencv/issues/14866#issuecomment-580207109
             img = np.ascontiguousarray(img)
             self.imgs.append(img)
+            #self.lock.release()
 
-            #return self.imgs
+        return self.imgs
 
     def list_window_names(self):
         temp = []
@@ -188,7 +202,24 @@ class WindowCapture(threading.Thread):
     def run(self):
         self.start_capturing()
         while not self.exit.is_set():
-            self.screenshot = self.capture_screen()
+            if not self.accurate:
+                self.screenshots = self.capture_screen()
+            else:
+                self.fishing_window_pos_screenshots = self.capture_screen(accurate=True,
+                                                                          object_position=(self.x_fishwin, self.y_fishwin),
+                                                                          object_size=(self.w_fishwin, self.h_fishwin))
+
+                self.clock_pos_screenshots = self.capture_screen(accurate=True,
+                                                                object_position=(self.x_fishwin + 107, self.y_fishwin + 217),
+                                                                object_size=(30, 30))
+
+                self.blue_bar_pos_screenshots = self.capture_screen(accurate=True,
+                                                                   object_position=(self.x_fishwin + 17, self.y_fishwin + 249),
+                                                                   object_size=(231, 14))
+                if not self.day_time:
+                    self.red_bar_pos_screenshots = self.capture_screen(accurate=True,
+                                                                      object_position=(self.x_fishwin + 17, self.y_fishwin + 249),
+                                                                      object_size=(231, 14))
 
     def stop(self):
         # self.send_message(f'TEST ScreenshotMaster stopped\n')

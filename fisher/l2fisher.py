@@ -42,6 +42,9 @@ class Fisher:
     mail_send_counter = 0
     mail_receive_counter = 0
 
+    # Boolean parameters
+    fishing_window_first_check = False
+
     def __init__(self, window, wincap, q):
         self.send_message(f'TEST fisher {window.window_id} created')
         self.wincap = wincap
@@ -54,8 +57,8 @@ class Fisher:
         self.counter = 0
 
         self.image_database = [
-            ['fishing', '../images/fishing.jpg', 0.8],
-            ['pumping', '../images/pumping.jpg', 0.87],
+            ['fishing', 'images/fishing.jpg', 0.8],
+            ['pumping', 'images/pumping.jpg', 0.87],
             ['reeling', 'images/reeling.jpg', 0.87],
             ['blue_bar', 'images/blue_bar2.jpg', 0.8],
             ['clock', 'images/clock3.jpg', 0.8],
@@ -93,11 +96,12 @@ class Fisher:
         self.send_message(f"TEST fisher {self.fisher_id} destroyed")
 
     def init_search(self):
-        try:
-            for key in self.library:
-                self.library[key][1] = self.library[key][0].find(self.update_full_screen())
-        except:
-            pass
+        #try:
+        for key in self.library:
+            print(key)
+            self.library[key][1] = self.library[key][0].find(self.update_full_screen())
+        #except:
+            #pass
 
     def init_params(self):
         self.day_time = True
@@ -154,27 +158,80 @@ class Fisher:
         pass
 
     def update_full_screen(self):
-        self.screenshot = self.wincap.get_screenshot(self.fisher_id)
+        print(len(self.wincap.imgs))
+        self.screenshot = self.wincap.capture_screen()[self.fisher_id]
         return self.screenshot
 
     def update_day_screen(self):
-        self.screenshot_fishing_window = self.wincap.get_screenshot(self.fisher_id)
-        self.screenshot_fishing_clock = self.wincap.get_screenshot(self.fisher_id)
-        self.screenshot_fishing_blue_bar = self.wincap.get_screenshot(self.fisher_id)
+        if not self.fishing_window_first_check:
+            x_fishwin, y_fishwin, w_fishwin, h_fishwin = self.fishing_window_first_check_func()
+
+            self.wincap.x_fishwin = x_fishwin
+            self.wincap.y_fishwin = y_fishwin
+            self.wincap.w_fishwin = w_fishwin
+            self.wincap.h_fishwin = h_fishwin
+            self.wincap.accurate = True
+
+        self.screenshot_fishing_window = self.wincap.fishing_window_pos_screenshots[self.fisher_id]
+        self.screenshot_fishing_clock = self.wincap.clock_pos_screenshots[self.fisher_id]
+        self.screenshot_fishing_blue_bar = self.wincap.blue_bar_pos_screenshots[self.fisher_id]
 
     def update_night_screen(self):
-        self.screenshot_fishing_window = self.wincap.get_screenshot(self.fisher_id)
-        self.screenshot_fishing_clock = self.wincap.get_screenshot(self.fisher_id)
-        self.screenshot_fishing_blue_bar = self.wincap.get_screenshot(self.fisher_id)
-        self.screenshot_fishing_red_bar = self.wincap.get_screenshot(self.fisher_id)
+        if not self.fishing_window_first_check:
+            x_fishwin, y_fishwin, w_fishwin, h_fishwin = self.fishing_window_first_check_func()
+
+            self.wincap.x_fishwin = x_fishwin
+            self.wincap.y_fishwin = y_fishwin
+            self.wincap.w_fishwin = w_fishwin
+            self.wincap.h_fishwin = h_fishwin
+            self.wincap.accurate = True
+
+        self.screenshot_fishing_window = self.wincap.fishing_window_pos_screenshots[self.fisher_id]
+        self.screenshot_fishing_clock = self.wincap.clock_pos_screenshots[self.fisher_id]
+        self.screenshot_fishing_blue_bar = self.wincap.blue_bar_pos_screenshots[self.fisher_id]
+        self.screenshot_fishing_red_bar = self.wincap.red_bar_pos_screenshots[self.fisher_id]
+
+    def fishing_window_first_check_func(self):
+        if not self.fishing_window_first_check:
+            while not self.fishing_window_first_check:
+                print('self.library', self.library)
+                fishing_pos = self.library['fishing'][1]
+                #skills_thread_processing(fishing_pos, slow=True)
+                #self.mouse_move(fishing_pos, slow=True)
+                time.sleep(1.5)
+                screenshot = self.update_full_screen()
+                cv2.imshow('Sc', screenshot)
+                cv2.waitKey(1)
+                fishing_window_coordinates_and_size = self.library['fishing_window'][0].find(screenshot, coordinates_and_sizes=True)
+
+                if fishing_window_coordinates_and_size:
+                    # print('fishing_window_coordinates_and_size', fishing_window_coordinates_and_size)
+                    [(x_fishwin, y_fishwin, w_fishwin, h_fishwin)] = fishing_window_coordinates_and_size
+                    self.fishing_window_first_check = True
+                    print('fishing_window_first_check', self.fishing_window_first_check)
+                    #self.mouse_move(fishing_pos, slow=True)
+                    return x_fishwin, y_fishwin, w_fishwin, h_fishwin
+                else:
+                    if self.day_time:
+                        pass
+                        #self.mouse_move(bait_colored, slow=True)
+                    else:
+                        pass
+                        #self.mouse_move(bait_luminous, slow=True)
+                    continue
 
     def init_images(self):
+        print('self.image_database', self.image_database)
         for obj in self.image_database:
-            try:
-                self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]
-                print([Vision(obj[1], obj[2]), None])
-            except:
-                pass
+            #try:
+            #print('obj', obj)
+            #print('obj[0]', obj[0])
+            #print('self.library', self.library)
+            #print('self.library[obj[0]]', self.library[obj[0]])
+            self.library[obj[0]] = [Vision(obj[1], obj[2]), None]
+            print([Vision(obj[1], obj[2]), None])
+            #except:
+               # pass
                 # print('Error finding images')
 
     def get_status(self):

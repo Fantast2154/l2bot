@@ -87,7 +87,7 @@ class FishingService:
             if fisher.daytime():
                 pass
                 # print(f'TEST fisher {fisher.fisher_id} day time')
-                # fisher.update_day_screen()
+                fisher.update_day_screen()
             else:
                 fisher.update_night_screen()
 
