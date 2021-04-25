@@ -32,6 +32,7 @@ class Fisher:
     blue_bar_pos = None
 
     # fishing_params
+    fishing_is_allowed = False
     day_time = True
     fishing_is_active = 0
     x_border = 0
@@ -98,7 +99,7 @@ class Fisher:
     def init_search(self):
         # try:
         for key in self.library:
-            print(key)
+            # print(key)
             self.library[key][1] = self.library[key][0].find(self.update_full_screen())
         # except:
         # pass
@@ -116,6 +117,7 @@ class Fisher:
         self.mail_receive_constant = 1000
         self.mail_send_counter = 0
         self.mail_receive_counter = 0
+        self.fishing_is_allowed = False
 
     @classmethod
     def send_message(cls, message):
@@ -158,8 +160,9 @@ class Fisher:
         pass
 
     def update_full_screen(self):
-        print(len(self.wincap.imgs))
-        self.screenshot = self.wincap.capture_screen()[self.fisher_id]
+        # print(len(self.wincap.imgs))
+        self.screenshot = self.wincap.capture_screen()
+        # self.screenshot = self.wincap.capture_screen[self.fisher_id]
         return self.screenshot
 
     def update_day_screen(self):
@@ -181,8 +184,8 @@ class Fisher:
     def fishing_window_first_check_func(self):
         # if not self.fishing_window_first_check:
         #     while not self.fishing_window_first_check:
-        print('self.library', self.library)
-        fishing_pos = self.library['fishing'][1]
+        # print('self.library', self.library)
+        # fishing_pos = self.library['fishing'][1]
         # skills_thread_processing(fishing_pos, slow=True)
         # self.mouse_move(fishing_pos, slow=True)
         time.sleep(1.5)
@@ -191,9 +194,9 @@ class Fisher:
         cv2.waitKey(1)
         fishing_window_coordinates_and_size = self.library['fishing_window'][0].find(screenshot,
                                                                                      coordinates_and_sizes=True)
-
+        print('fishing_window_coordinates_and_size', fishing_window_coordinates_and_size)
         if fishing_window_coordinates_and_size:
-            # print('fishing_window_coordinates_and_size', fishing_window_coordinates_and_size)
+            print('fishing_window_coordinates_and_size', fishing_window_coordinates_and_size)
             [(x_fishwin, y_fishwin, w_fishwin, h_fishwin)] = fishing_window_coordinates_and_size
             # self.fishing_window_first_check = True
             # print('fishing_window_first_check', self.fishing_window_first_check)
@@ -209,7 +212,7 @@ class Fisher:
             # continue
 
     def init_images(self):
-        print('self.image_database', self.image_database)
+        # print('self.image_database', self.image_database)
         for obj in self.image_database:
             # try:
             # print('obj', obj)
@@ -217,7 +220,7 @@ class Fisher:
             # print('self.library', self.library)
             # print('self.library[obj[0]]', self.library[obj[0]])
             self.library[obj[0]] = [Vision(obj[1], obj[2]), None]
-            print([Vision(obj[1], obj[2]), None])
+            # print([Vision(obj[1], obj[2]), None])
             # except:
             # pass
             # print('Error finding images')
@@ -247,9 +250,17 @@ class Fisher:
 
         x_fishwin, y_fishwin, w_fishwin, h_fishwin = self.fishing_window_first_check_func()
         self.wincap.set_fishing_window(self.fisher_id, x_fishwin, y_fishwin, w_fishwin, h_fishwin)
+        self.fishing_is_allowed = True
+
+    def pause_fishing(self):
+        self.fishing_is_allowed = False
+
+    def resume_fishing(self):
+        self.fishing_is_allowed = True
 
     def stop_fishing(self):
         # before stop fishing
+        self.fishing_is_allowed = False
         self.send_message(f'TEST fisher {self.fisher_id} has finished fishing\n')
 
     def is_not_fishing_too_long(self):
@@ -294,11 +305,12 @@ class Fisher:
         self.red_bar_pos = None
         return self.red_bar_pos
 
+    def fishing(self):
+        self.timer_start_fishing = time.time()
+        self.send_message(f'TEST fisher {self.fisher_id} CLICK start fishing\n')
+
     def pumping(self, count):
         pass
-
-    def fishing(self):
-        self.send_message(f'TEST fisher {self.fisher_id} CLICK start fishing\n')
 
     def reeling(self, count):
         pass
@@ -354,7 +366,6 @@ class Fisher:
     def check_soski_count(self):
         count = 100  # test
         return count
-
 
 class Trader:
 

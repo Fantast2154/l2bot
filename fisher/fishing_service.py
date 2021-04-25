@@ -81,16 +81,21 @@ class FishingService:
                 self.q.get()
                 continue
 
-            self.fishers_update_fishingwindow_clock_bars()
+            for fisher in self.fishers:
+                if not fisher.fishing_is_allowed:
+                    continue
+
+            self.fisher_update_vision()
 
             self.fishers_check_fishingwindow()
 
-            self.fishers_check_clock_bars()
+            self.actions_while_not_fishing()
 
-    def fishers_update_fishingwindow_clock_bars(self):
+            self.fishers_check_clock_and_bars()
+
+    def fisher_update_vision(self):
         for fisher in self.fishers:
             if fisher.daytime():
-                pass
                 # print(f'TEST fisher {fisher.fisher_id} day time')
                 fisher.update_day_screen()
             else:
@@ -99,7 +104,6 @@ class FishingService:
     def fishers_check_fishingwindow(self):
         for fisher in self.fishers:
             if not fisher.fishing_window() and fisher.resting() > fisher.max_rest_time:
-                self.actions_while_not_fishing()
 
                 time.sleep(2)  # test
                 print(f'TEST fisher {fisher.fisher_id} fishing_window check')
@@ -117,7 +121,7 @@ class FishingService:
 
                 fisher.fishing()
 
-    def fishers_check_clock_bars(self):
+    def fishers_check_clock_and_bars(self):
         for fisher in self.fishers:
             if fisher.clock():
                 time.sleep(2)  # test
@@ -145,10 +149,12 @@ class FishingService:
                             print(f'TEST coordinates red = {coordinates}')
 
     def actions_while_not_fishing(self):
-        self.check_buff()
-        self.check_soski_clicked()
-        self.check_fishing_problems()
-        self.check_soski_baits_overweight()
+        for fisher in self.fishers:
+            if not fisher.fishing_window() and fisher.resting() > fisher.max_rest_time:
+                self.check_buff()
+                self.check_soski_clicked()
+                self.check_fishing_problems()
+                self.check_soski_baits_overweight()
 
     def check_buff(self):
         for fisher in self.fishers:
@@ -165,18 +171,20 @@ class FishingService:
 
     def check_soski_baits_overweight(self):
         for fisher in self.fishers:
-            if fisher.fishing_window():  # to all fishers: STOP FISHING
-                fisher.fishing()
+            fisher.pause_fishing()  # to all fishers: STOP FISHING
+
         for fisher in self.fishers:
             dbaits_count = fisher.check_dbaits_count()
             nbaits_count = fisher.check_nbaits_count()
             soski_count = fisher.check_soski_count()
             overweight = fisher.check_dbaits_count()
+
     def send_catched_fish(self):
         pass
 
     def receive_baits_soski(self):
         pass
+
     # @classmethod
     # def raise_error(cls):
     #     cls.send_message(f'TEST raise_error calling')

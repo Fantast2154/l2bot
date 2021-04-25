@@ -1,3 +1,5 @@
+import win32gui
+
 from fisher.fishing_service import FishingService
 from system.telegram import Telegram
 from system.l2window import L2window
@@ -25,11 +27,24 @@ def input_number(message):
             return userInput
 
 
-def get_l2windows_param(wincap, l2window_name):
+def list_window_names():
+
+    temp = []
+
+    def winEnumHandler(hwnd, ctx):
+        if win32gui.IsWindowVisible(hwnd):
+            temp.append([hwnd, win32gui.GetWindowText(hwnd)])
+
+    win32gui.EnumWindows(winEnumHandler, None)
+    return temp
+
+
+def get_l2windows_param(l2window_name):
+
     hash_list = []
     name_list = []
-    wincap.list_window_names()  # СПИСОК ВСЕХ ДОСТУПНЫХ ОКОН
-    list_all_windows = wincap.get_windows_param()
+
+    list_all_windows = list_window_names()
     for window in list_all_windows:
         if window[1] == l2window_name:
             name_list.append(window[1])
@@ -42,13 +57,9 @@ if __name__ == '__main__':
 
     print('PROGRAM start--------------------------------------')
     l2window_name = 'Asterios'
-    win_capture = WindowCapture(l2window_name)
 
-    '''  
-    win_capture.windows_param = hash_list
-    print(hash_list)
-    '''
-    name_list, hash_list = get_l2windows_param(win_capture, l2window_name)
+
+    name_list, hash_list = get_l2windows_param(l2window_name)
 
     n = len(win_capture.game_windows)
     print('number of l2 windows:', n)
@@ -75,7 +86,7 @@ if __name__ == '__main__':
     for i in range(n):
         windows.append(L2window(i, name_list[i], hash_list[i]))
 
-    #win_capture.set_windows(windows)
+    win_capture = WindowCapture(windows)
     win_capture.start()
 
     delay = 3

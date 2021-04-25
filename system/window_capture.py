@@ -5,6 +5,29 @@ import win32ui
 import win32con
 from threading import Thread, Lock
 
+from system.l2window import L2window
+
+
+class L2window_optimized:
+    def __init__(self, window):
+        print(f'TEST L2window {window.window_id} created')
+        self.window_id = window.window_id
+        self.window_name = window.window_name
+        self.hwnd = window.hwnd
+
+        window_rect = win32gui.GetWindowRect(window.hwnd)
+        border_pixels = 8
+        titlebar_pixels = 30
+        self.my_x = window_rect[0]
+        self.my_y = window_rect[1]
+        self.w = window_rect[2] - self.my_x - (border_pixels * 2)
+        self.h = window_rect[3] - self.my_y - titlebar_pixels - border_pixels
+        self.w_init = window_rect[2] - self.my_x
+        self.h_init = window_rect[3] - self.my_y
+        self.cropped_x = border_pixels
+        self.cropped_y = titlebar_pixels
+        self.offset_x = self.my_x + self.cropped_x
+        self.offset_y = self.my_y + self.cropped_y
 
 class WindowCapture(threading.Thread):
 
@@ -36,62 +59,48 @@ class WindowCapture(threading.Thread):
 
     windows_param = []
     windows_list = []
+    game_windows = []
+    new_windows = []
 
-    def __init__(self, window_name=None):
+    def __init__(self, windows):
+        # window_name=None
+
         self.send_message(f'TEST ScreenshotMaster created\n')
         threading.Thread.__init__(self)
         self.exit = threading.Event()
-        self.screenshots = []
 
         self.fishing_window_pos_screenshots = []
         self.clock_pos_screenshots = []
         self.blue_bar_pos_screenshots = []
         self.red_bar_pos_screenshots = []
-
-        self.lock = Lock()
+        self.screenshots = []
         self.imgs = []
-        self.windows_param = []
-        self.game_windows = []
+        self.lock = Lock()
+
+        for window in windows:
+            self.game_windows.append(L2window_optimized(window))
+
+        # self.game_windows = windows
+        # self.windows_param = []
 
         # find the handle for the window we want to capture.
         # if no window name is given, capture the entire screen
-        if window_name is None:
-            self.hwnd = win32gui.GetDesktopWindow()
-            self.windows_param.append(self.hwnd)
-        else:
-            _, self.windows_param = self.get_l2windows_param(window_name)
-            for _ in self.windows_param:
-                self.game_windows.append({})
-            self.hwnd = win32gui.FindWindow(None, window_name)
-            if not self.hwnd:
-                raise Exception('Window not found: {}'.format(window_name))
+        # if window_name is None:
+        #     self.hwnd = win32gui.GetDesktopWindow()
+        #     self.windows_param.append(self.hwnd)
+        # else:
+        #     _, self.windows_param = self.get_l2windows_param(window_name)
+        #     for _ in self.windows_param:
+        #         self.game_windows.append({})
+        # self.hwnd = win32gui.FindWindow(None, window_name)
+        # if not self.hwnd:
+        #     raise Exception('Window not found: {}'.format(window_name))
 
-        for id, hwnd_l in enumerate(self.windows_param):
-            self.game_windows[id]['hwnd'] = hwnd_l
 
-            # get the window size
-            window_rect = win32gui.GetWindowRect(hwnd_l)
-            self.game_windows[id]['w'] = window_rect[2] - window_rect[0]
-            self.game_windows[id]['h'] = window_rect[3] - window_rect[1]
-            self.game_windows[id]['w_init'] = window_rect[2] - window_rect[0]
-            self.game_windows[id]['h_init'] = window_rect[3] - window_rect[1]
-            self.game_windows[id]['my_x'] = window_rect[0]
-            self.game_windows[id]['my_y'] = window_rect[1]
 
-            if not window_name is None:
-                # account for the window border and titlebar and cut them off
-                border_pixels = 8
-                titlebar_pixels = 30
-                self.game_windows[id]['w'] = self.game_windows[id]['w'] - (border_pixels * 2)
-                self.game_windows[id]['h'] = self.game_windows[id]['h'] - titlebar_pixels - border_pixels
-                self.game_windows[id]['cropped_x'] = border_pixels
-                self.game_windows[id]['cropped_y'] = titlebar_pixels
-
-                # set the cropped coordinates offset so we can translate screenshot
-                # images into actual screen positions
-
-                self.game_windows[id]['offset_x'] = window_rect[0] + self.game_windows[id]['cropped_x']
-                self.game_windows[id]['offset_y'] = window_rect[1] + self.game_windows[id]['cropped_y']
+    @classmethod
+    def send_message(cls, message):
+        print(message)
 
     def set_windows(self, windows_list):
         if windows_list:
@@ -103,13 +112,12 @@ class WindowCapture(threading.Thread):
         self.w_fishwin[id] = w_fishwin
         self.h_fishwin[id] = h_fishwin
 
-
     def __del__(self):
         self.send_message(f'TEST ScreenshotMaster destroyed')
 
     # @classmethod
     def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
-        #self.lock.acquire()
+        # self.lock.acquire()
         self.imgs = []
         # print('NUM', self.game_windows)
         for game_window in self.game_windows:
@@ -118,7 +126,7 @@ class WindowCapture(threading.Thread):
             h = game_window['h']
             cropped_x = game_window['cropped_x']
             cropped_y = game_window['cropped_y']
-            #print('hwnd_l, w, h, cropped_x, cropped_y', hwnd_l, w, h, cropped_x, cropped_y)
+            # print('hwnd_l, w, h, cropped_x, cropped_y', hwnd_l, w, h, cropped_x, cropped_y)
             # get the window image data
             wDC = win32gui.GetWindowDC(hwnd_l)
             dcObj = win32ui.CreateDCFromHandle(wDC)
@@ -170,7 +178,7 @@ class WindowCapture(threading.Thread):
             # https://github.com/opencv/opencv/issues/14866#issuecomment-580207109
             img = np.ascontiguousarray(img)
             self.imgs.append(img)
-            #self.lock.release()
+            # self.lock.release()
 
         return self.imgs
 
@@ -194,7 +202,7 @@ class WindowCapture(threading.Thread):
             if window[1] == l2window_name:
                 name_list.append(window[1])
                 hash_list.append(window[0])
-                print(window)
+                # print(window)
         return name_list, hash_list
 
     def get_windows_param(self):
@@ -217,20 +225,24 @@ class WindowCapture(threading.Thread):
                 self.screenshots = self.capture_screen()
             else:
                 self.fishing_window_pos_screenshots = self.capture_screen(accurate=True,
-                                                                          object_position=(self.x_fishwin, self.y_fishwin),
+                                                                          object_position=(
+                                                                              self.x_fishwin, self.y_fishwin),
                                                                           object_size=(self.w_fishwin, self.h_fishwin))
 
                 self.clock_pos_screenshots = self.capture_screen(accurate=True,
-                                                                object_position=(self.x_fishwin + 107, self.y_fishwin + 217),
-                                                                object_size=(30, 30))
+                                                                 object_position=(
+                                                                     self.x_fishwin + 107, self.y_fishwin + 217),
+                                                                 object_size=(30, 30))
 
                 self.blue_bar_pos_screenshots = self.capture_screen(accurate=True,
-                                                                   object_position=(self.x_fishwin + 17, self.y_fishwin + 249),
-                                                                   object_size=(231, 14))
+                                                                    object_position=(
+                                                                        self.x_fishwin + 17, self.y_fishwin + 249),
+                                                                    object_size=(231, 14))
                 if not self.day_time:
                     self.red_bar_pos_screenshots = self.capture_screen(accurate=True,
-                                                                      object_position=(self.x_fishwin + 17, self.y_fishwin + 249),
-                                                                      object_size=(231, 14))
+                                                                       object_position=(
+                                                                           self.x_fishwin + 17, self.y_fishwin + 249),
+                                                                       object_size=(231, 14))
 
     def stop(self):
         # self.send_message(f'TEST ScreenshotMaster stopped\n')
