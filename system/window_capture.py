@@ -76,6 +76,7 @@ class WindowCapture():
         self.red_bar_pos_screenshots = []
         self.screenshots = []
         self.imgs = []
+        self.sreenshots_dict = {}
         self.lock = Lock()
 
         for window in windows:
@@ -184,6 +185,7 @@ class WindowCapture():
             # https://github.com/opencv/opencv/issues/14866#issuecomment-580207109
             img = np.ascontiguousarray(img)
             self.imgs.append(img)
+            self.sreenshots_dict[hwnd_l] = img
             #self.lock.release()
 
         return self.imgs
