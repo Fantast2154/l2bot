@@ -58,10 +58,9 @@ if __name__ == '__main__':
     print('PROGRAM start--------------------------------------')
     l2window_name = 'Asterios'
 
-
     name_list, hash_list = get_l2windows_param(l2window_name)
-
-    n = len(win_capture.game_windows)
+    print(name_list, hash_list)
+    n = len(hash_list)
     print('number of l2 windows:', n)
 
     if n == 0:
@@ -87,7 +86,8 @@ if __name__ == '__main__':
         windows.append(L2window(i, name_list[i], hash_list[i]))
 
     win_capture = WindowCapture(windows)
-    win_capture.start()
+    #win_capture.start()
+    win_capture.start_capturing()
 
     delay = 3
     for i in range(delay):
