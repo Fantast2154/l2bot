@@ -1,2 +1,3 @@
 class Telegram:
-    pass
+    def __init__(self):
+        print('PRIVET!!!!')
