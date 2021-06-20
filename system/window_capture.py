@@ -291,6 +291,6 @@ class WindowCapture():
 if __name__ == '__main__':
     hwnd = win32gui.FindWindow(None, 'Asterios')
     print(hwnd)
-    w = L2window(0, 'Asterios', 23470186)
+    w = L2window(0, 'Asterios', hwnd)
     win = WindowCapture([w])
     win.capture_screen()
