@@ -1,53 +1,71 @@
 import time
-from queue import Queue
+import threading
+
 from fisher.l2fisher import Fisher
+from system.action_queue import *
+
+from fisher.fishing_window import FishingWindow
+from system.action_queue import ActionQueue
 
 
-class Supplier:
-    def __init__(self, window_supplier, wincap, q):
-        pass
-
+# self.send_message(f'{self!r}')
 
 class FishingService:
+    number_of_fishers = 0
     fishers = []
-    supplier = None
+    fishing_windows = []
     raised_error = False
+    q = None
     win_capture = None
 
-    def __init__(self, windows, wincap, window_supplier):
+    def __new__(cls, number_of_fishers, windows, q):
+        if number_of_fishers < 1 or number_of_fishers > 2 or number_of_fishers != len(windows):
+            # warning
+            return None
+        return super(FishingService, cls).__new__(cls)
+
+    def __init__(self, number_of_fishers, windows, q):
         self.send_message(f'TEST FishingService created')
-        self.number_of_fishers = len(windows)
-        self.q = Queue()
-        self.wincap = wincap
+        q.activate_l2windows(windows)
+        for fisher_id in range(number_of_fishers):
 
-        for window in windows:
-            temp_fisher = Fisher(window, wincap, self.q)
+            win_capture = windows[fisher_id].wincap
+            window_name = windows[fisher_id].window_name
+            hwnd = windows[fisher_id].hwnd
+            temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd)
+            self.fishing_windows.append(temp_fishing_window)
+
+            temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
+            # temp_fisher.start()
+
             self.fishers.append(temp_fisher)
+            self.win_capture = win_capture
 
-        if window_supplier:
-            self.supplier = Supplier(window_supplier, wincap, self.q)
-
+        self.number_of_fishers = number_of_fishers
+        self.q = q
         self.start_fishing()
 
     def __del__(self):
         self.send_message("TEST FishingService destroyed")
+
         del self
 
     @classmethod
     def send_message(cls, message):
         print(message)
 
-    def start_fishing(self, fishers_list=None):
-        self.send_message(f'TEST FishingService start_fishing() calling')
+    @classmethod
+    def start_fishing(cls, fishers_list=None):
+        cls.send_message(f'TEST FishingService start_fishing() calling')
         if fishers_list is None:
-            for fisher in self.fishers:
-                fisher.start_fishing()
-
+            for fisher in cls.fishers:
+                fisher.start()
+                # fisher.start_fishing()
         else:
             for fisher in fishers_list:
-                fisher.start_fishing()
-
-        self.run_loop()
+                fisher.start()
+                # fisher.start_fishing()
+        cls.run_loop()
 
     @classmethod
     def stop_fishing(cls, fishers_list=None):
@@ -55,156 +73,40 @@ class FishingService:
         if fishers_list is None:
             for fisher in cls.fishers:
                 fisher.stop_fishing()
+                # fisher.join()
 
         else:
             for fisher in fishers_list:
                 fisher.stop_fishing()
+                # fisher.join()
 
-    # @classmethod
-    # def fisher_response(cls, response):
-    #
-    #     if response == 0:  # OK
-    #         pass
-    #     if response == 1:  # stopped fishing
-    #         cls.send_message(f'TEST FishingService fisher_response(response) calling')
-    #         cls.raise_error()
-    #     if response == 2:  # fatal problem
-    #         cls.send_message(f'TEST FishingService fisher_response(response) calling')
-    #         cls.raise_error()
+        del cls.fishers
+        del cls.fishing_windows
 
-    def run_loop(self):
+    @classmethod
+    def fisher_response(cls, response):
 
+        if response == 0:  # OK
+            pass
+        if response == 1:  # stopped fishing
+            cls.send_message(f'TEST FishingService fisher_response(response) calling')
+            cls.raise_error()
+        if response == 2:  # fatal problem
+            cls.send_message(f'TEST FishingService fisher_response(response) calling')
+            cls.raise_error()
+
+    @classmethod
+    def run_loop(cls):
+        # cls.send_message(f'TEST FishingService run_loop() calling')
         while True:
+            for fisher in cls.fishers:
+                cls.fisher_response(fisher.current_state)
 
-            if self.q.qsize() > 0:
-                # print('Qsize = ', self.q.qsize())
-                self.q.get()
-                continue
+            if cls.raised_error:
+                cls.stop_fishing()
+                break
 
-            for fisher in self.fishers:
-                if not fisher.fishing_is_allowed:
-                    continue
-
-            self.fisher_update_vision()
-
-            self.fishers_check_fishingwindow()
-
-            self.actions_while_not_fishing()
-
-            self.fishers_check_clock_and_bars()
-
-    def fisher_update_vision(self):
-        for fisher in self.fishers:
-            if fisher.daytime():
-                # print(f'TEST fisher {fisher.fisher_id} day time')
-                fisher.update_day_screen()
-            else:
-                fisher.update_night_screen()
-
-    def fishers_check_fishingwindow(self):
-        for fisher in self.fishers:
-            if not fisher.fishing_window() and fisher.resting() > fisher.max_rest_time:
-
-                time.sleep(2)  # test
-                print(f'TEST fisher {fisher.fisher_id} fishing_window check')
-                x = fisher.window.left_top_x + 100  # test
-                y = fisher.window.left_top_y + 100  # test
-                fisher.fishing_window_pos = [(x, y)]  # test
-
-                x = fisher.window.left_top_x + 111  # test
-                y = fisher.window.left_top_y + 111  # test
-                fisher.clock_pos = [(x, y)]  # test
-
-                x = fisher.window.left_top_x + 222  # test
-                y = fisher.window.left_top_y + 222  # test
-                fisher.blue_bar_pos = [(x, y)]  # test
-
-                fisher.fishing()
-
-    def fishers_check_clock_and_bars(self):
-        for fisher in self.fishers:
-            if fisher.clock():
-                time.sleep(2)  # test
-                blue_bar_pos = fisher.blue_bar()
-                if fisher.daytime():
-                    if blue_bar_pos:
-                        for coordinates in blue_bar_pos:
-                            (fisher.x_border, fisher.y_border) = coordinates
-                            print(f'TEST coordinates blue = {coordinates}')
-                            fisher.q.put(fisher.mouse_move([(fisher.x_border, fisher.y_border)]))
-
-                            x = fisher.window.left_top_x + 100  # test
-                            y = fisher.window.left_top_y + 100  # test
-                            fisher.fishing_window_pos = [(x, y)]  # test
-                else:
-                    red_bar_pos = fisher.red_bar()
-                    if blue_bar_pos:
-                        for coordinates in blue_bar_pos:
-                            (fisher.x_border, fisher.y_border) = coordinates
-                            print(f'TEST coordinates blue = {coordinates}')
-                            fisher.q.put(fisher.mouse_move([(fisher.x_border, fisher.y_border)]))
-                    if red_bar_pos:
-                        for coordinates in red_bar_pos:
-                            (fisher.x_border, fisher.y_border) = coordinates
-                            print(f'TEST coordinates red = {coordinates}')
-
-    def actions_while_not_fishing(self):
-        for fisher in self.fishers:
-            if not fisher.fishing_window() and fisher.resting() > fisher.max_rest_time:
-                self.check_buff()
-                self.check_soski_clicked()
-                self.check_fishing_problems()
-                self.check_soski_baits_overweight()
-
-    def check_buff(self):
-        for fisher in self.fishers:
-            if fisher.rebuff_time():
-                fisher.rebuff()
-
-    def check_soski_clicked(self):
-        pass
-
-    def check_fishing_problems(self):
-        for fisher in self.fishers:
-            if fisher.is_not_fishing_too_long():  # ~20 secs
-                fisher.change_bait()
-
-    def check_soski_baits_overweight(self):
-        for fisher in self.fishers:
-            fisher.pause_fishing()  # to all fishers: STOP FISHING
-
-        for fisher in self.fishers:
-            dbaits_count = fisher.check_dbaits_count()
-            nbaits_count = fisher.check_nbaits_count()
-            soski_count = fisher.check_soski_count()
-            overweight = fisher.check_dbaits_count()
-
-    def send_catched_fish(self):
-        pass
-
-    def receive_baits_soski(self):
-        pass
-
-    # @classmethod
-    # def raise_error(cls):
-    #     cls.send_message(f'TEST raise_error calling')
-    #     cls.raised_error = True
-    #     cls.stop_fishing()
-
-
-def message_gui(message):
-    print(message)
-
-
-def input_number(message):
-    while True:
-        try:
-            userInput = int(input(message))
-            if userInput < 0:
-                print('The value must be >= 0')
-                continue
-        except ValueError:
-            print("Not an integer! Try again.")
-            continue
-        else:
-            return userInput
+    @classmethod
+    def raise_error(cls):
+        cls.send_message(f'TEST raise_error calling')
+        cls.raised_error = True
