@@ -19,10 +19,10 @@ class ActionQueue(threading.Thread):
     priority_list = []
     action_rate_list = []
 
-    def __init__(self, wincap):
-        self.send_message(f'TEST Queue created\n')
+    def __init__(self):
+        self.send_message(f'Queue created\n')
         threading.Thread.__init__(self)
-        self.action_service = ActionService(wincap)
+        # self.action_service = ActionService(wincap)
         self.lock = Lock()
         self.exit = threading.Event()
         # self.queue_list = queue.Queue()
@@ -44,9 +44,9 @@ class ActionQueue(threading.Thread):
         except:
             print('TEST queue window activation error')
 
-    @classmethod
-    def send_message(cls, message):
-        print(message)
+    def send_message(self, message):
+        temp = 'ActionQueue' + ': ' + message
+        print(temp)
 
     def new_task(self, count, action, action_param, window, priority='Normal', action_rate='High'):
         self.queue_list.append(count)
@@ -67,15 +67,15 @@ class ActionQueue(threading.Thread):
 
         win32api.SetCursorPos((x, y))
         time.sleep(0.01)
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-        time.sleep(0.01)
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+        # time.sleep(0.01)
+        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
 
     def task_execution(self, count, action, params, window, action_rate='High'):
         #try:
         # print('Qsize = ', len(self.queue_list))
         self.lock.acquire()
-        # time.sleep(0.01)
+        time.sleep(0.01)
         # print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
 
         win32gui.SetForegroundWindow(window.hwnd)

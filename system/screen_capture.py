@@ -42,7 +42,7 @@ class ScreenCapture(threading.Thread):
         else:
             self.hwnd = win32gui.FindWindow(None, window_name)
             if not self.hwnd:
-                raise Exception('Window not found: {}'.format(window_name))
+                self.send_message(f'Window not found: {window_name}')
 
         # get the window size
         window_rect = win32gui.GetWindowRect(self.hwnd)
@@ -147,9 +147,9 @@ class ScreenCapture(threading.Thread):
     def get_screenshot(self, id):
         return self.screenshot
 
-    @classmethod
-    def send_message(cls, message):
-        print(message)
+    def send_message(self, message):
+        temp = 'screen_capture' + ': ' + message
+        print(temp)
 
     def start_capturing(self):
         pass

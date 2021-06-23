@@ -4,12 +4,15 @@ from system.l2window import L2window
 from system.screen_capture import ScreenCapture
 from system.action_queue import ActionQueue
 # from tests.test_queue_shefer import ActionQueue
+from system.window_capture import WindowCapture
+import win32gui
 import sys
 import time
 
 
-def message_gui(message):
-    print(message)
+def send_message(message):
+    temp = 'MAIN' + ': ' + message
+    print(temp)
 
 
 def input_number(message):
@@ -26,51 +29,43 @@ def input_number(message):
             return userInput
 
 
-def get_l2windows_param(wincap, l2window_name):
-    hash_list = []
-    name_list = []
-    wincap.list_window_names()  # СПИСОК ВСЕХ ДОСТУПНЫХ ОКОН
-    list_all_windows = wincap.get_windows_param()
-    for window in list_all_windows:
-        if window[1] == l2window_name:
-            name_list.append(window[1])
-            hash_list.append(window[0])
-            print(window)
-    return name_list, hash_list
-
-
 if __name__ == '__main__':
 
     print('PROGRAM start--------------------------------------')
-    win_capture = ScreenCapture()
-    queue = ActionQueue(win_capture)
-
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
-    name_list, hash_list = get_l2windows_param(win_capture, l2window_name)
+    # win_capture = ScreenCapture()
+    win_capture = WindowCapture(l2window_name)
+    queue = ActionQueue()
 
-    # n = input_number('number of l2 windows: ')
+    # searching running L2 windows
+
+    name_list, hash_list = win_capture.get_l2windows_param()
+
     n = len(name_list)
     print('number of l2 windows:', n)
-    if n >= 2:
-        m = 2  # m = input_number('')
+    if n >= 3:
+        m = 3  # number of fishers
     else:
-        m = n
+        m = n  # number of fishers
     print('number of fishers: ', m)
 
     if m > n:
-        message_gui("I DON'T HAVE ENOUGH WINDOWS!")
+        send_message("I DON'T HAVE ENOUGH WINDOWS!")
 
-    if m < 1 or m > 2:
-        message_gui('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY 1 OR 2 FISHERS! KEEP CALM!')
+    if m < 1 or m > 3:
+        send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY 1 OR 2 FISHERS! KEEP CALM!')
         sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
+    # create n windows L2
     windows = []
     for i in range(n):
         windows.append(L2window(i, win_capture, name_list[i], hash_list[i]))
 
     win_capture.set_windows(windows)
+
+    # start capturing screenshots
     queue.start()
-    win_capture.start()
+    win_capture.start_capturing()
 
     delay = 3
     for i in range(delay):
@@ -82,11 +77,6 @@ if __name__ == '__main__':
     queue.stop()
     queue.join()
     win_capture.stop()
-    win_capture.join()
-
-
-
-
 
     del windows
 

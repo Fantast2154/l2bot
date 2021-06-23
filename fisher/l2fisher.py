@@ -18,7 +18,6 @@ class Fisher(threading.Thread):
     last_buff_time = time.time()
 
     def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
-        self.send_message(f'TEST fisher {fisher_id} created')
         threading.Thread.__init__(self)
         self.exit = threading.Event()
         self.fishing_window = fishing_window
@@ -26,13 +25,14 @@ class Fisher(threading.Thread):
         self.number_of_fishers = number_of_fishers
         self.current_state = 0
         self.q = q
+        self.send_message(f'created')
 
     def __del__(self):
-        self.send_message(f"TEST fisher {self.fisher_id} destroyed")
+        self.send_message(f"destroyed")
 
-    @classmethod
-    def send_message(cls, message):
-        print(message)
+    def send_message(self, message):
+        temp = 'Fisher' + f' {self.fisher_id}' + ': ' + message
+        print(temp)
 
     def test_action(self, count):
         self.q.new_task(count, self.fishing_window)
@@ -45,8 +45,9 @@ class Fisher(threading.Thread):
             count += 1
 
             time.sleep(0.1)
-            print('ACTION', count)
             self.fishing_window.update_screenshot()
+            # cv2.imshow(f'fisher {self.fisher_id}', self.fishing_window.screenshot)
+            # cv2.waitKey(1)
             if count < 300:
                 rand = self.fisher_id + 1
                 if rand == 1:
@@ -68,8 +69,6 @@ class Fisher(threading.Thread):
     #             self.rebuff()
 
 
-
-
     def get_status(self):
         return self.current_state
 
@@ -79,9 +78,9 @@ class Fisher(threading.Thread):
 
     def start_fishing(self):
         delay = 3
-        print(f'The fisher {self.fisher_id} will start in ........ {delay} sec')
+        self.send_message(f'will start fishing in ........ {delay} sec')
         time.sleep(delay)
-        self.send_message(f'TEST fisher {self.fisher_id} starts fishing\n')
+        self.send_message(f'starts fishing\n')
         self.stopped = False
 
         # before start fishing
@@ -91,7 +90,7 @@ class Fisher(threading.Thread):
     def stop_fishing(self):
         # before stop fishing
 
-        self.send_message(f'TEST fisher {self.fisher_id} has finished fishing\n')
+        self.send_message(f'has finished fishing\n')
         self.exit.set()
 
     def buff_is_active(self):

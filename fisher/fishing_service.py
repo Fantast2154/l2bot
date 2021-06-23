@@ -19,13 +19,13 @@ class FishingService:
     win_capture = None
 
     def __new__(cls, number_of_fishers, windows, q):
-        if number_of_fishers < 1 or number_of_fishers > 2 or number_of_fishers != len(windows):
+        if number_of_fishers < 1 or number_of_fishers > 3 or number_of_fishers != len(windows):
             # warning
             return None
         return super(FishingService, cls).__new__(cls)
 
     def __init__(self, number_of_fishers, windows, q):
-        self.send_message(f'TEST FishingService created')
+        self.send_message(f'created')
         q.activate_l2windows(windows)
         for fisher_id in range(number_of_fishers):
 
@@ -46,17 +46,18 @@ class FishingService:
         self.start_fishing()
 
     def __del__(self):
-        self.send_message("TEST FishingService destroyed")
+        self.send_message("destroyed")
 
         del self
 
     @classmethod
     def send_message(cls, message):
-        print(message)
+        temp = 'FishingService:' + message
+        print(temp)
 
     @classmethod
     def start_fishing(cls, fishers_list=None):
-        cls.send_message(f'TEST FishingService start_fishing() calling')
+        cls.send_message(f'start_fishing() calling')
         if fishers_list is None:
             for fisher in cls.fishers:
                 fisher.start()
@@ -69,7 +70,7 @@ class FishingService:
 
     @classmethod
     def stop_fishing(cls, fishers_list=None):
-        cls.send_message(f'TEST FishingService stop_fishing() calling')
+        cls.send_message(f'stop_fishing() calling')
         if fishers_list is None:
             for fisher in cls.fishers:
                 fisher.stop_fishing()
@@ -89,10 +90,10 @@ class FishingService:
         if response == 0:  # OK
             pass
         if response == 1:  # stopped fishing
-            cls.send_message(f'TEST FishingService fisher_response(response) calling')
+            cls.send_message(f'TEST fisher_response(response) calling')
             cls.raise_error()
         if response == 2:  # fatal problem
-            cls.send_message(f'TEST FishingService fisher_response(response) calling')
+            cls.send_message(f'TEST fisher_response(response) calling')
             cls.raise_error()
 
     @classmethod

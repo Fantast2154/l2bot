@@ -10,12 +10,10 @@ class FishingWindow(L2window):
 
     def __init__(self, window_id, wincap, window_name, hwnd):
         super().__init__(window_id, wincap, window_name, hwnd)
-        self.send_message(f'TEST FishingWindow {window_id} created')
         self.wincap = wincap
-        self.screenshot = wincap.get_screenshot(window_id)
-        self.window_id = window_id
-        self.hwnd = hwnd
+        # self.screenshot = wincap.get_screenshot(window_id)
 
+        self.hwnd = hwnd
         self.image_database = [
             ['fishing', 'images/fishing.jpg', 0.8],
             ['pumping', 'images/pumping.jpg', 0.87],
@@ -49,27 +47,28 @@ class FishingWindow(L2window):
             ['catched_item_3', 'images/catcheditem4.jpg', 0.7]]
 
         self.vision_catcheditem_pos = [None] * 4
+        self.send_message(f'<-L2window created')
         # self.init_images()
         # self.init_search()
 
     def __del__(self):
-        self.send_message(f"TEST FishingWindow {self.window_id} destroyed")
+        self.send_message(f"destroyed")
 
     def update_screenshot(self):
-        self.screenshot = self.wincap.get_screenshot(self.window_id)
+        self.screenshot = self.wincap.get_screenshot(self.hwnd)
 
-    @classmethod
-    def send_message(cls, message):
-        print(message)
+    def send_message(self, message):
+        temp = 'FishingWindow' + f' {self.window_id}' + ': ' + message
+        print(temp)
 
-    def find(self, objects): # returns list of positions
+    def find(self, objects):  # returns list of positions
         try:
-            screenshot = self.wincap.get_screenshot(self.window_id)
+            screenshot = self.wincap.get_screenshot(self.hwnd)
             # position = object.find(screenshot)
             position = [(1, 1)]
             return position
         except:
-            print('ERROR finding', objects)
+            self.send_message('ERROR finding')
             return []
 
     def init_images(self):
@@ -77,12 +76,12 @@ class FishingWindow(L2window):
             try:
                 self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]
             except:
-                print('Error finding images')
+                self.send_message('Error finding images')
 
     def init_search(self):
-        self.screenshot = self.wincap.get_screenshot(self.window_id)
+        self.screenshot = self.wincap.get_screenshot(self.hwnd)
         try:
             for key in self.library:
                 self.library[key][1] = self.library[key][0].find(self.screenshot)
         except:
-            pass
+            self.send_message('Error init search')

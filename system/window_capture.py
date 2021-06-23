@@ -10,11 +10,9 @@ from system.l2window import L2window
 
 class L2window_optimized:
     def __init__(self, window):
-        print(f'TEST L2window {window.window_id} created')
         self.window_id = window.window_id
         self.window_name = window.window_name
         self.hwnd = window.hwnd
-
         window_rect = win32gui.GetWindowRect(window.hwnd)
         border_pixels = 8
         titlebar_pixels = 30
@@ -28,10 +26,14 @@ class L2window_optimized:
         self.cropped_y = titlebar_pixels
         self.offset_x = self.my_x + self.cropped_x
         self.offset_y = self.my_y + self.cropped_y
+        self.send_message(f'created')
 
+    def send_message(self, message):
+        temp = 'L2window_optimized' + f' {self.window_id}' + ': ' + message
+        print(temp)
 
-#class WindowCapture(threading.Thread):
-class WindowCapture():
+# class WindowCapture(threading.Thread):
+class WindowCapture:
     x_fishwin = []
     y_fishwin = []
     w_fishwin = []
@@ -62,14 +64,15 @@ class WindowCapture():
     windows_list = []
     game_windows = []
     new_windows = []
+    l2window_name = 0
 
-    def __init__(self, windows):
+    def __init__(self, l2win_name):
         # window_name=None
 
         self.send_message(f'TEST ScreenshotMaster created\n')
-        threading.Thread.__init__(self)
         self.exit = threading.Event()
-
+        # entire window accurate = False
+        # accurate = True
         self.fishing_window_pos_screenshots = []
         self.clock_pos_screenshots = []
         self.blue_bar_pos_screenshots = []
@@ -78,33 +81,12 @@ class WindowCapture():
         self.imgs = []
         self.sreenshots_dict = {}
         self.lock = Lock()
-
-        for window in windows:
-            self.game_windows.append(L2window_optimized(window))
-
-        # self.game_windows = windows
-        # self.windows_param = []
-
-        # find the handle for the window we want to capture.
-        # if no window name is given, capture the entire screen
-        # if window_name is None:
-        #     self.hwnd = win32gui.GetDesktopWindow()
-        #     self.windows_param.append(self.hwnd)
-        # else:
-        #     _, self.windows_param = self.get_l2windows_param(window_name)
-        #     for _ in self.windows_param:
-        #         self.game_windows.append({})
-        # self.hwnd = win32gui.FindWindow(None, window_name)
-        # if not self.hwnd:
-        #     raise Exception('Window not found: {}'.format(window_name))
-
-    @classmethod
-    def send_message(cls, message):
-        print(message)
+        self.l2window_name = l2win_name
 
     def set_windows(self, windows_list):
         if windows_list:
-            self.windows_list = windows_list
+            for window in windows_list:
+                self.game_windows.append(L2window_optimized(window))
 
     def set_fishing_window(self, id, x_fishwin, y_fishwin, w_fishwin, h_fishwin):
         self.x_fishwin[id] = x_fishwin
@@ -113,21 +95,16 @@ class WindowCapture():
         self.h_fishwin[id] = h_fishwin
 
     def __del__(self):
-        self.send_message(f'TEST ScreenshotMaster destroyed')
+        self.send_message(f'destroyed')
 
     # @classmethod
     def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
-        #print('CAPTURING SCREEN')
-        #self.lock.acquire()
+        # print('CAPTURING SCREEN')
+        # self.lock.acquire()
         self.imgs = []
-        #print('NUM', self.game_windows)
+        # print('NUM', self.game_windows)
         for game_window in self.game_windows:
             hwnd_l = game_window.hwnd
-            # hwnd_l = game_window['hwnd']
-            # w = game_window['w']
-            # h = game_window['h']
-            # cropped_x = game_window['cropped_x']
-            # cropped_y = game_window['cropped_y']
 
             w = game_window.w
             h = game_window.h
@@ -186,7 +163,7 @@ class WindowCapture():
             img = np.ascontiguousarray(img)
             self.imgs.append(img)
             self.sreenshots_dict[hwnd_l] = img
-            #self.lock.release()
+            # self.lock.release()
 
         return self.imgs
 
@@ -201,13 +178,13 @@ class WindowCapture():
         win32gui.EnumWindows(winEnumHandler, None)
         self.windows_param = temp
 
-    def get_l2windows_param(self, l2window_name):
+    def get_l2windows_param(self):
         hash_list = []
         name_list = []
         self.list_window_names()  # СПИСОК ВСЕХ ДОСТУПНЫХ ОКОН
         list_all_windows = self.get_windows_param()
         for window in list_all_windows:
-            if window[1] == l2window_name:
+            if window[1] == self.l2window_name:
                 name_list.append(window[1])
                 hash_list.append(window[0])
                 # print(window)
@@ -216,12 +193,12 @@ class WindowCapture():
     def get_windows_param(self):
         return self.windows_param
 
-    def get_screenshot(self, id):
-        return self.screenshot
+    def get_screenshot(self, window_hwnd):
+        return self.sreenshots_dict[window_hwnd]
 
-    @classmethod
-    def send_message(cls, message):
-        print(message)
+    def send_message(self, message):
+        temp = 'WindowCapture' + ': ' + message
+        print(temp)
 
     def start_capturing(self):
         self.stopped = False
@@ -230,35 +207,7 @@ class WindowCapture():
 
     def thread_run(self):
 
-        while not self.stopped:
-            if not self.accurate:
-                self.screenshots = self.capture_screen()
-            else:
-                self.fishing_window_pos_screenshots = self.capture_screen(accurate=True,
-                                                                          object_position=(
-                                                                              self.x_fishwin, self.y_fishwin),
-                                                                          object_size=(self.w_fishwin, self.h_fishwin))
-
-                self.clock_pos_screenshots = self.capture_screen(accurate=True,
-                                                                 object_position=(
-                                                                     self.x_fishwin + 107, self.y_fishwin + 217),
-                                                                 object_size=(30, 30))
-
-                self.blue_bar_pos_screenshots = self.capture_screen(accurate=True,
-                                                                    object_position=(
-                                                                        self.x_fishwin + 17, self.y_fishwin + 249),
-                                                                    object_size=(231, 14))
-                if not self.day_time:
-                    self.red_bar_pos_screenshots = self.capture_screen(accurate=True,
-                                                                       object_position=(
-                                                                           self.x_fishwin + 17, self.y_fishwin + 249),
-                                                                       object_size=(231, 14))
-
-    def run(self):
-        self.start_capturing()
         while not self.exit.is_set():
-            pass
-            '''
             if not self.accurate:
                 self.screenshots = self.capture_screen()
             else:
@@ -281,16 +230,20 @@ class WindowCapture():
                                                                        object_position=(
                                                                            self.x_fishwin + 17, self.y_fishwin + 249),
                                                                        object_size=(231, 14))
-            '''
+
+    # def run(self):
+    #     self.start_capturing()
+    #     while not self.exit.is_set():
+    #         pass
+
     def stop(self):
         self.stopped = True
         # self.send_message(f'TEST ScreenshotMaster stopped\n')
-        #self.exit.set()
+        self.exit.set()
 
-
-if __name__ == '__main__':
-    hwnd = win32gui.FindWindow(None, 'Asterios')
-    print(hwnd)
-    w = L2window(0, 'Asterios', hwnd)
-    win = WindowCapture([w])
-    win.capture_screen()
+# if __name__ == '__main__':
+#     hwnd = win32gui.FindWindow(None, 'Asterios')
+#     print(hwnd)
+#     w = L2window(0, 'Asterios', hwnd)
+#     win = WindowCapture([w])
+#     win.capture_screen()
