@@ -22,7 +22,7 @@ class FishingWindow(L2window):
             ['clock', 'images/clock3.jpg', 0.8],
             ['fishing_window', 'images/fishing_window.jpg', 0.7],
             ['red_bar', 'images/red_bar3.jpg', 0.8],
-            ['cdbuff', 'images/cdbuff.jpg', 0.87],
+            ['buff', 'images/cdbuff.jpg', 0.87],
             ['bait', 'images/bait.jpg', 0.90],
             ['colored', 'images/colored_2.jpg', 0.94],
             ['luminous', 'images/luminous_2.jpg', 0.94],
@@ -48,14 +48,15 @@ class FishingWindow(L2window):
 
         self.vision_catcheditem_pos = [None] * 4
         self.send_message(f'<-L2window created')
-        # self.init_images()
-        # self.init_search()
+        self.init_images()
+        self.init_search()
 
     def __del__(self):
         self.send_message(f"destroyed")
 
     def update_screenshot(self):
         self.screenshot = self.wincap.get_screenshot(self.hwnd)
+        return self.screenshot
 
     def send_message(self, message):
         temp = 'FishingWindow' + f' {self.window_id}' + ': ' + message
@@ -74,9 +75,33 @@ class FishingWindow(L2window):
     def init_images(self):
         for obj in self.image_database:
             try:
+                # {'key', [obj, [(x,y]/None]
                 self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]
             except:
                 self.send_message('Error finding images')
+
+    def get_object(self, name, search=False):
+
+        if name:
+            if self.library[name][0]:
+                pass
+            else:
+                temp = 'ERROR referring to the unknown object: ' + name
+                self.send_message(temp)
+                return []
+        else:
+            temp = 'ERROR referring to the unknown object: ' + name
+            self.send_message(temp)
+            return []
+
+        if search:
+            object = self.library[name][0].find(self.update_screenshot())
+            self.library[name][1] = object
+            return object
+        else:
+            return self.library[name][1]
+
+
 
     def init_search(self):
         self.screenshot = self.wincap.get_screenshot(self.hwnd)

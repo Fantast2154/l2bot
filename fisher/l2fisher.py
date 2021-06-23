@@ -12,6 +12,10 @@ class Fisher(threading.Thread):
     fisher_id = None
     number_of_fishers = None
     current_state = None
+    # 0 - not fishing
+    # 1 - fishing
+    # 2 - busy with actions (mail,trade and etc.)
+    # 9 - error/stucked
     stopped = None
     q = None
 
@@ -56,9 +60,8 @@ class Fisher(threading.Thread):
                     self.reeling(count)
             if count > 400:
                 self.current_state = 1
-                return
 
-        self.current_state = 2
+        self.current_state = 0
 
     # def test_run(self):
     #     if connection_is_lost:
@@ -71,7 +74,6 @@ class Fisher(threading.Thread):
 
     def get_status(self):
         return self.current_state
-
 
     def overweight_baits_soski_correction(f_try_count, m_send_counter, m_receive_counter):
         pass
@@ -99,9 +101,13 @@ class Fisher(threading.Thread):
         else:
             return True
 
+    def buff(self, count):
+        self.q.new_task(count, 'mouse', [self.fishing_window.get_object('buff', False), True, 'LEFT', False, False, False], self.fishing_window)
+
     def pumping(self, count):
         # self.q.new_task([(100, 100)], self.fishing_window.hwnd)
-        self.q.new_task(count, 'mouse', [[(100, 100)], True, 'LEFT', False, False, False], self.fishing_window)
+        self.q.new_task(count, 'mouse', [self.fishing_window.get_object('fishing', False), True, 'LEFT', False, False, False], self.fishing_window)
+        # self.q.new_task(count, 'mouse', [[(100, 100)], True, 'LEFT', False, False, False], self.fishing_window)
 
     def reeling(self, count):
         # self.q.new_task([(500, 500)], self.fishing_window.hwnd)

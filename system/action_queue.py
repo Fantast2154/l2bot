@@ -9,8 +9,8 @@ import win32com.client
 import win32api
 import win32con
 
-class ActionQueue(threading.Thread):
 
+class ActionQueue(threading.Thread):
     number = None
 
     actions = []
@@ -72,7 +72,7 @@ class ActionQueue(threading.Thread):
         # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
 
     def task_execution(self, count, action, params, window, action_rate='High'):
-        #try:
+        # try:
         # print('Qsize = ', len(self.queue_list))
         self.lock.acquire()
         time.sleep(0.01)
@@ -97,10 +97,10 @@ class ActionQueue(threading.Thread):
             if len(params) != 2:
                 return
             # self.action_service.keyboard_master(params)
-        #except:
-            #print('TEST queue window activation error')
+        # except:
+        # print('TEST queue window activation error')
         self.lock.release()
-        
+
     @classmethod
     def start_queueing(cls):
         pass
