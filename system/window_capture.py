@@ -39,7 +39,7 @@ class WindowCapture:
     w_fishwin = []
     h_fishwin = []
 
-    accurate = False
+    accurate = []
     day_time = True
 
     stopped = True
@@ -83,6 +83,8 @@ class WindowCapture:
         self.lock = Lock()
         self.l2window_name = l2win_name
 
+
+
     def set_windows(self, windows_list):
         if windows_list:
             for window in windows_list:
@@ -90,12 +92,13 @@ class WindowCapture:
                 self.offset_x = temp_w.offset_x
                 self.offset_y = temp_w.offset_y
                 self.game_windows.append(temp_w)
+                self.accurate.append(window.hwnd)
 
-    def set_fishing_window(self, id, x_fishwin, y_fishwin, w_fishwin, h_fishwin):
-        self.x_fishwin[id] = x_fishwin
-        self.y_fishwin[id] = y_fishwin
-        self.w_fishwin[id] = w_fishwin
-        self.h_fishwin[id] = h_fishwin
+    def set_fishing_window(self, hwnd, x_fishwin, y_fishwin, w_fishwin, h_fishwin):
+        self.x_fishwin[hwnd] = x_fishwin
+        self.y_fishwin[hwnd] = y_fishwin
+        self.w_fishwin[hwnd] = w_fishwin
+        self.h_fishwin[hwnd] = h_fishwin
 
     def __del__(self):
         self.send_message(f'destroyed')
@@ -208,31 +211,36 @@ class WindowCapture:
         t = Thread(target=self.thread_run)
         t.start()
 
+    def set_accurate_param(self, accurate, hwnd):
+        self.accurate[hwnd] = accurate
+
     def thread_run(self):
 
         while not self.exit.is_set():
-            if not self.accurate:
-                self.screenshots = self.capture_screen()
-            else:
-                self.fishing_window_pos_screenshots = self.capture_screen(accurate=True,
-                                                                          object_position=(
-                                                                              self.x_fishwin, self.y_fishwin),
-                                                                          object_size=(self.w_fishwin, self.h_fishwin))
 
-                self.clock_pos_screenshots = self.capture_screen(accurate=True,
-                                                                 object_position=(
-                                                                     self.x_fishwin + 107, self.y_fishwin + 217),
-                                                                 object_size=(30, 30))
+            for accurate in self.accurate:
+                if not accurate:
+                    self.screenshots = self.capture_screen()
+                else:
+                    self.fishing_window_pos_screenshots = self.capture_screen(accurate=True,
+                                                                              object_position=(
+                                                                                  self.x_fishwin, self.y_fishwin),
+                                                                              object_size=(self.w_fishwin, self.h_fishwin))
 
-                self.blue_bar_pos_screenshots = self.capture_screen(accurate=True,
-                                                                    object_position=(
-                                                                        self.x_fishwin + 17, self.y_fishwin + 249),
-                                                                    object_size=(231, 14))
-                if not self.day_time:
-                    self.red_bar_pos_screenshots = self.capture_screen(accurate=True,
-                                                                       object_position=(
-                                                                           self.x_fishwin + 17, self.y_fishwin + 249),
-                                                                       object_size=(231, 14))
+                    self.clock_pos_screenshots = self.capture_screen(accurate=True,
+                                                                     object_position=(
+                                                                         self.x_fishwin + 107, self.y_fishwin + 217),
+                                                                     object_size=(30, 30))
+
+                    self.blue_bar_pos_screenshots = self.capture_screen(accurate=True,
+                                                                        object_position=(
+                                                                            self.x_fishwin + 17, self.y_fishwin + 249),
+                                                                        object_size=(231, 14))
+                    if not self.day_time:
+                        self.red_bar_pos_screenshots = self.capture_screen(accurate=True,
+                                                                           object_position=(
+                                                                               self.x_fishwin + 17, self.y_fishwin + 249),
+                                                                           object_size=(231, 14))
 
     # def run(self):
     #     self.start_capturing()
