@@ -32,6 +32,7 @@ class L2window_optimized:
         temp = 'L2window_optimized' + f' {self.window_id}' + ': ' + message
         print(temp)
 
+
 # class WindowCapture(threading.Thread):
 class WindowCapture:
     x_fishwin = []
@@ -39,7 +40,10 @@ class WindowCapture:
     w_fishwin = []
     h_fishwin = []
 
-    accurate = []
+    accurate = {}
+    imgs = []
+    dict_imgs = {}
+    object_position_and_size = {}
     day_time = True
 
     stopped = True
@@ -83,8 +87,6 @@ class WindowCapture:
         self.lock = Lock()
         self.l2window_name = l2win_name
 
-
-
     def set_windows(self, windows_list):
         if windows_list:
             for window in windows_list:
@@ -92,13 +94,14 @@ class WindowCapture:
                 self.offset_x = temp_w.offset_x
                 self.offset_y = temp_w.offset_y
                 self.game_windows.append(temp_w)
-                self.accurate.append(window.hwnd)
+                #self.accurate.append(window.hwnd)
 
     def set_fishing_window(self, hwnd, x_fishwin, y_fishwin, w_fishwin, h_fishwin):
-        self.x_fishwin[hwnd] = x_fishwin
-        self.y_fishwin[hwnd] = y_fishwin
-        self.w_fishwin[hwnd] = w_fishwin
-        self.h_fishwin[hwnd] = h_fishwin
+
+        self.object_position_and_size[hwnd] = [[(x_fishwin, y_fishwin), (w_fishwin, h_fishwin), 'fishing_window'],
+                                               [(x_fishwin + 107, y_fishwin + 217), (30, 30), 'clock'],
+                                               [(x_fishwin + 17, y_fishwin + 249), (231, 14), 'blue_bar'],
+                                               [(x_fishwin + 17, y_fishwin + 249), (231, 14), 'red_bar']]
 
     def __del__(self):
         self.send_message(f'destroyed')
@@ -107,7 +110,7 @@ class WindowCapture:
     def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
         # print('CAPTURING SCREEN')
         # self.lock.acquire()
-        self.imgs = []
+        # self.imgs = []
         # print('NUM', self.game_windows)
         for game_window in self.game_windows:
             hwnd_l = game_window.hwnd
@@ -123,21 +126,38 @@ class WindowCapture:
             cDC = dcObj.CreateCompatibleDC()
             dataBitMap = win32ui.CreateBitmap()
 
-            if accurate:
-                (xx, yy) = object_position
-                (ww, hh) = object_size
-                # dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
-                dataBitMap.CreateCompatibleBitmap(dcObj, ww, hh)
-                cDC.SelectObject(dataBitMap)
-                cDC.BitBlt((0, 0), (ww, hh), dcObj, (cropped_x + xx, cropped_y + yy), win32con.SRCCOPY)
-                # cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
+            if self.accurate.get(hwnd_l, None):
+                self.imgs = []
+                for [object_position, object_size, object_name] in self.object_position_and_size[hwnd_l]:
+                    (xx, yy) = object_position
+                    (ww, hh) = object_size
+                    # dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
+                    dataBitMap.CreateCompatibleBitmap(dcObj, ww, hh)
+                    cDC.SelectObject(dataBitMap)
+                    cDC.BitBlt((0, 0), (ww, hh), dcObj, (cropped_x + xx, cropped_y + yy), win32con.SRCCOPY)
+                    # cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
 
-                # convert the raw data into a format opencv can read
-                # dataBitMap.SaveBitmapFile(cDC, 'debug.bmp')
-                signedIntsArray = dataBitMap.GetBitmapBits(True)
-                img = np.fromstring(signedIntsArray, dtype='uint8')
-                img.shape = (hh, ww, 4)
-                # img.shape = (self.h, self.w, 4)
+                    # convert the raw data into a format opencv can read
+                    # dataBitMap.SaveBitmapFile(cDC, 'debug.bmp')
+                    signedIntsArray = dataBitMap.GetBitmapBits(True)
+                    img = np.fromstring(signedIntsArray, dtype='uint8')
+                    img.shape = (hh, ww, 4)
+                    self.dict_imgs[object_name] = img
+                    #self.imgs.append(img)
+                    # img.shape = (self.h, self.w, 4)
+
+                    # free resources
+                    dcObj.DeleteDC()
+                    cDC.DeleteDC()
+                    win32gui.ReleaseDC(hwnd_l, wDC)
+                    win32gui.DeleteObject(dataBitMap.GetHandle())
+
+                    for key in self.dict_imgs.copy().keys():
+                        temp_img = self.dict_imgs[key]
+                        temp_img = temp_img[..., :3]
+                        self.dict_imgs[key] = np.ascontiguousarray(temp_img)
+
+                    self.sreenshots_dict[hwnd_l] = self.dict_imgs
 
             else:
                 dataBitMap.CreateCompatibleBitmap(dcObj, w, h)
@@ -149,26 +169,31 @@ class WindowCapture:
                 signedIntsArray = dataBitMap.GetBitmapBits(True)
                 img = np.fromstring(signedIntsArray, dtype='uint8')
                 img.shape = (h, w, 4)
+                self.imgs.append(img)
 
-            # free resources
-            dcObj.DeleteDC()
-            cDC.DeleteDC()
-            win32gui.ReleaseDC(hwnd_l, wDC)
-            win32gui.DeleteObject(dataBitMap.GetHandle())
+                # free resources
+                dcObj.DeleteDC()
+                cDC.DeleteDC()
+                win32gui.ReleaseDC(hwnd_l, wDC)
+                win32gui.DeleteObject(dataBitMap.GetHandle())
 
-            # drop the alpha channel, or cv.matchTemplate() will throw an error like:
-            #   error: (-215:Assertion failed) (depth == CV_8U || depth == CV_32F) && type == _templ.type()
-            #   && _img.dims() <= 2 in function 'cv::matchTemplate'
-            img = img[..., :3]
+                # drop the alpha channel, or cv.matchTemplate() will throw an error like:
+                #   error: (-215:Assertion failed) (depth == CV_8U || depth == CV_32F) && type == _templ.type()
+                #   && _img.dims() <= 2 in function 'cv::matchTemplate'
+                temp_arr = []
+                for img in self.imgs:
+                    img = img[..., :3]
+                    # make image C_CONTIGUOUS to avoid errors that look like:
+                    #   File ... in draw_rectangles
+                    #   TypeError: an integer is required (got type tuple)
+                    # see the discussion here:
+                    # https://github.com/opencv/opencv/issues/14866#issuecomment-580207109
+                    img = np.ascontiguousarray(img)
+                    temp_arr.append(img)
 
-            # make image C_CONTIGUOUS to avoid errors that look like:
-            #   File ... in draw_rectangles
-            #   TypeError: an integer is required (got type tuple)
-            # see the discussion here:
-            # https://github.com/opencv/opencv/issues/14866#issuecomment-580207109
-            img = np.ascontiguousarray(img)
-            self.imgs.append(img)
-            self.sreenshots_dict[hwnd_l] = img
+                self.imgs = temp_arr
+            # self.imgs.append(img)
+                self.sreenshots_dict[hwnd_l] = self.imgs
             # self.lock.release()
 
         return self.imgs
@@ -217,30 +242,36 @@ class WindowCapture:
     def thread_run(self):
 
         while not self.exit.is_set():
+            self.screenshots = self.capture_screen()
 
+            '''
             for accurate in self.accurate:
-                if not accurate:
-                    self.screenshots = self.capture_screen()
-                else:
-                    self.fishing_window_pos_screenshots = self.capture_screen(accurate=True,
-                                                                              object_position=(
-                                                                                  self.x_fishwin, self.y_fishwin),
-                                                                              object_size=(self.w_fishwin, self.h_fishwin))
+            if not accurate:
+                      
+            else:
+                pass
+                
+                
+                self.fishing_window_pos_screenshots = self.capture_screen(accurate=True,
+                                                                          object_position=(
+                                                                              self.x_fishwin, self.y_fishwin),
+                                                                          object_size=(self.w_fishwin, self.h_fishwin))
 
-                    self.clock_pos_screenshots = self.capture_screen(accurate=True,
-                                                                     object_position=(
-                                                                         self.x_fishwin + 107, self.y_fishwin + 217),
-                                                                     object_size=(30, 30))
+                self.clock_pos_screenshots = self.capture_screen(accurate=True,
+                                                                 object_position=(
+                                                                     self.x_fishwin + 107, self.y_fishwin + 217),
+                                                                 object_size=(30, 30))
 
-                    self.blue_bar_pos_screenshots = self.capture_screen(accurate=True,
-                                                                        object_position=(
-                                                                            self.x_fishwin + 17, self.y_fishwin + 249),
-                                                                        object_size=(231, 14))
-                    if not self.day_time:
-                        self.red_bar_pos_screenshots = self.capture_screen(accurate=True,
-                                                                           object_position=(
-                                                                               self.x_fishwin + 17, self.y_fishwin + 249),
-                                                                           object_size=(231, 14))
+                self.blue_bar_pos_screenshots = self.capture_screen(accurate=True,
+                                                                    object_position=(
+                                                                        self.x_fishwin + 17, self.y_fishwin + 249),
+                                                                    object_size=(231, 14))
+                if not self.day_time:
+                    self.red_bar_pos_screenshots = self.capture_screen(accurate=True,
+                                                                       object_position=(
+                                                                           self.x_fishwin + 17, self.y_fishwin + 249),
+                                                                       object_size=(231, 14))
+            '''
 
     # def run(self):
     #     self.start_capturing()
