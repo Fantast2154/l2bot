@@ -86,7 +86,10 @@ class WindowCapture:
     def set_windows(self, windows_list):
         if windows_list:
             for window in windows_list:
-                self.game_windows.append(L2window_optimized(window))
+                temp_w = L2window_optimized(window)
+                self.offset_x = temp_w.offset_x
+                self.offset_y = temp_w.offset_y
+                self.game_windows.append(temp_w)
 
     def set_fishing_window(self, id, x_fishwin, y_fishwin, w_fishwin, h_fishwin):
         self.x_fishwin[id] = x_fishwin

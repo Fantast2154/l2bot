@@ -89,6 +89,8 @@ class ActionQueue(threading.Thread):
             [(x_temp, y_temp)] = params[0]
             x = x_temp + window.wincap.offset_x
             y = y_temp + window.wincap.offset_y
+            print('window.wincap.offset_x', window.wincap.offset_x)
+            print('window.wincap.offset_y', window.wincap.offset_y)
             self.click(x, y)
             # self.lock.release()
             # print(params)

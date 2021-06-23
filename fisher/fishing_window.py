@@ -101,8 +101,6 @@ class FishingWindow(L2window):
         else:
             return self.library[name][1]
 
-
-
     def init_search(self):
         self.screenshot = self.wincap.get_screenshot(self.hwnd)
         try:
