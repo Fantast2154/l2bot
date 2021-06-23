@@ -125,13 +125,17 @@ class WindowCapture:
             dcObj = win32ui.CreateDCFromHandle(wDC)
             cDC = dcObj.CreateCompatibleDC()
             dataBitMap = win32ui.CreateBitmap()
-
+            self.imgs = []
             if self.accurate.get(hwnd_l, None):
-                self.imgs = []
+
                 for [object_position, object_size, object_name] in self.object_position_and_size[hwnd_l]:
+                    print('object_position', object_position)
+                    print('object_size', object_size)
                     (xx, yy) = object_position
                     (ww, hh) = object_size
                     # dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
+                    # ww = 20
+                    # hh = 30
                     dataBitMap.CreateCompatibleBitmap(dcObj, ww, hh)
                     cDC.SelectObject(dataBitMap)
                     cDC.BitBlt((0, 0), (ww, hh), dcObj, (cropped_x + xx, cropped_y + yy), win32con.SRCCOPY)
@@ -193,7 +197,7 @@ class WindowCapture:
 
                 self.imgs = temp_arr
             # self.imgs.append(img)
-                self.sreenshots_dict[hwnd_l] = self.imgs
+                self.sreenshots_dict[hwnd_l] = {hwnd_l: self.imgs}
             # self.lock.release()
 
         return self.imgs
@@ -284,8 +288,21 @@ class WindowCapture:
         self.exit.set()
 
 # if __name__ == '__main__':
-#     hwnd = win32gui.FindWindow(None, 'Asterios')
-#     print(hwnd)
-#     w = L2window(0, 'Asterios', hwnd)
-#     win = WindowCapture([w])
-#     win.capture_screen()
+#     # hwnd = win32gui.FindWindow(None, 'Asterios')
+#     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
+#     # win_capture = ScreenCapture()
+#     win_capture = WindowCapture(l2window_name)
+#
+#     # searching running L2 windows
+#
+#     name_list, hash_list = win_capture.get_l2windows_param()
+#     print(hash_list[0])
+#     # w = L2window(0, 'Asterios', hwnd)
+#     # win = WindowCapture([w])
+#
+#     # win_capture.set_windows(L2window(i, win_capture, name_list[i], hash_list[i]))
+#
+#     # start capturing screenshots
+#
+#     # win_capture.start_capturing()
+#     win_capture.capture_screen(accurate=True)

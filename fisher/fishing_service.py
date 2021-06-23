@@ -43,7 +43,7 @@ class FishingService:
 
         self.number_of_fishers = number_of_fishers
         self.q = q
-        self.start_fishing()
+        self.start_fishers()
 
     def __del__(self):
         self.send_message("destroyed")
@@ -56,7 +56,7 @@ class FishingService:
         print(temp)
 
     @classmethod
-    def start_fishing(cls, fishers_list=None):
+    def start_fishers(cls, fishers_list=None):
         cls.send_message(f'start_fishing() calling')
         if fishers_list is None:
             for fisher in cls.fishers:
@@ -69,7 +69,7 @@ class FishingService:
         cls.run_loop()
 
     @classmethod
-    def stop_fishing(cls, fishers_list=None):
+    def stop_fishers(cls, fishers_list=None):
         cls.send_message(f'stop_fishing() calling')
         if fishers_list is None:
             for fisher in cls.fishers:
@@ -83,6 +83,16 @@ class FishingService:
 
         del cls.fishers
         del cls.fishing_windows
+
+    @classmethod
+    def pause_fishers(cls, delay, fishers_list=None):
+        cls.send_message(f'stop_fishing() calling')
+        if fishers_list is None:
+            for fisher in cls.fishers:
+                fisher.pause_fisher(delay)
+        else:
+            for fisher in fishers_list:
+                fisher.pause_fisher(delay)
 
     @classmethod
     def fisher_response(cls, response):
@@ -104,7 +114,7 @@ class FishingService:
                 cls.fisher_response(fisher.current_state)
 
             if cls.raised_error:
-                cls.stop_fishing()
+                cls.stop_fishers()
                 break
 
     @classmethod

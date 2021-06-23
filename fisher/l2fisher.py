@@ -68,6 +68,9 @@ class Fisher(threading.Thread):
     def test_action(self, count):
         self.q.new_task(count, self.fishing_window)
 
+    def pause_fisher(self, delay):
+        pass
+
     def run(self):
         count = -1
         self.start_fishing(count)
@@ -155,14 +158,12 @@ class Fisher(threading.Thread):
 
         temp_timer = time.time()
         searching_time = 10
-        while ((not self.fishing_window.get_object('fishing_window')) and (time.time() - temp_timer < searching_time)):
+        while (not self.fishing_window.get_object('fishing_window')) and (time.time() - temp_timer < searching_time):
             continue
         else:
             self.stop_fishing()
 
-        self.fishing_window.record_fishing_window()
-
-
+        self.fishing_window.start_accurate()
 
     def overweight_baits_soski_correction(self, count):
         return True
@@ -188,7 +189,7 @@ class Fisher(threading.Thread):
         else:
             return True
 
-    def pause_fisher(self, delay):
+    def pause_thread(self, delay):
         # self.send_message(f'PAUSED for {delay} seconds')
         time.sleep(delay)
 
@@ -211,7 +212,7 @@ class Fisher(threading.Thread):
                         [self.fishing_window.get_object('buff', False), True, 'LEFT', False, False, False],
                         self.fishing_window)
         self.buff_time = time.time()
-        self.pause_fisher(1.5)
+        self.pause_thread(1.5)
 
     def turn_on_soski(self, count):
         self.q.new_task(count, 'mouse',
@@ -223,14 +224,14 @@ class Fisher(threading.Thread):
                         [self.fishing_window.get_object('luminous', False), True, 'RIGHT', False, False, False],
                         self.fishing_window)
         self.current_baits = 'n_baits'
-        self.pause_fisher(0.7)
+        self.pause_thread(0.7)
 
     def choose_day_bait(self, count):
         self.q.new_task(count, 'mouse',
                         [self.fishing_window.get_object('colored', False), True, 'RIGHT', False, False, False],
                         self.fishing_window)
         self.current_baits = 'd_baits'
-        self.pause_fisher(0.7)
+        self.pause_thread(0.7)
 
     # def equipment_bag(self, count):
     #     self.q.new_task(count, 'mouse', [self.fishing_window.get_object('equipment_bag', False), True, 'RIGHT', False, False, False], self.fishing_window)
