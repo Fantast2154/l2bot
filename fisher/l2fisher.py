@@ -49,9 +49,8 @@ class Fisher(threading.Thread):
             count += 1
 
             time.sleep(0.1)
-            self.fishing_window.update_screenshot()
-            # cv2.imshow(f'fisher {self.fisher_id}', self.fishing_window.screenshot)
-            # cv2.waitKey(1)
+            cv2.imshow(f'fisher {self.fisher_id}', self.fishing_window.update_screenshot())
+            cv2.waitKey(1)
             if count < 300:
                 rand = self.fisher_id + 1
                 if rand == 1:
@@ -111,7 +110,8 @@ class Fisher(threading.Thread):
 
     def reeling(self, count):
         # self.q.new_task([(500, 500)], self.fishing_window.hwnd)
-        self.q.new_task(count, 'mouse', [[(500, 500)], True, 'LEFT', False, False, False], self.fishing_window)
+        self.q.new_task(count, 'mouse', [self.fishing_window.get_object('reeling', False), True, 'LEFT', False, False, False], self.fishing_window)
+        # self.q.new_task(count, 'mouse', [[(500, 500)], True, 'LEFT', False, False, False], self.fishing_window)
 
     # def rebuff(self):
     #     self.q.new_task(count, 'mouse', self.fishing_window, True, 'LEFT', False, False, False], self.fishing_window)
