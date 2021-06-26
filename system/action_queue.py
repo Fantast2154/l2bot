@@ -8,7 +8,7 @@ import pyautogui
 import win32com.client
 import win32api
 import win32con
-
+import keyboard
 
 class ActionQueue(threading.Thread):
     number = None
@@ -33,14 +33,12 @@ class ActionQueue(threading.Thread):
     def activate_l2windows(self, windows):
         try:
             for window in windows:
-                time.sleep(0.01)
                 self.lock.acquire()
-                time.sleep(0.01)
+                time.sleep(0.05)
                 self.shell.SendKeys('%')
                 win32gui.SetForegroundWindow(window.hwnd)
-                time.sleep(0.01)
+                time.sleep(0.05)
                 self.lock.release()
-                time.sleep(0.01)
         except:
             print('TEST queue window activation error')
 
@@ -64,22 +62,56 @@ class ActionQueue(threading.Thread):
         pass
 
     def click(self, x, y):
-
+        # self.lock.acquire()
         win32api.SetCursorPos((x, y))
-        time.sleep(0.01)
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-        time.sleep(0.01)
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+
+        print('CLICK')
+        time.sleep(0.5)
+        pyautogui.mouseDown()
+        time.sleep(0.1)
+        pyautogui.mouseUp()
+        time.sleep(0.5)
+        # pyautogui.mouseDown()
+        # time.sleep(0.1)
+        # pyautogui.mouseUp()
+        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+        # time.sleep(0.2)
+        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+        # time.sleep(0.2)
+        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+        # time.sleep(0.2)
+        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+        # self.lock.release()
 
     def task_execution(self, count, action, params, window, action_rate='High'):
         # try:
         # print('Qsize = ', len(self.queue_list))
+
         self.lock.acquire()
-        time.sleep(0.01)
+        print(win32gui.GetForegroundWindow())
+        # win32gui.SetFocus(window.hwnd)
+        # if win32gui.GetForegroundWindow() != window.hwnd:
+        #     pyautogui.keyDown('alt')
+        #     time.sleep(.01)
+        #     pyautogui.press('tab')
+        #     time.sleep(.01)
+        #     pyautogui.keyUp('alt')
+        #     print(win32gui.GetForegroundWindow())
+            # print('TETSTSTSTS')
+            # time.sleep(0.1)
+            # print('tetstst', win32gui.IsWindowVisible(window.hwnd))
+            # win32gui.SetForegroundWindow(window.hwnd)
+
+        # win32gui.SetActiveWindow(window.hwnd)
+        # win32gui.ShowWindow(window.hwnd, 9)
+        # self.shell.SendKeys('%')
+        # win32gui.BringWindowToTop(window.hwnd)
+        # win32gui.SetForegroundWindow(window.hwnd)
+        # win32gui.ShowWindow(window.hwnd, win32con.SW_SHOWMAXIMIZED)
+        win32gui.SetForegroundWindow(window.hwnd)
+        time.sleep(0.5)
         # print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
 
-        win32gui.SetForegroundWindow(window.hwnd)
-        # time.sleep(0.01)
         # params = [0]*6
         if action == 'mouse':
 
@@ -87,10 +119,11 @@ class ActionQueue(threading.Thread):
                 return
 
             [(x_temp, y_temp)] = params[0]
-            x = x_temp + window.wincap.offset_x
-            y = y_temp + window.wincap.offset_y
-            print('window.wincap.offset_x', window.wincap.offset_x)
-            print('window.wincap.offset_y', window.wincap.offset_y)
+            x = x_temp + window.wincap.offset_x[window.window_id]
+            y = y_temp + window.wincap.offset_y[window.window_id]
+            print('window_id', window.window_id)
+            print('window.wincap.offset_x', window.wincap.offset_x[window.window_id])
+            print('window.wincap.offset_y', window.wincap.offset_y[window.window_id])
             self.click(x, y)
             # self.lock.release()
             # print(params)
@@ -122,7 +155,7 @@ class ActionQueue(threading.Thread):
                     if self.windows[0]:
                         window = self.windows[0]
                         action = self.actions[0]
-                        # action_param = self.action_params[0]
+                        action_param = self.action_params[0]
                     else:
                         continue
                     # action = self.actions[0]
@@ -131,14 +164,8 @@ class ActionQueue(threading.Thread):
 
                     del self.windows[0]
                     del self.actions[0]
-                    # del self.actions[0]
+                    del self.action_params[0]
 
-                    # speed = self.speed_list[0]
-                    # self.task_execution(self.queue_list.get(), priority, speed)
-
-                    # self.queue_list.get()
-                    # action_param = 1
-                    # self.task_execution(self.queue_list.get(), action, action_param, window)
-                    self.task_execution(self.queue_list.pop(-1), action, self.action_params.pop(-1), window)
+                    self.task_execution(self.queue_list.pop(-1), action, action_param, window)
                 finally:
                     pass

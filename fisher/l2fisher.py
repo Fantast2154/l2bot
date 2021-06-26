@@ -117,17 +117,21 @@ class Fisher(threading.Thread):
     def start_fishing(self, count):
         self.current_state = 0
         delay = 2
-        delay_correction = delay + 3 / self.number_of_fishers
+        delay_correction = delay + 3 / (self.fisher_id+1)
         self.send_message(f'will start fishing in ........ {delay_correction} sec')
         time.sleep(delay_correction)
         self.send_message(f'starts fishing\n')
         self.attempt_counter = 0
 
+
+
         if not self.fishing_window.init_search():
             self.stop_fishing()
 
+
         if not self.trial_rod_cast(count):
             self.stop_fishing()
+
 
         # if not self.buff_is_active():
         #     self.rebuff(count)
@@ -152,18 +156,24 @@ class Fisher(threading.Thread):
         return self.current_state
 
     def trial_rod_cast(self, count):
-        self.q.new_task(count, 'mouse',
-                        [self.fishing_window.get_object('fishing', False), True, 'LEFT', False, False, False],
-                        self.fishing_window)
+        self.fishing(count)
 
         temp_timer = time.time()
         searching_time = 10
-        while (not self.fishing_window.get_object('fishing_window')) and (time.time() - temp_timer < searching_time):
+        while (not self.fishing_window.get_object('fishing_window', True)) and (time.time() - temp_timer < searching_time):
             continue
-        else:
-            self.stop_fishing()
-
+        # else:
+        #     return False
         self.fishing_window.start_accurate()
+        # self.fishing(count)
+        self.pause_thread(0.5)
+
+        # if not self.baits_clicked(count):
+        #     return False
+
+        while True:
+            self.fishing_window.is_fishing_window()
+
 
     def overweight_baits_soski_correction(self, count):
         return True
@@ -184,8 +194,12 @@ class Fisher(threading.Thread):
         pass
 
     def baits_clicked(self, count):
-        if time.time() - self.buff_time < 30:
-            return False
+        if self.current_baits is None:
+            self.choose_day_bait(count)
+            self.pause_thread(0.5)
+            self.choose_day_bait(count)
+            self.pause_thread(0.5)
+            self.choose_day_bait(count)
         else:
             return True
 
@@ -193,10 +207,16 @@ class Fisher(threading.Thread):
         # self.send_message(f'PAUSED for {delay} seconds')
         time.sleep(delay)
 
-    def pumping(self, count):
+    def fishing(self, count):
         # self.q.new_task([(100, 100)], self.fishing_window.hwnd)
         self.q.new_task(count, 'mouse',
                         [self.fishing_window.get_object('fishing', False), True, 'LEFT', False, False, False],
+                        self.fishing_window)
+
+    def pumping(self, count):
+        # self.q.new_task([(100, 100)], self.fishing_window.hwnd)
+        self.q.new_task(count, 'mouse',
+                        [self.fishing_window.get_object('pumping', False), True, 'LEFT', False, False, False],
                         self.fishing_window)
         # self.q.new_task(count, 'mouse', [[(100, 100)], True, 'LEFT', False, False, False], self.fishing_window)
 
@@ -221,14 +241,14 @@ class Fisher(threading.Thread):
 
     def choose_night_bait(self, count):
         self.q.new_task(count, 'mouse',
-                        [self.fishing_window.get_object('luminous', False), True, 'RIGHT', False, False, False],
+                        [self.fishing_window.get_object('luminous', False)[1], True, 'RIGHT', False, False, False],
                         self.fishing_window)
         self.current_baits = 'n_baits'
         self.pause_thread(0.7)
 
     def choose_day_bait(self, count):
         self.q.new_task(count, 'mouse',
-                        [self.fishing_window.get_object('colored', False), True, 'RIGHT', False, False, False],
+                        [self.fishing_window.get_object('colored', False)[0], True, 'RIGHT', False, False, False],
                         self.fishing_window)
         self.current_baits = 'd_baits'
         self.pause_thread(0.7)

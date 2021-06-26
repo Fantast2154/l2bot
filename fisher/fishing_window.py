@@ -17,19 +17,19 @@ class FishingWindow(L2window):
         self.init_image_database = [
             ['fishing', 'images/fishing.jpg', 0.8],
             ['pumping', 'images/pumping.jpg', 0.87],
-            ['reeling', 'images/reeling.jpg', 0.87],
-            ['bait', 'images/bait.jpg', 0.90],
-            ['soski', 'images/soski.jpg', 0.95],
-            ['map_button', 'images/map.jpg', 0.9],
-            ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
-            ['menu', 'images/menu.jpg', 0.6]]
+            ['reeling', 'images/reeling.jpg', 0.87]]
 
         self.extended_image_database = [
+            ['bait', 'images/bait.jpg', 0.90],
+            ['soski', 'images/soski.jpg', 0.7],
             ['blue_bar', 'images/blue_bar2.jpg', 0.8],
             ['colored', 'images/colored_2.jpg', 0.94],
             ['luminous', 'images/luminous_2.jpg', 0.94],
             ['clock', 'images/clock3.jpg', 0.8],
-            ['fishing_window', 'images/fishing_window.jpg', 0.7],
+            ['map_button', 'images/map.jpg', 0.9],
+            ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
+            ['menu', 'images/menu.jpg', 0.6],
+            ['fishing_window', 'images/fishing_window.jpg', 0.6],
             ['red_bar', 'images/red_bar3.jpg', 0.8],
             ['buff', 'images/cdbuff.jpg', 0.87],
             ['soski_activated', 'images/soski_activated.jpg', 0.78],
@@ -51,19 +51,27 @@ class FishingWindow(L2window):
         self.vision_catcheditem_pos = [None] * 4
         self.send_message(f'<-L2window created')
         self.init_images()
-        self.init_search()
+        # self.init_search()
 
     def __del__(self):
         self.send_message(f"destroyed")
 
     def update_screenshot(self, object=None):
-        if object is None:
-            [self.screenshot] = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
-        else:
-            [self.screenshot] = self.wincap.get_screenshot(self.hwnd)[object]
 
-        cv2.imshow('1', self.screenshot)
-        cv2.waitKey(1)
+        if object is None:
+
+            [self.screenshot] = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
+            # temp = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
+        else:
+
+            temp = self.wincap.get_screenshot(self.hwnd).get(object, None)
+            if temp is None:
+                return self.screenshot
+            else:
+                self.screenshot = temp
+            # cv2.imshow('1', self.screenshot)
+            # cv2.waitKey(1)
+            # temp = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
 
         return self.screenshot
 
@@ -76,10 +84,13 @@ class FishingWindow(L2window):
             if not accurate:
                 position = self.library[object][0].find(self.update_screenshot())
             else:
-                position = self.library[object][0].find(self.update_screenshot(object))
+                self.send_message(f'TEST object {object}')
+                position = self.library[object][0].find(self.update_screenshot(object=object))
+                self.send_message(f'TEST position {position}')
             return position
-        except:
-            self.send_message('ERROR object search')
+        except KeyError:
+            self.send_message(f'ERROR object search')
+            self.send_message(f'{KeyError}')
             return []
 
     def start_accurate(self):
@@ -89,21 +100,25 @@ class FishingWindow(L2window):
                 self.update_screenshot(), coordinates_and_sizes=True)
             self.wincap.set_fishing_window(self.hwnd, x_fishwin, y_fishwin, w_fishwin, h_fishwin)
             self.wincap.set_accurate_param(True, self.hwnd)
-        except:
+        except KeyError:
+            self.send_message(f'TEST {KeyError}')
             self.send_message('Error recording fishing_window')
 
-    def fishing_window(self):
-        if self.library['fishing_window'][1]:
-            pass
-        return self.find('fishing_window', accurate=True)
+    def is_fishing_window(self):
 
-    def blue_bar(self):
+        if self.library['fishing_window'][1]:
+            temp = self.find('fishing_window', accurate=True)
+            return temp
+        else:
+            return False
+
+    def is_blue_bar(self):
         return self.find('blue_bar', accurate=True)
 
-    def red_bar(self):
+    def is_red_bar(self):
         return self.find('red_bar', accurate=True)
 
-    def clock(self):
+    def is_clock(self):
         return self.find('clock', accurate=True)
 
     def init_images(self):
@@ -127,17 +142,17 @@ class FishingWindow(L2window):
                 pass
             else:
                 temp = 'ERROR referring to the unknown object: ' + name
-                self.send_message(temp)
+                # self.send_message(temp)
                 return []
         else:
             temp = 'ERROR referring to the unknown object: ' + name
-            self.send_message(temp)
+            # self.send_message(temp)
             return []
 
         if search:
-            object = self.library[name][0].find(self.update_screenshot())
-            self.library[name][1] = object
-            return object
+            pos = self.library[name][0].find(self.update_screenshot())
+            self.library[name][1] = pos
+            return pos
         else:
             return self.library[name][1]
 

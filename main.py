@@ -8,6 +8,7 @@ from system.window_capture import WindowCapture
 import win32gui
 import sys
 import time
+import threading
 
 
 def send_message(message):
