@@ -160,6 +160,7 @@ class ActionQueue(threading.Thread):
         # win32gui.SetForegroundWindow(window.hwnd)
         # win32gui.ShowWindow(window.hwnd, win32con.SW_SHOWMAXIMIZED)
         forceFocus(window.hwnd)
+
         # win32gui.SetForegroundWindow(window.hwnd)
         time.sleep(0.5)
         # print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
