@@ -1,3 +1,5 @@
+import win32process
+
 from system.action_service import ActionService
 import time
 import queue
@@ -9,6 +11,55 @@ import win32com.client
 import win32api
 import win32con
 import keyboard
+import platform
+
+
+def forceFocus(wnd):
+    if platform.system() != 'Windows':
+        return
+
+    SPI_GETFOREGROUNDLOCKTIMEOUT = 0x2000
+    SPI_SETFOREGROUNDLOCKTIMEOUT = 0x2001
+
+    SW_RESTORE = 9
+    SPIF_SENDCHANGE = 2
+
+    import ctypes
+    IsIconic = ctypes.windll.user32.IsIconic
+    ShowWindow = ctypes.windll.user32.ShowWindow
+    GetForegroundWindow = ctypes.windll.user32.GetForegroundWindow
+    GetWindowThreadProcessId = ctypes.windll.user32.GetWindowThreadProcessId
+    BringWindowToTop = ctypes.windll.user32.BringWindowToTop
+    AttachThreadInput = ctypes.windll.user32.AttachThreadInput
+    SetForegroundWindow = ctypes.windll.user32.SetForegroundWindow
+
+    if IsIconic(wnd):
+        ShowWindow(wnd, SW_RESTORE)
+
+    if GetForegroundWindow() == wnd:
+        return True
+
+    ForegroundThreadID = GetWindowThreadProcessId(GetForegroundWindow(), None)
+    ThisThreadID = GetWindowThreadProcessId(wnd, None)
+    if AttachThreadInput(ThisThreadID, ForegroundThreadID, True):
+        BringWindowToTop(wnd)
+        SetForegroundWindow(wnd)
+        AttachThreadInput(ThisThreadID, ForegroundThreadID, False)
+        if GetForegroundWindow() == wnd:
+            return True
+
+    timeout = ctypes.c_int()
+    zero = ctypes.c_int(0)
+    win32gui.SystemParametersInfo(SPI_GETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(timeout), 0)
+    win32gui.SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(zero), SPIF_SENDCHANGE)
+    BringWindowToTop(wnd)
+    SetForegroundWindow(wnd)
+    win32gui.SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(timeout), SPIF_SENDCHANGE);
+    if GetForegroundWindow() == wnd:
+        return True
+
+    return False
+
 
 class ActionQueue(threading.Thread):
     number = None
@@ -97,10 +148,10 @@ class ActionQueue(threading.Thread):
         #     time.sleep(.01)
         #     pyautogui.keyUp('alt')
         #     print(win32gui.GetForegroundWindow())
-            # print('TETSTSTSTS')
-            # time.sleep(0.1)
-            # print('tetstst', win32gui.IsWindowVisible(window.hwnd))
-            # win32gui.SetForegroundWindow(window.hwnd)
+        # print('TETSTSTSTS')
+        # time.sleep(0.1)
+        # print('tetstst', win32gui.IsWindowVisible(window.hwnd))
+        # win32gui.SetForegroundWindow(window.hwnd)
 
         # win32gui.SetActiveWindow(window.hwnd)
         # win32gui.ShowWindow(window.hwnd, 9)
@@ -108,7 +159,8 @@ class ActionQueue(threading.Thread):
         # win32gui.BringWindowToTop(window.hwnd)
         # win32gui.SetForegroundWindow(window.hwnd)
         # win32gui.ShowWindow(window.hwnd, win32con.SW_SHOWMAXIMIZED)
-        win32gui.SetForegroundWindow(window.hwnd)
+        forceFocus(window.hwnd)
+        # win32gui.SetForegroundWindow(window.hwnd)
         time.sleep(0.5)
         # print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
 

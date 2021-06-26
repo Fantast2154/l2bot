@@ -240,7 +240,6 @@ class WindowCapture:
     def start_capturing(self):
         self.stopped = False
         t = Thread(target=self.thread_run)
-        t.setDaemon(True)
         t.start()
 
     def set_accurate_param(self, accurate, hwnd):
