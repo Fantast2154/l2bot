@@ -1,4 +1,5 @@
 import win32process
+from pywinauto import win32functions
 
 from system.action_service import ActionService
 import time
@@ -12,7 +13,12 @@ import win32api
 import win32con
 import keyboard
 import platform
+import pywinauto
+from ctypes import windll
+import ctypes
 
+
+    # return self
 
 def forceFocus(wnd):
     if platform.system() != 'Windows':
@@ -54,7 +60,7 @@ def forceFocus(wnd):
     win32gui.SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(zero), SPIF_SENDCHANGE)
     BringWindowToTop(wnd)
     SetForegroundWindow(wnd)
-    win32gui.SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(timeout), SPIF_SENDCHANGE);
+    win32gui.SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(timeout), SPIF_SENDCHANGE)
     if GetForegroundWindow() == wnd:
         return True
 
@@ -117,11 +123,11 @@ class ActionQueue(threading.Thread):
         win32api.SetCursorPos((x, y))
 
         print('CLICK')
-        time.sleep(0.5)
+        time.sleep(0.1)
         pyautogui.mouseDown()
         time.sleep(0.1)
         pyautogui.mouseUp()
-        time.sleep(0.5)
+        time.sleep(0.1)
         # pyautogui.mouseDown()
         # time.sleep(0.1)
         # pyautogui.mouseUp()
@@ -139,6 +145,7 @@ class ActionQueue(threading.Thread):
         # print('Qsize = ', len(self.queue_list))
 
         self.lock.acquire()
+        print('===============================================')
         print(win32gui.GetForegroundWindow())
         # win32gui.SetFocus(window.hwnd)
         # if win32gui.GetForegroundWindow() != window.hwnd:
@@ -159,10 +166,23 @@ class ActionQueue(threading.Thread):
         # win32gui.BringWindowToTop(window.hwnd)
         # win32gui.SetForegroundWindow(window.hwnd)
         # win32gui.ShowWindow(window.hwnd, win32con.SW_SHOWMAXIMIZED)
-        forceFocus(window.hwnd)
+        # ==================
+        self.SetFocus(window.hwnd)
+
+        # ============================
+        # remote_thread, _ = win32process.GetWindowThreadProcessId(handle)
+        # win32process.AttachThreadInput(win32api.GetCurrentThreadId(), remote_thread, True)
+        # prev_handle = win32gui.SetFocus(handle)
+
+        # ===========================
+        # app = pywinauto.application.Application()
+        # t, c = u'WINDOW SWAPY RECORDS', u'CLASS SWAPY RECORDS'
+        # handle = pywinauto.findwindows.find_windows(title=t, class_name=c)[0]
+        # w = app.window(handle=handle)
+        # w.Setfocus()
 
         # win32gui.SetForegroundWindow(window.hwnd)
-        time.sleep(0.5)
+        time.sleep(1)
         # print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
 
         # params = [0]*6
@@ -174,9 +194,9 @@ class ActionQueue(threading.Thread):
             [(x_temp, y_temp)] = params[0]
             x = x_temp + window.wincap.offset_x[window.window_id]
             y = y_temp + window.wincap.offset_y[window.window_id]
-            print('window_id', window.window_id)
-            print('window.wincap.offset_x', window.wincap.offset_x[window.window_id])
-            print('window.wincap.offset_y', window.wincap.offset_y[window.window_id])
+            # print('window_id', window.window_id)
+            # print('window.wincap.offset_x', window.wincap.offset_x[window.window_id])
+            # print('window.wincap.offset_y', window.wincap.offset_y[window.window_id])
             self.click(x, y)
             # self.lock.release()
             # print(params)
@@ -222,3 +242,69 @@ class ActionQueue(threading.Thread):
                     self.task_execution(self.queue_list.pop(-1), action, action_param, window)
                 finally:
                     pass
+
+    def SetFocus(self, hwnd):
+        print('TEST SetFocus')
+        """Set the focus to this control
+    
+        Activate the window if necessary"""
+        win32gui.UpdateWindow(hwnd)
+        # find the current foreground window
+        cur_foreground = win32gui.GetForegroundWindow()
+        # print(f'TEST cur_foreground {cur_foreground}')
+        # if it is already foreground then just return
+        # if hwnd != cur_foreground:
+        if True:
+
+            # get the thread of the window that is in the foreground
+            # cur_fore_thread = windll.kernel32.GetCurrentThreadId()
+            cur_fore_thread = win32api.GetCurrentThreadId()
+            print(f'TEST cur_fore_thread {cur_fore_thread}')
+            # cur_fore_thread = win32process.GetWindowThreadProcessId(cur_foreground)
+
+            # get the thread of the window that we want to be in the foreground
+            control_thread = windll.user32.GetWindowThreadProcessId(cur_foreground, None)
+            print(f'TEST control_thread {control_thread}')
+            # control_thread = win32process.GetWindowThreadProcessId(hwnd) #TEST
+
+            # if a different thread owns the active window
+            if cur_fore_thread != control_thread:
+                # Attach the two threads and set the foreground window
+                # win32process.AttachThreadInput(
+                #     cur_fore_thread, control_thread, True)
+                res = windll.user32.AttachThreadInput(control_thread, cur_fore_thread, True)
+                # print(f'TEST res {res}')
+                ERROR_INVALID_PARAMETER = 87
+                if res == 0 and ctypes.GetLastError() != ERROR_INVALID_PARAMETER:
+                    print("WARN: could not attach thread input to thread {0} ({1})"
+                        .format(control_thread, ctypes.GetLastError()))
+                    return
+
+
+                # detach the thread again
+                # win32process.AttachThreadInput(
+                #   cur_fore_thread, control_thread, False)
+                res2 = windll.user32.AttachThreadInput(control_thread, cur_fore_thread, True)
+                self.shell.SendKeys('%')
+                cur_fore_thread = windll.kernel32.GetCurrentThreadId()
+                print(f'TEST cur_fore_thread {cur_fore_thread}')
+                # cur_fore_thread = win32process.GetWindowThreadProcessId(cur_foreground)
+
+                # get the thread of the window that we want to be in the foreground
+                control_thread = windll.user32.GetWindowThreadProcessId(cur_foreground, None)
+                print(f'TEST control_thread {control_thread}')
+                # win32gui.SetForegroundWindow(hwnd) #TEST
+                # win32gui.SetFocus(hwnd)
+                focus_whd = windll.user32.SetFocus(hwnd)
+                print(f'TEST focus_whd {focus_whd}')
+                focus_whd2 = windll.user32.GetFocus()
+                print(f'TEST focus_whd {focus_whd2}')
+                # print(f'TEST res2 {res2}')
+            else:   # same threads - just set the foreground window
+                win32gui.SetForegroundWindow(hwnd)
+
+        # make sure that we are idle before returning
+        win32functions.WaitGuiThreadIdle(hwnd)
+
+        # only sleep if we had to change something!
+        time.sleep(.06)

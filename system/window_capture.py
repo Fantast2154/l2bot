@@ -220,7 +220,9 @@ class WindowCapture:
         name_list = []
         self.list_window_names()  # СПИСОК ВСЕХ ДОСТУПНЫХ ОКОН
         list_all_windows = self.get_windows_param()
+
         for window in list_all_windows:
+            print(window)
             if window[1] == self.l2window_name:
                 name_list.append(window[1])
                 hash_list.append(window[0])

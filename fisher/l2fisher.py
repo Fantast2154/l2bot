@@ -157,22 +157,28 @@ class Fisher(threading.Thread):
 
     def trial_rod_cast(self, count):
         self.fishing(count)
-
-        temp_timer = time.time()
-        searching_time = 10
-        while (not self.fishing_window.get_object('fishing_window', True)) and (time.time() - temp_timer < searching_time):
-            continue
+        self.pause_thread(3)
+        self.fishing(count)
+        self.pause_thread(2)
+        # temp_timer = time.time()
+        # searching_time = 10
+        # while (not self.fishing_window.get_object('fishing_window', True)) and (time.time() - temp_timer < searching_time):
+        #     continue
         # else:
         #     return False
-        self.fishing_window.start_accurate()
+
+        self.fishing(count)
+        # else:
+        #     return False
+        # self.fishing_window.start_accurate()
         # self.fishing(count)
         self.pause_thread(0.5)
 
         # if not self.baits_clicked(count):
         #     return False
 
-        while True:
-            self.fishing_window.is_fishing_window()
+        # while True:
+        #     self.fishing_window.is_fishing_window()
 
 
     def overweight_baits_soski_correction(self, count):
