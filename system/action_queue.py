@@ -114,6 +114,8 @@ class ActionQueue(threading.Thread):
         self.queue_list.append(count)
         self.actions.append(action)
         self.action_params.append(action_param)
+        # for param in self.action_params:
+        #     print('ACTION PARAM', param[0])
         self.windows.append(window)
         # self.priority_list.append(priority)
         # self.action_rate_list.append(action_rate)
@@ -124,6 +126,23 @@ class ActionQueue(threading.Thread):
 
     def new_keyboard_task(self):
         pass
+
+    def window_init(self, window):
+
+        x = window.wincap.offset_x[window.window_id] + 10
+        y = window.wincap.offset_y[window.window_id] - 10
+        win32api.SetCursorPos((x, y))
+        time.sleep(0.1)
+        pyautogui.mouseDown()
+        time.sleep(0.1)
+        pyautogui.mouseUp()
+        time.sleep(0.1)
+
+        for i in range(20):
+            win32api.SetCursorPos((x+i, y+i))
+            time.sleep(0.01)
+
+        print(f'WINDOW {window.window_id} WAS INITIALIZED')
 
     def click(self, x, y):
         # self.lock.acquire()
@@ -140,22 +159,16 @@ class ActionQueue(threading.Thread):
         for i in range(3):
             win32api.SetCursorPos((x+i, y+i))
             #time.sleep(0.01)
-        time.sleep(0.1)
-        pyautogui.mouseDown()
-
-        print('CLICK')
-        time.sleep(0.01)
-        pyautogui.mouseUp()
-        time.sleep(0.1)
-
-
+        # time.sleep(0.01)
         # pyautogui.mouseDown()
-        # time.sleep(0.1)
+        # time.sleep(0.02)
         # pyautogui.mouseUp()
-        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-        # time.sleep(0.2)
-        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
-        # time.sleep(0.2)
+        # time.sleep(0.01)
+        time.sleep(0.01)
+        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+        time.sleep(0.01)
+        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+        time.sleep(0.01)
         # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
         # time.sleep(0.2)
         # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
@@ -167,29 +180,7 @@ class ActionQueue(threading.Thread):
         # keyboard.send('s')
 
         self.lock.acquire()
-        print('===============================================')
-        print(win32gui.GetForegroundWindow())
-        # win32gui.SetFocus(window.hwnd)
-        # if win32gui.GetForegroundWindow() != window.hwnd:
-        #     pyautogui.keyDown('alt')
-        #     time.sleep(.01)
-        #     pyautogui.press('tab')
-        #     time.sleep(.01)
-        #     pyautogui.keyUp('alt')
-        #     print(win32gui.GetForegroundWindow())
-        # print('TETSTSTSTS')
-        # time.sleep(0.1)
-        # print('tetstst', win32gui.IsWindowVisible(window.hwnd))
-        # win32gui.SetForegroundWindow(window.hwnd)
 
-        # win32gui.SetActiveWindow(window.hwnd)
-        # win32gui.ShowWindow(window.hwnd, 9)
-        # self.shell.SendKeys('%')
-        # win32gui.BringWindowToTop(window.hwnd)
-        # win32gui.SetForegroundWindow(window.hwnd)
-        # win32gui.ShowWindow(window.hwnd, win32con.SW_SHOWMAXIMIZED)
-        # ==================
-        #self.SetFocus(window.hwnd)
         #self.focus_by_BOYKO(window.hwnd)
         #self.shell.SendKeys('%')
         #win32gui.SetForegroundWindow(window.hwnd)
@@ -224,6 +215,8 @@ class ActionQueue(threading.Thread):
             # print('window.wincap.offset_x', window.wincap.offset_x[window.window_id])
             # print('window.wincap.offset_y', window.wincap.offset_y[window.window_id])
             self.focus_by_BOYKO(window.hwnd)
+            time.sleep(0.01)
+            # self.SetFocus(window.hwnd)
             #win32api.PostMessage(window.hwnd, win32con.WM_CHAR, ord('x'), 0)
 
             #win32api.SendMessage(window.hwnd, win32con.WM_CHAR, ord('x'), 0)
@@ -259,7 +252,7 @@ class ActionQueue(threading.Thread):
             while self.queue_list:
                 try:
                     # priority = self.priority_list[0]
-                    if self.windows[0]:
+                    if self.windows:
                         window = self.windows[0]
                         action = self.actions[0]
                         action_param = self.action_params[0]
@@ -316,7 +309,8 @@ class ActionQueue(threading.Thread):
                 # detach the thread again
                 win32process.AttachThreadInput(
                     cur_fore_thread, control_thread, False)
-                res2 = windll.user32.AttachThreadInput(control_thread, cur_fore_thread, True)
+                # res2 = windll.user32.AttachThreadInput(control_thread, cur_fore_thread, True)
+                wproc.AttachThreadInput(wapi.GetCurrentThreadId(), control_thread, True)
                 self.shell.SendKeys('%')
                 cur_fore_thread = windll.kernel32.GetCurrentThreadId()
                 print(f'TEST cur_fore_thread {cur_fore_thread}')
@@ -342,7 +336,6 @@ class ActionQueue(threading.Thread):
         time.sleep(.06)
 
     def focus_by_BOYKO(self, HEX):
-        print('focus_by_BOYKO', HEX)
         remote_thread, i = wproc.GetWindowThreadProcessId(HEX)
         wproc.AttachThreadInput(wapi.GetCurrentThreadId(), remote_thread, True)
         prev_handle = wgui.SetFocus(HEX)

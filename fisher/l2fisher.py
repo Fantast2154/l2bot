@@ -116,11 +116,14 @@ class Fisher(threading.Thread):
 
     def start_fishing(self, count):
         self.current_state = 0
-        delay = 2
-        delay_correction = delay + 3 / (self.fisher_id+1)
-        self.send_message(f'will start fishing in ........ {delay_correction} sec')
-        time.sleep(delay_correction)
+        delay = 1.5
+        second_delay = 4
+        delay_correction = delay + 5*self.fisher_id
+        self.send_message(f'will start fishing in ........ {delay_correction + second_delay} sec')
+        self.pause_thread(delay_correction)
         self.send_message(f'starts fishing\n')
+        self.q.window_init(self.fishing_window)
+        self.pause_thread(second_delay)
         self.attempt_counter = 0
 
 
@@ -156,9 +159,9 @@ class Fisher(threading.Thread):
         return self.current_state
 
     def trial_rod_cast(self, count):
-        for _ in range(10):
+        for _ in range(15):
             self.fishing(count)
-            self.pause_thread(0.5)
+            self.pause_thread(1)
         #self.fishing(count)
         #self.pause_thread(2)
         # temp_timer = time.time()
@@ -216,8 +219,9 @@ class Fisher(threading.Thread):
 
     def fishing(self, count):
         # self.q.new_task([(100, 100)], self.fishing_window.hwnd)
+        # print(f'FISHING {self.fisher_id}:', self.fishing_window.get_object('fishing', False))
         self.q.new_task(count, 'mouse',
-                        [self.fishing_window.get_object('fishing', False), True, 'LEFT', False, False, False],
+                        [self.fishing_window.get_object('fishing', search=False), True, 'LEFT', False, False, False],
                         self.fishing_window)
 
     def pumping(self, count):

@@ -152,8 +152,10 @@ class FishingWindow(L2window):
         if search:
             pos = self.library[name][0].find(self.update_screenshot())
             self.library[name][1] = pos
+            print(f'DATABASE IF {self.window_id}: {pos}')
             return pos
         else:
+            print(f'DATABASE ELSE {self.window_id}: {self.library[name][1]}')
             return self.library[name][1]
 
     def init_search(self):
