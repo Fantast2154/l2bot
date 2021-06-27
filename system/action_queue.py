@@ -273,7 +273,7 @@ class ActionQueue(threading.Thread):
                 # win32process.AttachThreadInput(
                 #     cur_fore_thread, control_thread, True)
                 res = windll.user32.AttachThreadInput(control_thread, cur_fore_thread, True)
-                # print(f'TEST res {res}')
+                print(f'TEST res {res}')
                 ERROR_INVALID_PARAMETER = 87
                 if res == 0 and ctypes.GetLastError() != ERROR_INVALID_PARAMETER:
                     print("WARN: could not attach thread input to thread {0} ({1})"
@@ -296,9 +296,9 @@ class ActionQueue(threading.Thread):
                 # win32gui.SetForegroundWindow(hwnd) #TEST
                 # win32gui.SetFocus(hwnd)
                 focus_whd = windll.user32.SetFocus(hwnd)
-                print(f'TEST focus_whd {focus_whd}')
+                print(f'TEST set_focus_whd {focus_whd}')
                 focus_whd2 = windll.user32.GetFocus()
-                print(f'TEST focus_whd {focus_whd2}')
+                print(f'TEST get_focus_whd {focus_whd2}')
                 # print(f'TEST res2 {res2}')
             else:   # same threads - just set the foreground window
                 win32gui.SetForegroundWindow(hwnd)
