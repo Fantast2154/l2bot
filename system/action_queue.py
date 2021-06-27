@@ -17,8 +17,15 @@ import pywinauto
 from ctypes import windll
 import ctypes
 
+import sys
+import win32gui as wgui
+import win32process as wproc
+import win32api as wapi
 
-    # return self
+import pyperclip
+
+
+# return self
 
 def forceFocus(wnd):
     if platform.system() != 'Windows':
@@ -121,13 +128,27 @@ class ActionQueue(threading.Thread):
     def click(self, x, y):
         # self.lock.acquire()
         win32api.SetCursorPos((x, y))
+        #win32api.
 
-        print('CLICK')
+        #pyperclip.copy('123')
+        #time.sleep(1)
+        #pyperclip.paste()
+        #keyboard.send('F4')
+        #pyautogui.drag(1, 1, duration=0.1, mouseDownUp=False)
+        #win32api.SetCursorPos((x+2, y+2))
+        #time.sleep(0.1)
+        for i in range(3):
+            win32api.SetCursorPos((x+i, y+i))
+            #time.sleep(0.01)
         time.sleep(0.1)
         pyautogui.mouseDown()
-        time.sleep(0.1)
+
+        print('CLICK')
+        time.sleep(0.01)
         pyautogui.mouseUp()
         time.sleep(0.1)
+
+
         # pyautogui.mouseDown()
         # time.sleep(0.1)
         # pyautogui.mouseUp()
@@ -143,6 +164,7 @@ class ActionQueue(threading.Thread):
     def task_execution(self, count, action, params, window, action_rate='High'):
         # try:
         # print('Qsize = ', len(self.queue_list))
+        # keyboard.send('s')
 
         self.lock.acquire()
         print('===============================================')
@@ -167,7 +189,11 @@ class ActionQueue(threading.Thread):
         # win32gui.SetForegroundWindow(window.hwnd)
         # win32gui.ShowWindow(window.hwnd, win32con.SW_SHOWMAXIMIZED)
         # ==================
-        self.SetFocus(window.hwnd)
+        #self.SetFocus(window.hwnd)
+        #self.focus_by_BOYKO(window.hwnd)
+        #self.shell.SendKeys('%')
+        #win32gui.SetForegroundWindow(window.hwnd)
+        #time.sleep(1)
 
         # ============================
         # remote_thread, _ = win32process.GetWindowThreadProcessId(handle)
@@ -182,7 +208,7 @@ class ActionQueue(threading.Thread):
         # w.Setfocus()
 
         # win32gui.SetForegroundWindow(window.hwnd)
-        time.sleep(1)
+
         # print(f'queue {count} fisher {window.window_id} is calling {action} hwnd = {window.hwnd}\n')
 
         # params = [0]*6
@@ -197,7 +223,15 @@ class ActionQueue(threading.Thread):
             # print('window_id', window.window_id)
             # print('window.wincap.offset_x', window.wincap.offset_x[window.window_id])
             # print('window.wincap.offset_y', window.wincap.offset_y[window.window_id])
+            self.focus_by_BOYKO(window.hwnd)
+            #win32api.PostMessage(window.hwnd, win32con.WM_CHAR, ord('x'), 0)
+
+            #win32api.SendMessage(window.hwnd, win32con.WM_CHAR, ord('x'), 0)
+
+            #time.sleep(0.5)
+
             self.click(x, y)
+            #time.sleep(0.5)
             # self.lock.release()
             # print(params)
             # self.action_service.mouse_master(params)
@@ -270,37 +304,35 @@ class ActionQueue(threading.Thread):
             # if a different thread owns the active window
             if cur_fore_thread != control_thread:
                 # Attach the two threads and set the foreground window
-                # win32process.AttachThreadInput(
-                #     cur_fore_thread, control_thread, True)
+                win32process.AttachThreadInput(cur_fore_thread, control_thread, True)
                 res = windll.user32.AttachThreadInput(control_thread, cur_fore_thread, True)
                 print(f'TEST res {res}')
                 ERROR_INVALID_PARAMETER = 87
                 if res == 0 and ctypes.GetLastError() != ERROR_INVALID_PARAMETER:
                     print("WARN: could not attach thread input to thread {0} ({1})"
-                        .format(control_thread, ctypes.GetLastError()))
+                          .format(control_thread, ctypes.GetLastError()))
                     return
 
-
                 # detach the thread again
-                # win32process.AttachThreadInput(
-                #   cur_fore_thread, control_thread, False)
+                win32process.AttachThreadInput(
+                    cur_fore_thread, control_thread, False)
                 res2 = windll.user32.AttachThreadInput(control_thread, cur_fore_thread, True)
                 self.shell.SendKeys('%')
                 cur_fore_thread = windll.kernel32.GetCurrentThreadId()
                 print(f'TEST cur_fore_thread {cur_fore_thread}')
-                # cur_fore_thread = win32process.GetWindowThreadProcessId(cur_foreground)
+                cur_fore_thread = win32process.GetWindowThreadProcessId(cur_foreground)
 
                 # get the thread of the window that we want to be in the foreground
                 control_thread = windll.user32.GetWindowThreadProcessId(cur_foreground, None)
                 print(f'TEST control_thread {control_thread}')
-                # win32gui.SetForegroundWindow(hwnd) #TEST
-                # win32gui.SetFocus(hwnd)
+                win32gui.SetForegroundWindow(hwnd)  # TEST
+                win32gui.SetFocus(hwnd)
                 focus_whd = windll.user32.SetFocus(hwnd)
                 print(f'TEST set_focus_whd {focus_whd}')
                 focus_whd2 = windll.user32.GetFocus()
                 print(f'TEST get_focus_whd {focus_whd2}')
                 # print(f'TEST res2 {res2}')
-            else:   # same threads - just set the foreground window
+            else:  # same threads - just set the foreground window
                 win32gui.SetForegroundWindow(hwnd)
 
         # make sure that we are idle before returning
@@ -308,3 +340,11 @@ class ActionQueue(threading.Thread):
 
         # only sleep if we had to change something!
         time.sleep(.06)
+
+    def focus_by_BOYKO(self, HEX):
+        print('focus_by_BOYKO', HEX)
+        remote_thread, i = wproc.GetWindowThreadProcessId(HEX)
+        wproc.AttachThreadInput(wapi.GetCurrentThreadId(), remote_thread, True)
+        prev_handle = wgui.SetFocus(HEX)
+        self.shell.SendKeys('%')
+        win32gui.SetForegroundWindow(HEX)

@@ -156,10 +156,11 @@ class Fisher(threading.Thread):
         return self.current_state
 
     def trial_rod_cast(self, count):
-        self.fishing(count)
-        self.pause_thread(3)
-        self.fishing(count)
-        self.pause_thread(2)
+        for _ in range(10):
+            self.fishing(count)
+            self.pause_thread(0.5)
+        #self.fishing(count)
+        #self.pause_thread(2)
         # temp_timer = time.time()
         # searching_time = 10
         # while (not self.fishing_window.get_object('fishing_window', True)) and (time.time() - temp_timer < searching_time):

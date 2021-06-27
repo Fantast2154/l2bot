@@ -129,8 +129,8 @@ class WindowCapture:
             if self.accurate.get(hwnd_l, None):
 
                 for [object_position, object_size, object_name] in self.object_position_and_size[hwnd_l]:
-                    # print('object_position', object_position)
-                    # print('object_size', object_size)
+                    print('object_position', object_position)
+                    print('object_size', object_size)
                     (xx, yy) = object_position
                     (ww, hh) = object_size
                     # dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
@@ -150,11 +150,11 @@ class WindowCapture:
                     #self.imgs.append(img)
                     # img.shape = (self.h, self.w, 4)
 
-                    # # free resources
-                    # dcObj.DeleteDC()
-                    # cDC.DeleteDC()
-                    # win32gui.ReleaseDC(hwnd_l, wDC)
-                    # win32gui.DeleteObject(dataBitMap.GetHandle())
+                    # free resources
+                    dcObj.DeleteDC()
+                    cDC.DeleteDC()
+                    win32gui.ReleaseDC(hwnd_l, wDC)
+                    win32gui.DeleteObject(dataBitMap.GetHandle())
 
                     for key in self.dict_imgs.copy().keys():
                         temp_img = self.dict_imgs[key]
@@ -175,7 +175,11 @@ class WindowCapture:
                 img.shape = (h, w, 4)
                 self.imgs.append(img)
 
-
+                # free resources
+                dcObj.DeleteDC()
+                cDC.DeleteDC()
+                win32gui.ReleaseDC(hwnd_l, wDC)
+                win32gui.DeleteObject(dataBitMap.GetHandle())
 
                 # drop the alpha channel, or cv.matchTemplate() will throw an error like:
                 #   error: (-215:Assertion failed) (depth == CV_8U || depth == CV_32F) && type == _templ.type()
@@ -193,13 +197,7 @@ class WindowCapture:
 
                 self.imgs = temp_arr
             # self.imgs.append(img)
-            # free resources
-            dcObj.DeleteDC()
-            cDC.DeleteDC()
-            win32gui.ReleaseDC(hwnd_l, wDC)
-            win32gui.DeleteObject(dataBitMap.GetHandle())
-
-            self.sreenshots_dict[hwnd_l] = {hwnd_l: self.imgs}
+                self.sreenshots_dict[hwnd_l] = {hwnd_l: self.imgs}
             # self.lock.release()
 
         return self.imgs
