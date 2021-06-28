@@ -1,12 +1,13 @@
+import threading
+
 from system.screen_analyzer import *
 from system.l2window import L2window
 import cv2
 
 
 class FishingWindow(L2window):
-    library = {}
-    screenshot = None
-    win_capture = None
+
+
 
     def __init__(self, window_id, wincap, window_name, hwnd):
         super().__init__(window_id, wincap, window_name, hwnd)
@@ -14,6 +15,9 @@ class FishingWindow(L2window):
         # self.screenshot = wincap.get_screenshot(window_id)
 
         self.hwnd = hwnd
+        self.library = {}
+        self.screenshot = None
+        self.win_capture = None
         self.init_image_database = [
             ['fishing', 'images/fishing.jpg', 0.8],
             ['pumping', 'images/pumping.jpg', 0.87],
@@ -95,7 +99,7 @@ class FishingWindow(L2window):
 
     def start_accurate(self):
         try:
-            self.library['fishing_window'][1] = self.find('fishing_window')
+            self.send_message(f'TEST {KeyError}')
             [(x_fishwin, y_fishwin, w_fishwin, h_fishwin)] = self.library['fishing_window'][0].find(
                 self.update_screenshot(), coordinates_and_sizes=True)
             self.wincap.set_fishing_window(self.hwnd, x_fishwin, y_fishwin, w_fishwin, h_fishwin)
@@ -137,30 +141,35 @@ class FishingWindow(L2window):
                 self.send_message('Error finding images2')
 
     def get_object(self, name, search=False):
-        if name:
-            if self.library[name][0]:
-                pass
-            else:
-                temp = 'ERROR referring to the unknown object: ' + name
-                # self.send_message(temp)
-                return []
+        if self.library[name][0]:
+            pass
+            # if self.library[name][0]:
+            #     pass
+            # else:
+            #     temp = 'ERROR referring to the unknown object: ' + name
+            #     # self.send_message(temp)
+            #     return []
         else:
             temp = 'ERROR referring to the unknown object: ' + name
             # self.send_message(temp)
-            return []
+            return False
 
         if search:
             pos = self.library[name][0].find(self.update_screenshot())
-            self.library[name][1] = pos
-            print(f'DATABASE IF {self.window_id}: {pos}')
-            return pos
+            if pos:
+                self.library[name][1] = pos
+            # print(f'DATABASE IF {self.window_id}: {pos}')
+                return pos
+            else:
+                return []
         else:
-            print(f'DATABASE ELSE {self.window_id}: {self.library[name][1]}')
+            # print(f'DATABASE ELSE {self.window_id}: {self.library[name][1]}')
             return self.library[name][1]
 
     def init_search(self):
         try:
             for key in self.init_image_database:
+                # self.send_message(f'{key}')
                 temp = self.library[key[0]][0].find(self.update_screenshot())
                 if not temp:
                     return False
@@ -170,3 +179,12 @@ class FishingWindow(L2window):
         except:
             self.send_message('Error init search')
             return False
+
+    # def start(self):
+    #     t = threading.Thread(target=self.run)
+    #     t.start()
+    #
+    # def run(self):
+    #     while True:
+            # print(f'RUN TEST {self.window_id}', self.library['fishing'][1])
+            # print(f'RUN TEST {self.window_id}:{id(self.library)}')

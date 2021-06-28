@@ -1,3 +1,4 @@
+import math
 import threading
 import random
 from threading import Lock
@@ -7,42 +8,6 @@ import cv2
 
 
 class Fisher(threading.Thread):
-    # fisher params
-    fishing_window = None
-    fisher_id = None
-    number_of_fishers = None
-    current_state = None
-    # 0 - not fishing
-    # 1 - fishing
-    # 2 - busy with actions (mail,trade and etc.)
-    # 9 - error/stucked
-    paused = None
-    q = None
-
-    # send/receive counters
-    send_counter = 0
-    receive_counter = 0
-    attempt_counter = 0
-
-    # fishing timers
-    total_fishing_time = 0
-    rod_cast_time = 0
-    buff_time = time.time()
-
-    # overweight, soski, baits
-    current_baits = None
-    max_weight = 0
-    used_weight = 0
-    baits_colored = 0
-    baits_luminous = 0
-    soski = 0
-    baits_colored_max = 0
-    baits_luminous_max = 0
-    soski_max = 0
-
-    # connection params
-    bot_is_connected = True
-    it_is_almost_server_restart_time = False
 
     def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
         threading.Thread.__init__(self)
@@ -54,9 +19,37 @@ class Fisher(threading.Thread):
         self.q = q
         self.send_message(f'created')
 
+        # fisher params
+        # 0 - not fishing
+        # 1 - fishing
+        # 2 - busy with actions (mail,trade and etc.)
+        # 9 - error/stucked
+        self.paused = None
+
+        # send/receive counters
         self.send_counter = 0
         self.receive_counter = 0
         self.attempt_counter = 0
+
+        # fishing timers
+        self.total_fishing_time = 0
+        self.rod_cast_time = 0
+        self.buff_time = time.time()
+
+        # overweight, soski, baits
+        self.current_baits = None
+        self.max_weight = 0
+        self.used_weight = 0
+        self.baits_colored = 0
+        self.baits_luminous = 0
+        self.soski = 0
+        self.baits_colored_max = 0
+        self.baits_luminous_max = 0
+        self.soski_max = 0
+
+        # connection params
+        self.bot_is_connected = True
+        self.it_is_almost_server_restart_time = False
 
     def __del__(self):
         self.send_message(f"destroyed")
@@ -72,120 +65,194 @@ class Fisher(threading.Thread):
         pass
 
     def run(self):
-        count = -1
-        self.start_fishing(count)
 
-        while not self.exit.is_set():  # or keyboard was pressed and not disconnected
-            count += 1
-            time.sleep(0.1)
-            cv2.imshow(f'fisher {self.fisher_id}', self.fishing_window.update_screenshot())
-            cv2.waitKey(1)
-            if count < 300:
-                rand = self.fisher_id + 1
-                if rand == 1:
-                    self.pumping(count)
-                if rand == 2:
-                    self.reeling(count)
-            if count > 400:
-                self.current_state = 1
-            self.send_message(f'count {count}')
-        self.current_state = 0
-
-    def test_run(self):
-        queue_count = 0
-        if not self.start_fishing(queue_count):
+        if not self.start_fishing():
             self.stop_fishing()
             self.send_message('ERROR start_fishing()')
             return
-
+        self.send_message('actions_while_fishing started')
         while not self.exit.is_set():  # or keyboard was pressed and not disconnected
 
-            if not self.actions_while_fishing(queue_count):
-                self.stop_fishing()
-                self.send_message('ERROR actions_while_fishing()')
-                return
+            if not self.actions_while_fishing():
+                # self.stop_fishing()
+                self.send_message('actions_while_fishing()')
 
-            if not self.actions_between_fishing_rod_casts(queue_count):
-                self.stop_fishing()
-                self.send_message('ERROR actions_between_fishing_rod_casts()')
-                return
+            if not self.actions_between_fishing_rod_casts():
+                # self.stop_fishing()
+                self.send_message('actions_between_fishing_rod_casts()')
 
         if not self.stop_fishing():
             self.send_message('ERROR stop_fishing()')
             return
 
-    def start_fishing(self, count):
+    def start_fishing(self):
         self.current_state = 0
         delay = 1.5
         second_delay = 4
-        delay_correction = delay + 5*self.fisher_id
+        delay_correction = delay + 6 * self.fisher_id
         self.send_message(f'will start fishing in ........ {delay_correction + second_delay} sec')
         self.pause_thread(delay_correction)
-        self.send_message(f'starts fishing\n')
-        self.q.window_init(self.fishing_window)
-        self.pause_thread(second_delay)
-        self.attempt_counter = 0
-
-
 
         if not self.fishing_window.init_search():
             self.stop_fishing()
 
+        self.send_message(f'starts fishing\n')
+        self.q.window_init(self.fishing_window)
+        self.pause_thread(second_delay)
 
-        if not self.trial_rod_cast(count):
+        if not self.trial_rod_cast():
             self.stop_fishing()
 
+        return True
 
-        # if not self.buff_is_active():
-        #     self.rebuff(count)
+    def actions_while_fishing(self):
+        temp_timer = time.time()
+        searching_time = 20
 
-        # if not self.overweight_baits_soski_correction(count):
-        #     pass
+        if not self.new_task_loop(self.fishing_window.get_object, self.fishing, 10, 4, 'fishing_window', True):
+            return False
 
-    def actions_while_fishing(self, count):
-        pass
+        while not self.fishing_window.get_object('clock', True):
+            if time.time() - temp_timer > searching_time:
+                return False
+        self.send_message('clock found')
 
-    def actions_between_fishing_rod_casts(self, count):
-        pass
+        blue_bar_pos = 0
+        coords_saved = False
+        x_border = None
+        previous_position = None
+        pump_skill_cast_time = 0
+        reeling_skill_cast_time = 0
+        pump_was_pressed = False
+        reel_was_pressed = False
+        pump_timer_was_set = False
+        pumping_time = time.time()
+        reeling_time = time.time()
+        reeling_skill_CD = 2.2
+        pumping_skill_CD = 2.2
+        pumping_CD = 1.05
+        reel_count = 0
+        reel_timer_was_set = False
+
+
+        while self.fishing_window.get_object('clock', True):
+            if time.time() - temp_timer > searching_time:
+                return False
+
+            temp = self.fishing_window.get_object('blue_bar', True)
+            # self.send_message(f'temp {temp}')
+            if temp:
+                (x_temp, y_temp) = temp[-1]
+                # self.send_message(f'temp {temp[-1]}')
+                x_border = x_temp
+            else:
+                self.pumping()
+
+            if not coords_saved and (x_border != None):
+                pumping_time = time.time()
+                coords_saved = True
+                previous_position = x_border
+                self.send_message('COORDS SAVED!!!!')
+
+            if previous_position != None and x_border != None:
+                delta_pump_skill = time.time() - pump_skill_cast_time
+                delta_reel_skill = time.time() - reeling_skill_cast_time
+
+                if pump_was_pressed and 15 <= x_border - previous_position < 45 and delta_reel_skill >= reeling_skill_CD:
+                    pump_was_pressed = False
+                    reel_count = 0
+                    self.reeling()
+                    reeling_skill_cast_time = time.time()
+                    self.send_message('ОШИБКА PUMP. ИСПРАВЛЯЮ.')
+
+                elif reel_was_pressed and 15 <= x_border - previous_position < 45 and delta_pump_skill >= pumping_skill_CD:
+                    reel_was_pressed = False
+                    reel_count = 0
+                    self.pumping()
+                    pump_skill_cast_time = time.time()
+                    self.send_message('ОШИБКА REEL. ИСПРАВЛЯЮ.')
+
+                #if x_border != previous_position:
+                if 10 > math.fabs(x_border - previous_position) > 3: # было not < 3
+                    pumping_time = time.time()
+
+                if x_border - previous_position < 4:
+                    if not pump_timer_was_set:
+                        pump_timer_was_set = True
+                        pumping_time = time.time()
+
+                    delta = time.time() - pumping_time # NEW
+                    delta_pump_skill = time.time() - pump_skill_cast_time
+                    if delta >= pumping_CD and delta_pump_skill >= pumping_skill_CD: # NEW
+                        pump_timer_was_set = False
+                        reel_count = 0
+                        self.pumping()
+                        pump_skill_cast_time = time.time()
+                        pump_was_pressed = True
+                        reel_was_pressed = False
+
+                elif 4 <= x_border - previous_position < 15:
+                    reel_count += 1
+                    delta_reel_skill = time.time() - reeling_skill_cast_time
+
+                    #if reel_count > 0 and delta_reel_skill >= reeling_skill_CD:
+                    if delta_reel_skill >= reeling_skill_CD: # reel_count > 1
+                        reel_count = 0
+                        self.reeling()
+                        reeling_skill_cast_time = time.time()
+                        reel_was_pressed = True
+                        pump_was_pressed = False
+                        pump_timer_was_set = False # NEW
+                        # print(x_border - previous_position, 'REEL')
+
+                        if not reel_timer_was_set:
+                            reel_timer_was_set = True
+                            reeling_time = time.time()
+
+                        if time.time() - reeling_time >= reeling_skill_CD:
+                            reel_timer_was_set = False
+
+                previous_position = x_border
+
+        return True
+
+    def actions_between_fishing_rod_casts(self):
+        self.pause_thread(5)
+        return True
 
     def stop_fishing(self):
         self.send_message(f'has finished fishing\n')
         self.paused = True
         self.exit.set()
         self.current_state = 9
-        self.paused = False
+
+    def trial_rod_cast(self):
+
+        if not self.new_task_loop(self.fishing_window.get_object, self.fishing, 10, 4, 'fishing_window', True):
+            return False
+
+        self.send_message('fishing window has been recorded')
+        self.fishing()
+        self.pause_thread(3)
+        return True
+
+    def new_task_loop(self, condition, task_proc, searching_time, repeat_times, *args):
+        attempt_counter = 0
+        temp_timer = time.time()
+        while not condition(*args):
+
+            if time.time() - temp_timer > searching_time or attempt_counter > repeat_times:
+                return False
+
+            if time.time() - temp_timer > (searching_time / repeat_times) * attempt_counter:
+                attempt_counter += 1
+                task_proc()
+        return True
 
     def get_status(self):
         return self.current_state
 
-    def trial_rod_cast(self, count):
-        for _ in range(15):
-            self.fishing(count)
-            self.pause_thread(1)
-        #self.fishing(count)
-        #self.pause_thread(2)
-        # temp_timer = time.time()
-        # searching_time = 10
-        # while (not self.fishing_window.get_object('fishing_window', True)) and (time.time() - temp_timer < searching_time):
-        #     continue
-        # else:
-        #     return False
-
-        self.fishing(count)
-        # else:
-        #     return False
-        # self.fishing_window.start_accurate()
-        # self.fishing(count)
-        self.pause_thread(0.5)
-
-        # if not self.baits_clicked(count):
-        #     return False
-
-        # while True:
-        #     self.fishing_window.is_fishing_window()
-
-
-    def overweight_baits_soski_correction(self, count):
+    def overweight_baits_soski_correction(self):
         return True
 
     def buff_is_active(self):
@@ -205,11 +272,11 @@ class Fisher(threading.Thread):
 
     def baits_clicked(self, count):
         if self.current_baits is None:
-            self.choose_day_bait(count)
+            self.choose_day_bait()
             self.pause_thread(0.5)
-            self.choose_day_bait(count)
+            self.choose_day_bait()
             self.pause_thread(0.5)
-            self.choose_day_bait(count)
+            self.choose_day_bait()
         else:
             return True
 
@@ -217,72 +284,72 @@ class Fisher(threading.Thread):
         # self.send_message(f'PAUSED for {delay} seconds')
         time.sleep(delay)
 
-    def fishing(self, count):
+    def fishing(self):
         # self.q.new_task([(100, 100)], self.fishing_window.hwnd)
-        # print(f'FISHING {self.fisher_id}:', self.fishing_window.get_object('fishing', False))
-        self.q.new_task(count, 'mouse',
+        # self.send_message('fishing')
+        self.q.new_task('mouse',
                         [self.fishing_window.get_object('fishing', search=False), True, 'LEFT', False, False, False],
                         self.fishing_window)
 
-    def pumping(self, count):
-        # self.q.new_task([(100, 100)], self.fishing_window.hwnd)
-        self.q.new_task(count, 'mouse',
+    def pumping(self):
+        # self.send_message('pumping')
+        self.q.new_task('mouse',
                         [self.fishing_window.get_object('pumping', False), True, 'LEFT', False, False, False],
                         self.fishing_window)
-        # self.q.new_task(count, 'mouse', [[(100, 100)], True, 'LEFT', False, False, False], self.fishing_window)
+        # self.q.new_task('mouse', [[(100, 100)], True, 'LEFT', False, False, False], self.fishing_window)
 
-    def reeling(self, count):
-        # self.q.new_task([(500, 500)], self.fishing_window.hwnd)
-        self.q.new_task(count, 'mouse',
+    def reeling(self):
+        # self.send_message('reeling')
+        self.q.new_task('mouse',
                         [self.fishing_window.get_object('reeling', False), True, 'LEFT', False, False, False],
                         self.fishing_window)
-        # self.q.new_task(count, 'mouse', [[(500, 500)], True, 'LEFT', False, False, False], self.fishing_window)
+        # self.q.new_task('mouse', [[(500, 500)], True, 'LEFT', False, False, False], self.fishing_window)
 
-    def rebuff(self, count):
-        self.q.new_task(count, 'mouse',
+    def rebuff(self):
+        self.q.new_task('mouse',
                         [self.fishing_window.get_object('buff', False), True, 'LEFT', False, False, False],
                         self.fishing_window)
         self.buff_time = time.time()
         self.pause_thread(1.5)
 
-    def turn_on_soski(self, count):
-        self.q.new_task(count, 'mouse',
+    def turn_on_soski(self):
+        self.q.new_task('mouse',
                         [self.fishing_window.get_object('soski', True), True, 'RIGHT', False, False, False],
                         self.fishing_window)
 
-    def choose_night_bait(self, count):
-        self.q.new_task(count, 'mouse',
+    def choose_night_bait(self):
+        self.q.new_task('mouse',
                         [self.fishing_window.get_object('luminous', False)[1], True, 'RIGHT', False, False, False],
                         self.fishing_window)
         self.current_baits = 'n_baits'
         self.pause_thread(0.7)
 
-    def choose_day_bait(self, count):
-        self.q.new_task(count, 'mouse',
+    def choose_day_bait(self):
+        self.q.new_task('mouse',
                         [self.fishing_window.get_object('colored', False)[0], True, 'RIGHT', False, False, False],
                         self.fishing_window)
         self.current_baits = 'd_baits'
         self.pause_thread(0.7)
 
-    # def equipment_bag(self, count):
-    #     self.q.new_task(count, 'mouse', [self.fishing_window.get_object('equipment_bag', False), True, 'RIGHT', False, False, False], self.fishing_window)
+    # def equipment_bag(self,
+    #     self.q.new_task('mouse', [self.fishing_window.get_object('equipment_bag', False), True, 'RIGHT', False, False, False], self.fishing_window)
 
-    def send_mail(self, count):
+    def send_mail(self):
         pass
 
-    def send_trade(self, count):
+    def send_trade(self):
         pass
 
-    def wait_for_trade(self, count):
+    def wait_for_trade(self):
         pass
 
-    def receive_mail(self, count):
+    def receive_mail(self):
         pass
 
-    def change_bait(self, count):
+    def change_bait(self):
         pass
 
-    def map(self, count):
-        self.q.new_task(count, 'mouse',
+    def map(self):
+        self.q.new_task('mouse',
                         [self.fishing_window.get_object('map_button', False), True, 'RIGHT', False, False, False],
                         self.fishing_window)
