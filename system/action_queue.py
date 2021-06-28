@@ -1,8 +1,8 @@
 import win32process
 from pywinauto import win32functions
 
-from lib.AutoHotPy import AutoHotPy
-from lib.InterceptionWrapper import InterceptionMouseState, InterceptionMouseStroke
+# from lib.AutoHotPy import AutoHotPy
+# from lib.InterceptionWrapper import InterceptionMouseState, InterceptionMouseStroke
 from system.action_service import ActionService
 import time
 import queue
