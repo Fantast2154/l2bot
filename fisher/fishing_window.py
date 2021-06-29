@@ -55,7 +55,6 @@ class FishingWindow(L2window):
         self.vision_catcheditem_pos = [None] * 4
         self.send_message(f'<-L2window created')
         self.init_images()
-        # self.init_search()
 
     def __del__(self):
         self.send_message(f"destroyed")
@@ -116,14 +115,14 @@ class FishingWindow(L2window):
     def is_blue_bar(self):
         temp = self.find('blue_bar', accurate=True)
         if temp:
-            return True
+            return temp
         else:
             return False
 
     def is_red_bar(self):
         temp = self.find('red_bar', accurate=True)
         if temp:
-            return True
+            return temp
         else:
             return False
 
