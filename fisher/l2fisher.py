@@ -85,7 +85,7 @@ class Fisher(threading.Thread):
         while not self.exit.is_set():  # or keyboard was pressed and not disconnected
 
             if not self.actions_while_fishing():
-                pass
+                print('self.actions_while_fishing()')
 
             if not self.actions_between_fishing_rod_casts():
                 self.send_message('actions_between_fishing_rod_casts FAILED')
@@ -132,7 +132,7 @@ class Fisher(threading.Thread):
         if not self.new_task_loop(self.fishing_window.get_object, self.fishing, 10, 'fishing_window', True):
             return False
         self.fishing_window.record_fishing_window()
-        # self.fishing_window.start_accurate_search()
+        self.fishing_window.start_accurate_search()
         self.fishing()
         self.pause_thread(2)
         return True
@@ -142,10 +142,10 @@ class Fisher(threading.Thread):
         searching_time = 20
 
         # if not self.new_task_loop(self.fishing_window.get_object, self.fishing, 10, 4, 'fishing_window', True):
-        if not self.new_task_loop(self.fishing_window.is_fishing_window, self.fishing, 10):
+        if not self.new_task_loop(self.fishing_window.is_fishing_window, self.fishing, 20):
             return False
 
-        if not self.new_task_loop(self.fishing_window.is_clock, None, 10):
+        if not self.new_task_loop(self.fishing_window.is_clock, None, 20):
             return False
 
         # while not self.fishing_window.get_object('clock', True):
@@ -273,6 +273,10 @@ class Fisher(threading.Thread):
         attempt_counter = 0
         repeat_times = searching_time // 2.5
         temp_timer = time.time()
+        print('task_proc', task_proc)
+        #print('*ARGS', *args)
+        #print('condition(ARGS)', self.fisher_id, condition(*args))
+
         while not condition(*args):
 
             if task_proc is not None:
@@ -386,5 +390,5 @@ class Fisher(threading.Thread):
                         self.fishing_window)
 
     def is_day_time(self):
-        if self.game_time is not None:
-            return True
+        #if self.game_time is not None:
+        return True

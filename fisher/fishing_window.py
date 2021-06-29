@@ -60,13 +60,13 @@ class FishingWindow(L2window):
         self.send_message(f"destroyed")
 
     def update_screenshot(self):
-        [self.screenshot] = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
+        self.screenshot = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
         return self.screenshot
 
     def update_accurate_screenshot(self, object=False):
         if object:
-            [self.screenshot_accurate] = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
-            self.send_message(f'{self.screenshot_accurate}')
+            self.screenshot_accurate = self.wincap.get_screenshot(self.hwnd)[object]
+            #self.send_message(f'{self.screenshot_accurate}')
             return self.screenshot_accurate
         else:
             return []
@@ -79,7 +79,11 @@ class FishingWindow(L2window):
             if not accurate:
                 position = self.library[object][0].find(self.update_screenshot())
             else:
-                position = self.library[object][0].find(self.update_accurate_screenshot(object=object))
+                t = self.update_accurate_screenshot(object=object)
+                #cv2.imshow(f'{self.window_id}', t)
+                #cv2.waitKey(20)
+                position = self.library[object][0].find(t)
+                #self.send_message(f'{object} {position}')
             return position
         except KeyError:
             self.send_message(f'find function ERROR object search')
@@ -108,7 +112,7 @@ class FishingWindow(L2window):
     def is_fishing_window(self):
         temp = self.find('fishing_window', accurate=True)
         if temp:
-            return True
+            return temp
         else:
             return False
 
@@ -129,7 +133,7 @@ class FishingWindow(L2window):
     def is_clock(self):
         temp = self.find('clock', accurate=True)
         if temp:
-            return True
+            return temp
         else:
             return False
 

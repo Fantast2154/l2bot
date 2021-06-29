@@ -84,6 +84,8 @@ class WindowCapture:
         self.screenshots = []
         self.imgs = []
         self.sreenshots_dict = {}
+        self.sreenshots_dict_SECOND = {}
+        self.sreenshots_dict_THIRD = {}
         self.lock = Lock()
         self.l2window_name = l2win_name
 
@@ -98,6 +100,11 @@ class WindowCapture:
 
     def set_fishing_window(self, hwnd, x_fishwin, y_fishwin, w_fishwin, h_fishwin):
 
+        # self.object_position_and_size[hwnd] = [[(x_fishwin, y_fishwin), (w_fishwin, h_fishwin), 'fishing_window'],
+        #                                        [(x_fishwin + 107, y_fishwin + 217), (30, 30), 'clock'],
+        #                                        [(x_fishwin + 17, y_fishwin + 249), (231, 14), 'blue_bar'],
+        #                                        [(x_fishwin + 17, y_fishwin + 249), (231, 14), 'red_bar']]
+        #x_fishwin, y_fishwin, w_fishwin, h_fishwin = 0 , 0, 400, 400
         self.object_position_and_size[hwnd] = [[(x_fishwin, y_fishwin), (w_fishwin, h_fishwin), 'fishing_window'],
                                                [(x_fishwin + 107, y_fishwin + 217), (30, 30), 'clock'],
                                                [(x_fishwin + 17, y_fishwin + 249), (231, 14), 'blue_bar'],
@@ -112,6 +119,7 @@ class WindowCapture:
         # self.lock.acquire()
         # self.imgs = []
         # print('NUM', self.game_windows)
+        temp_arr = []
         for game_window in self.game_windows:
             hwnd_l = game_window.hwnd
 
@@ -121,16 +129,27 @@ class WindowCapture:
             cropped_y = game_window.cropped_y
             # print('hwnd_l, w, h, cropped_x, cropped_y', hwnd_l, w, h, cropped_x, cropped_y)
             # get the window image data
-            wDC = win32gui.GetWindowDC(hwnd_l)
-            dcObj = win32ui.CreateDCFromHandle(wDC)
-            cDC = dcObj.CreateCompatibleDC()
-            dataBitMap = win32ui.CreateBitmap()
+            # wDC = win32gui.GetWindowDC(hwnd_l)
+            # dcObj = win32ui.CreateDCFromHandle(wDC)
+            # cDC = dcObj.CreateCompatibleDC()
+            # dataBitMap = win32ui.CreateBitmap()
             self.imgs = []
-            if self.accurate.get(hwnd_l, None):
+            #print('CAPTURE SCREEN', self.accurate.get(hwnd_l, None))
 
-                for [object_position, object_size, object_name] in self.object_position_and_size[hwnd_l]:
-                    print('object_position', object_position)
-                    print('object_size', object_size)
+            if self.accurate.get(hwnd_l, None) is not None:
+                #self.dict_imgs.clear()
+
+                for shefer in self.object_position_and_size[hwnd_l]:
+                    #print('shefer hwnd_l', shefer, hwnd_l)
+                    [object_position, object_size, object_name] = shefer
+                    wDC = win32gui.GetWindowDC(hwnd_l)
+                    dcObj = win32ui.CreateDCFromHandle(wDC)
+                    cDC = dcObj.CreateCompatibleDC()
+                    dataBitMap = win32ui.CreateBitmap()
+
+                    #print('object_position', object_position)
+                    #print('object_size', object_size)
+                    #print('object_name', object_name)
                     (xx, yy) = object_position
                     (ww, hh) = object_size
                     # dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
@@ -146,7 +165,9 @@ class WindowCapture:
                     signedIntsArray = dataBitMap.GetBitmapBits(True)
                     img = np.fromstring(signedIntsArray, dtype='uint8')
                     img.shape = (hh, ww, 4)
-                    self.dict_imgs[object_name] = img
+
+                    #self.dict_imgs[object_name] = img
+
                     #self.imgs.append(img)
                     # img.shape = (self.h, self.w, 4)
 
@@ -156,14 +177,25 @@ class WindowCapture:
                     win32gui.ReleaseDC(hwnd_l, wDC)
                     win32gui.DeleteObject(dataBitMap.GetHandle())
 
-                    for key in self.dict_imgs.copy().keys():
-                        temp_img = self.dict_imgs[key]
-                        temp_img = temp_img[..., :3]
-                        self.dict_imgs[key] = np.ascontiguousarray(temp_img)
+                    img = img[..., :3]
+                    img = np.ascontiguousarray(img)
 
-                    self.sreenshots_dict[hwnd_l] = self.dict_imgs
+                    self.dict_imgs[object_name] = img
+
+                    # for img in self.imgs:
+                    #     img = img[..., :3]
+                    #     img = np.ascontiguousarray(img)
+                    #     temp_arr.append(img)
+                self.sreenshots_dict_THIRD[hwnd_l] = self.dict_imgs
+                #return self.sreenshots_dict_THIRD
 
             else:
+
+                wDC = win32gui.GetWindowDC(hwnd_l)
+                dcObj = win32ui.CreateDCFromHandle(wDC)
+                cDC = dcObj.CreateCompatibleDC()
+                dataBitMap = win32ui.CreateBitmap()
+
                 dataBitMap.CreateCompatibleBitmap(dcObj, w, h)
                 cDC.SelectObject(dataBitMap)
                 cDC.BitBlt((0, 0), (w, h), dcObj, (cropped_x, cropped_y), win32con.SRCCOPY)
@@ -173,7 +205,7 @@ class WindowCapture:
                 signedIntsArray = dataBitMap.GetBitmapBits(True)
                 img = np.fromstring(signedIntsArray, dtype='uint8')
                 img.shape = (h, w, 4)
-                self.imgs.append(img)
+                #self.imgs.append(img)
 
                 # free resources
                 dcObj.DeleteDC()
@@ -181,26 +213,33 @@ class WindowCapture:
                 win32gui.ReleaseDC(hwnd_l, wDC)
                 win32gui.DeleteObject(dataBitMap.GetHandle())
 
+                img = img[..., :3]
+                img = np.ascontiguousarray(img)
+
                 # drop the alpha channel, or cv.matchTemplate() will throw an error like:
                 #   error: (-215:Assertion failed) (depth == CV_8U || depth == CV_32F) && type == _templ.type()
                 #   && _img.dims() <= 2 in function 'cv::matchTemplate'
-                temp_arr = []
-                for img in self.imgs:
-                    img = img[..., :3]
+                #temp_arr = []
+                #for img in self.imgs:
+
                     # make image C_CONTIGUOUS to avoid errors that look like:
                     #   File ... in draw_rectangles
                     #   TypeError: an integer is required (got type tuple)
                     # see the discussion here:
                     # https://github.com/opencv/opencv/issues/14866#issuecomment-580207109
-                    img = np.ascontiguousarray(img)
-                    temp_arr.append(img)
 
-                self.imgs = temp_arr
+                #self.dict_imgs[object_name]
+                #temp_arr.append(img)
+
+                #self.imgs = temp_arr
+
             # self.imgs.append(img)
-                self.sreenshots_dict[hwnd_l] = {hwnd_l: self.imgs}
+                #self.sreenshots_dict_THIRD[hwnd_l] = {hwnd_l: self.imgs}
+                self.dict_imgs[hwnd_l] = img
+                self.sreenshots_dict_THIRD[hwnd_l] = self.dict_imgs
             # self.lock.release()
 
-        return self.imgs
+        return self.sreenshots_dict_THIRD
 
     def list_window_names(self):
         temp = []
@@ -248,7 +287,11 @@ class WindowCapture:
     def thread_run(self):
 
         while not self.exit.is_set():
-            self.screenshots = self.capture_screen()
+            self.sreenshots_dict = self.capture_screen()
+            # self.sreenshots_dict_SECOND = self.capture_screen()
+            # self.sreenshots_dict = self.sreenshots_dict_SECOND.copy()
+
+
 
             '''
             for accurate in self.accurate:
