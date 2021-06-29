@@ -110,33 +110,26 @@ class ActionQueue(threading.Thread):
         print(f'WINDOW {window.window_id} WAS INITIALIZED')
 
     def click(self, x, y, param=False):
-        # self.lock.acquire()
+
+        self.lock.acquire()
         win32api.SetCursorPos((x, y))
-        #win32api.
+
         if param:
             time.sleep(0.01)
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, 0, 0)
-            time.sleep(0.03)
+            time.sleep(0.01)
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, 0, 0)
             time.sleep(0.01)
 
-        for i in range(4):
-            win32api.SetCursorPos((x+i, y+i))
-            #time.sleep(0.01)
-        # time.sleep(0.01)
-        # pyautogui.mouseDown()
-        # time.sleep(0.02)
-        # pyautogui.mouseUp()
-        # time.sleep(0.01)
+            for i in range(4):
+                win32api.SetCursorPos((x+i, y+i))
+
         time.sleep(0.01)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-        time.sleep(0.03)
+        time.sleep(0.01)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
         time.sleep(0.01)
-        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-        # time.sleep(0.2)
-        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
-        # self.lock.release()
+        self.lock.release()
 
     def exitAutoHotKey(self, autohotpy, event):
         """
@@ -151,11 +144,6 @@ class ActionQueue(threading.Thread):
 
 
     def task_execution(self, action, params, window, action_rate='High'):
-        # try:
-        # print('Qsize = ', len(self.queue_list))
-        # keyboard.send('s')
-
-        # self.lock.acquire()
 
         # params = [0]*6
         if action == 'mouse':
@@ -184,7 +172,7 @@ class ActionQueue(threading.Thread):
             # self.action_service.keyboard_master(params)
         # except:
         # print('TEST queue window activation error')
-        # self.lock.release()
+
 
     @classmethod
     def start_queueing(cls):

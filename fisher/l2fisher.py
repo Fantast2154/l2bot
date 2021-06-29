@@ -132,8 +132,8 @@ class Fisher(threading.Thread):
         pump_timer_was_set = False
         pumping_time = time.time()
         reeling_time = time.time()
-        reeling_skill_CD = 2.2
-        pumping_skill_CD = 2.2
+        reeling_skill_CD = 2.0
+        pumping_skill_CD = 2.0
         pumping_CD = 1.05
         reel_count = 0
         reel_timer_was_set = False
