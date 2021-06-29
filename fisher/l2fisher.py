@@ -23,6 +23,7 @@ class Fisher(threading.Thread):
         # 0 - not fishing
         # 1 - fishing
         # 2 - busy with actions (mail,trade and etc.)
+        # 8 - paused
         # 9 - error/stucked
         self.paused = None
 
@@ -62,7 +63,10 @@ class Fisher(threading.Thread):
         self.q.new_task(count, self.fishing_window)
 
     def pause_fisher(self, delay):
-        pass
+        if delay is None:
+            pass
+        else:
+            self.pause_thread(delay)
 
     def run(self):
 
@@ -70,12 +74,12 @@ class Fisher(threading.Thread):
             self.stop_fishing()
             self.send_message('ERROR start_fishing()')
             return
-        self.send_message('actions_while_fishing started')
         while not self.exit.is_set():  # or keyboard was pressed and not disconnected
 
             if not self.actions_while_fishing():
+                pass
                 # self.stop_fishing()
-                self.send_message('actions_while_fishing()')
+                # self.send_message('actions_while_fishing()')
 
             if not self.actions_between_fishing_rod_casts():
                 # self.stop_fishing()
@@ -115,7 +119,7 @@ class Fisher(threading.Thread):
         while not self.fishing_window.get_object('clock', True):
             if time.time() - temp_timer > searching_time:
                 return False
-        self.send_message('clock found')
+        # self.send_message('clock found')
 
         blue_bar_pos = 0
         coords_saved = False
@@ -152,7 +156,7 @@ class Fisher(threading.Thread):
                 pumping_time = time.time()
                 coords_saved = True
                 previous_position = x_border
-                self.send_message('COORDS SAVED!!!!')
+                # self.send_message('COORDS SAVED!!!!')
 
             if previous_position != None and x_border != None:
                 delta_pump_skill = time.time() - pump_skill_cast_time
@@ -163,14 +167,14 @@ class Fisher(threading.Thread):
                     reel_count = 0
                     self.reeling()
                     reeling_skill_cast_time = time.time()
-                    self.send_message('ОШИБКА PUMP. ИСПРАВЛЯЮ.')
+                    # self.send_message('ОШИБКА PUMP. ИСПРАВЛЯЮ.')
 
                 elif reel_was_pressed and 15 <= x_border - previous_position < 45 and delta_pump_skill >= pumping_skill_CD:
                     reel_was_pressed = False
                     reel_count = 0
                     self.pumping()
                     pump_skill_cast_time = time.time()
-                    self.send_message('ОШИБКА REEL. ИСПРАВЛЯЮ.')
+                    # self.send_message('ОШИБКА REEL. ИСПРАВЛЯЮ.')
 
                 #if x_border != previous_position:
                 if 10 > math.fabs(x_border - previous_position) > 3: # было not < 3
@@ -217,7 +221,7 @@ class Fisher(threading.Thread):
         return True
 
     def actions_between_fishing_rod_casts(self):
-        self.pause_thread(5)
+        self.fishing_window.stop_accurate_search()
         return True
 
     def stop_fishing(self):
@@ -230,10 +234,10 @@ class Fisher(threading.Thread):
 
         if not self.new_task_loop(self.fishing_window.get_object, self.fishing, 10, 4, 'fishing_window', True):
             return False
-
-        self.send_message('fishing window has been recorded')
+        self.fishing_window.record_fishing_window()
+        # self.fishing_window.start_accurate_search()
         self.fishing()
-        self.pause_thread(3)
+        self.pause_thread(2)
         return True
 
     def new_task_loop(self, condition, task_proc, searching_time, repeat_times, *args):

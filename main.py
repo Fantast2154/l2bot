@@ -36,25 +36,23 @@ if __name__ == '__main__':
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
     # win_capture = ScreenCapture()
     win_capture = WindowCapture(l2window_name)
+
     queue = ActionQueue()
 
     # searching running L2 windows
-
     name_list, hash_list = win_capture.get_l2windows_param()
 
     n = len(name_list)
     print('number of l2 windows:', n)
-    if n >= 3:
-        m = 3  # number of fishers
+    max_number_of_fishers = 3
+    if n >= max_number_of_fishers:
+        m = max_number_of_fishers  # number of fishers
     else:
         m = n  # number of fishers
     print('number of fishers: ', m)
 
-    if m > n:
-        send_message("I DON'T HAVE ENOUGH WINDOWS!")
-
     if m < 1 or m > 3:
-        send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY 1 OR 2 FISHERS! KEEP CALM!')
+        send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY < 3 FISHERS! KEEP CALM!')
         sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
     # create n windows L2
@@ -62,10 +60,12 @@ if __name__ == '__main__':
     for i in range(n):
         windows.append(L2window(i, win_capture, name_list[i], hash_list[i]))
 
+    # setting created windows to screenshot maker
     win_capture.set_windows(windows)
 
-    # start capturing screenshots
+    # start queueing of tasks
     queue.start()
+    # start capturing screenshots
     win_capture.start_capturing()
 
     delay = 3
@@ -74,7 +74,13 @@ if __name__ == '__main__':
         time.sleep(1)
 
     windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
+
+    # t = Telegram()
+
+    # start fishing
     FishingService(m, windows_f, queue)
+
+    # stop everything
     queue.stop()
     queue.join()
     win_capture.stop()

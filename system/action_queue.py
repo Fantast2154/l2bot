@@ -36,6 +36,7 @@ class ActionQueue(threading.Thread):
     priority_list = []
     action_rate_list = []
 
+
     def __init__(self):
         self.send_message(f'Queue created\n')
         threading.Thread.__init__(self)
@@ -46,16 +47,16 @@ class ActionQueue(threading.Thread):
         self.queue_list = []
         self.shell = win32com.client.Dispatch("WScript.Shell")
         self.shell.SendKeys('%')
-
-        self.auto = AutoHotPy()
-        self.auto.registerExit(self.auto.ESC, self.exitAutoHotKey)
+        self.last_active_window = None
+        # self.auto = AutoHotPy()
+        # self.auto.registerExit(self.auto.ESC, self.exitAutoHotKey)
         # t = threading.Thread(target=self.auto_start)
         # t.start()
 
 
-    def auto_start(self):
+    # def auto_start(self):
           # Registering an end key is mandatory to be able tos top the program gracefully
-        self.auto.start()
+        # self.auto.start()
 
     def activate_l2windows(self, windows):
         try:
@@ -108,10 +109,16 @@ class ActionQueue(threading.Thread):
         time.sleep(1)
         print(f'WINDOW {window.window_id} WAS INITIALIZED')
 
-    def click(self, x, y):
+    def click(self, x, y, param=False):
         # self.lock.acquire()
         win32api.SetCursorPos((x, y))
         #win32api.
+        if param:
+            time.sleep(0.01)
+            win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, 0, 0)
+            time.sleep(0.03)
+            win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, 0, 0)
+            time.sleep(0.01)
 
         for i in range(4):
             win32api.SetCursorPos((x+i, y+i))
@@ -138,11 +145,12 @@ class ActionQueue(threading.Thread):
         autohotpy.stop()
 
     def click_target(self, x, y):
+        pass
         # time.sleep(0.02)
-        self.auto.moveMouseToPosition(x, y)
+        # self.auto.moveMouseToPosition(x, y)
 
 
-    def task_execution(self, count, action, params, window, action_rate='High'):
+    def task_execution(self, action, params, window, action_rate='High'):
         # try:
         # print('Qsize = ', len(self.queue_list))
         # keyboard.send('s')
@@ -159,15 +167,15 @@ class ActionQueue(threading.Thread):
             x = x_temp + window.wincap.offset_x[window.window_id]
             y = y_temp + window.wincap.offset_y[window.window_id]
 
-            if window.hwnd != win32gui.GetForegroundWindow():
-                win32gui.SetForegroundWindow(window.hwnd)
-                self.shell.SendKeys('%')
-                time.sleep(0.15)
-            self.focus_by_BOYKO(window.hwnd)
+            if window.hwnd != self.last_active_window:
+                self.last_active_window = window.hwnd
+                # win32gui.SetForegroundWindow(window.hwnd)
+                # self.shell.SendKeys('%')
+                # self.focus_by_BOYKO(window.hwnd)
+                self.click(x, y, param=True)
+            else:
 
-            time.sleep(0.01)
-
-            self.click(x, y)
+                self.click(x, y, param=False)
             # self.click_target(x, y)
 
         if action == 'keyboard':
@@ -208,7 +216,7 @@ class ActionQueue(threading.Thread):
                     del self.actions[0]
                     del self.action_params[0]
 
-                    self.task_execution(self.queue_list.pop(-1), action, action_param, window)
+                    self.task_execution(action, action_param, window)
                 finally:
                     pass
 

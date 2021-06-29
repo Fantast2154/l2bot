@@ -7,8 +7,6 @@ import cv2
 
 class FishingWindow(L2window):
 
-
-
     def __init__(self, window_id, wincap, window_name, hwnd):
         super().__init__(window_id, wincap, window_name, hwnd)
         self.wincap = wincap
@@ -16,8 +14,10 @@ class FishingWindow(L2window):
 
         self.hwnd = hwnd
         self.library = {}
-        self.screenshot = None
+
         self.win_capture = None
+        self.accurate_search = False
+        self.screenshot_accurate = None
         self.init_image_database = [
             ['fishing', 'images/fishing.jpg', 0.8],
             ['pumping', 'images/pumping.jpg', 0.87],
@@ -60,25 +60,17 @@ class FishingWindow(L2window):
     def __del__(self):
         self.send_message(f"destroyed")
 
-    def update_screenshot(self, object=None):
-
-        if object is None:
-
-            [self.screenshot] = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
-            # temp = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
-        else:
-
-            temp = self.wincap.get_screenshot(self.hwnd).get(object, None)
-            if temp is None:
-                return self.screenshot
-            else:
-                self.screenshot = temp
-            # cv2.imshow('1', self.screenshot)
-            # cv2.waitKey(1)
-            # temp = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
-
+    def update_screenshot(self):
+        [self.screenshot] = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
         return self.screenshot
 
+    def update_accurate_screenshot(self, object=False):
+        if object:
+            [self.screenshot_accurate] = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
+            self.send_message(f'{self.screenshot_accurate}')
+            return self.screenshot_accurate
+        else:
+            return []
     def send_message(self, message):
         temp = 'FishingWindow' + f' {self.window_id}' + ': ' + message
         print(temp)
@@ -88,42 +80,59 @@ class FishingWindow(L2window):
             if not accurate:
                 position = self.library[object][0].find(self.update_screenshot())
             else:
-                self.send_message(f'TEST object {object}')
-                position = self.library[object][0].find(self.update_screenshot(object=object))
-                self.send_message(f'TEST position {position}')
+                position = self.library[object][0].find(self.update_accurate_screenshot(object=object))
             return position
         except KeyError:
-            self.send_message(f'ERROR object search')
+            self.send_message(f'find function ERROR object search')
             self.send_message(f'{KeyError}')
             return []
 
-    def start_accurate(self):
+    def start_accurate_search(self):
+        self.wincap.set_accurate_param(True, self.hwnd)
+        self.accurate_search = True
+        self.send_message('start_accurate command is ON')
+
+    def stop_accurate_search(self):
+        self.wincap.set_accurate_param(False, self.hwnd)
+        self.accurate_search = False
+        self.send_message('start_accurate command is OFF')
+
+    def record_fishing_window(self):
         try:
-            self.send_message(f'TEST {KeyError}')
             [(x_fishwin, y_fishwin, w_fishwin, h_fishwin)] = self.library['fishing_window'][0].find(
                 self.update_screenshot(), coordinates_and_sizes=True)
             self.wincap.set_fishing_window(self.hwnd, x_fishwin, y_fishwin, w_fishwin, h_fishwin)
-            self.wincap.set_accurate_param(True, self.hwnd)
-        except KeyError:
-            self.send_message(f'TEST {KeyError}')
-            self.send_message('Error recording fishing_window')
+            self.send_message('fishing window has been recorded')
+        except:
+            self.send_message('Error recording fishing window')
 
     def is_fishing_window(self):
-
-        if self.library['fishing_window'][1]:
-            temp = self.find('fishing_window', accurate=True)
-            return temp
+        temp = self.find('fishing_window', accurate=True)
+        if temp:
+            return True
         else:
             return False
 
     def is_blue_bar(self):
-        return self.find('blue_bar', accurate=True)
+        temp = self.find('blue_bar', accurate=True)
+        if temp:
+            return True
+        else:
+            return False
 
     def is_red_bar(self):
-        return self.find('red_bar', accurate=True)
+        temp = self.find('red_bar', accurate=True)
+        if temp:
+            return True
+        else:
+            return False
 
     def is_clock(self):
-        return self.find('clock', accurate=True)
+        temp = self.find('clock', accurate=True)
+        if temp:
+            return True
+        else:
+            return False
 
     def init_images(self):
         for obj in self.init_image_database:
@@ -143,27 +152,20 @@ class FishingWindow(L2window):
     def get_object(self, name, search=False):
         if self.library[name][0]:
             pass
-            # if self.library[name][0]:
-            #     pass
-            # else:
-            #     temp = 'ERROR referring to the unknown object: ' + name
-            #     # self.send_message(temp)
-            #     return []
         else:
             temp = 'ERROR referring to the unknown object: ' + name
-            # self.send_message(temp)
+            self.send_message(temp)
             return False
 
         if search:
             pos = self.library[name][0].find(self.update_screenshot())
             if pos:
                 self.library[name][1] = pos
-            # print(f'DATABASE IF {self.window_id}: {pos}')
+                # print(f'DATABASE IF {self.window_id}: {pos}')
                 return pos
             else:
                 return []
         else:
-            # print(f'DATABASE ELSE {self.window_id}: {self.library[name][1]}')
             return self.library[name][1]
 
     def init_search(self):
@@ -179,12 +181,3 @@ class FishingWindow(L2window):
         except:
             self.send_message('Error init search')
             return False
-
-    # def start(self):
-    #     t = threading.Thread(target=self.run)
-    #     t.start()
-    #
-    # def run(self):
-    #     while True:
-            # print(f'RUN TEST {self.window_id}', self.library['fishing'][1])
-            # print(f'RUN TEST {self.window_id}:{id(self.library)}')

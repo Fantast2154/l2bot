@@ -11,12 +11,9 @@ from system.action_queue import ActionQueue
 # self.send_message(f'{self!r}')
 
 class FishingService:
-    number_of_fishers = 0
     fishers = []
     fishing_windows = []
     raised_error = False
-    q = None
-    win_capture = None
 
     def __new__(cls, number_of_fishers, windows, q):
         if number_of_fishers < 1 or number_of_fishers > 3 or number_of_fishers != len(windows):
@@ -37,12 +34,15 @@ class FishingService:
             # temp_fishing_window.start() # TEST
             temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
             # temp_fisher.start()
-
             self.fishers.append(temp_fisher)
             self.win_capture = win_capture
 
         self.number_of_fishers = number_of_fishers
         self.q = q
+
+        self.offset_x = 0
+        self.offset_y = 0
+
         self.start_fishers()
 
     def __del__(self):
@@ -61,11 +61,9 @@ class FishingService:
         if fishers_list is None:
             for fisher in cls.fishers:
                 fisher.start()
-                # fisher.start_fishing()
         else:
             for fisher in fishers_list:
                 fisher.start()
-                # fisher.start_fishing()
         cls.run_loop()
 
     @classmethod
@@ -85,39 +83,54 @@ class FishingService:
         del cls.fishing_windows
 
     @classmethod
-    def pause_fishers(cls, delay, fishers_list=None):
+    def pause_fishers(cls, fisher, delay=None):
         cls.send_message(f'stop_fishing() calling')
-        if fishers_list is None:
-            for fisher in cls.fishers:
-                fisher.pause_fisher(delay)
+        if delay is None: # infinit pausing
+            pass
+            # while True:
+            #     fisher.pause_fisher(None)
         else:
-            for fisher in fishers_list:
-                fisher.pause_fisher(delay)
+            fisher.pause_fisher(delay)
 
     @classmethod
-    def fisher_response(cls, response):
+    def fisher_response(cls, id, response):
+        # fisher params
+        # 0 - not fishing
+        # 1 - fishing
+        # 2 - busy with actions (mail,trade and etc.)
+        # 8 - paused
+        # 9 - error/stucked
 
-        if response == 0:  # OK
+        if response == 0:
             pass
-        if response == 1:  # stopped fishing
-            cls.send_message(f'TEST fisher_response(response) calling')
-            cls.raise_error()
-        if response == 2:  # fatal problem
-            cls.send_message(f'TEST fisher_response(response) calling')
-            cls.raise_error()
+            # cls.send_message(f'fisher {id} is not fishing')
+        if response == 1:
+            pass
+            # cls.send_message(f'fisher {id} is fishing')
+        if response == 2:
+            pass
+            # cls.send_message(f'fisher {id} busy with action (mailing, trading and etc.)')
+        if response == 8:
+            cls.send_message(f'fisher {id} is paused')
+        if response == 9:
+            cls.send_message(f'fisher {id} stucked (ERROR)')
+            # cls.raise_error()
 
     @classmethod
     def run_loop(cls):
         # cls.send_message(f'TEST FishingService run_loop() calling')
         while True:
             for fisher in cls.fishers:
-                cls.fisher_response(fisher.current_state)
+                cls.fisher_response(fisher.fisher_id, fisher.get_status())
 
-            if cls.raised_error:
-                cls.stop_fishers()
-                break
+            #if key is pressed:
+                # cls.pause_fishers(fisher)
 
-    @classmethod
-    def raise_error(cls):
-        cls.send_message(f'TEST raise_error calling')
-        cls.raised_error = True
+            # if cls.raised_error:
+            #     cls.stop_fishers()
+            #     break
+
+    # @classmethod
+    # def raise_error(cls):
+    #     cls.send_message(f'TEST raise_error calling')
+    #     cls.raised_error = True
