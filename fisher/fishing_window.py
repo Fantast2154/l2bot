@@ -174,6 +174,7 @@ class FishingWindow(L2window):
                 # self.send_message(f'{key}')
                 temp = self.library[key[0]][0].find(self.update_screenshot())
                 if not temp:
+                    self.send_message(f'Error init search object: {key}')
                     return False
                 else:
                     self.library[key[0]][1] = temp

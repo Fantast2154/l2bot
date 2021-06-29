@@ -78,12 +78,9 @@ class Fisher(threading.Thread):
 
             if not self.actions_while_fishing():
                 pass
-                # self.stop_fishing()
-                # self.send_message('actions_while_fishing()')
 
             if not self.actions_between_fishing_rod_casts():
-                # self.stop_fishing()
-                self.send_message('actions_between_fishing_rod_casts()')
+                self.send_message('actions_between_fishing_rod_casts FAILED')
 
         if not self.stop_fishing():
             self.send_message('ERROR stop_fishing()')
@@ -92,21 +89,44 @@ class Fisher(threading.Thread):
     def start_fishing(self):
         self.current_state = 0
         delay = 1.5
-        second_delay = 4
         delay_correction = delay + 6 * self.fisher_id
-        self.send_message(f'will start fishing in ........ {delay_correction + second_delay} sec')
+        self.send_message(f'will start fishing in ........ {delay_correction} sec')
         self.pause_thread(delay_correction)
 
         if not self.fishing_window.init_search():
             self.stop_fishing()
 
-        self.send_message(f'starts fishing\n')
-        self.q.window_init(self.fishing_window)
-        self.pause_thread(second_delay)
+        self.send_message(f'starts fishing')
 
         if not self.trial_rod_cast():
+            self.send_message(f'record_game_time FAILURE')
             self.stop_fishing()
 
+        if not self.record_game_time():
+            self.send_message(f'record_game_time FAILURE')
+            self.stop_fishing()
+
+        # self.rebuff(search=True)
+        self.send_message('rebuff')
+        # self.choose_day_bait(search=True)
+        self.send_message('day baits has chosen FAILURE')
+        # self.switch_soski(search=True)
+        self.send_message('soski turned ON')
+
+        if not self.overweight_baits_soski_correction():
+            self.send_message('overweight_baits_soski_correction FAILURE')
+            self.stop_fishing()
+
+        return True
+
+    def trial_rod_cast(self):
+
+        if not self.new_task_loop(self.fishing_window.get_object, self.fishing, 10, 4, 'fishing_window', True):
+            return False
+        self.fishing_window.record_fishing_window()
+        # self.fishing_window.start_accurate_search()
+        self.fishing()
+        self.pause_thread(2)
         return True
 
     def actions_while_fishing(self):
@@ -221,7 +241,9 @@ class Fisher(threading.Thread):
         return True
 
     def actions_between_fishing_rod_casts(self):
-        self.fishing_window.stop_accurate_search()
+        pass
+        #rebuff
+        #overweight_supplies_correction
         return True
 
     def stop_fishing(self):
@@ -229,16 +251,6 @@ class Fisher(threading.Thread):
         self.paused = True
         self.exit.set()
         self.current_state = 9
-
-    def trial_rod_cast(self):
-
-        if not self.new_task_loop(self.fishing_window.get_object, self.fishing, 10, 4, 'fishing_window', True):
-            return False
-        self.fishing_window.record_fishing_window()
-        # self.fishing_window.start_accurate_search()
-        self.fishing()
-        self.pause_thread(2)
-        return True
 
     def new_task_loop(self, condition, task_proc, searching_time, repeat_times, *args):
         attempt_counter = 0
@@ -257,6 +269,7 @@ class Fisher(threading.Thread):
         return self.current_state
 
     def overweight_baits_soski_correction(self):
+        self.send_message('overweight_baits_soski_correction')
         return True
 
     def buff_is_active(self):
@@ -274,16 +287,6 @@ class Fisher(threading.Thread):
     def got_the_bait(self):
         pass
 
-    def baits_clicked(self, count):
-        if self.current_baits is None:
-            self.choose_day_bait()
-            self.pause_thread(0.5)
-            self.choose_day_bait()
-            self.pause_thread(0.5)
-            self.choose_day_bait()
-        else:
-            return True
-
     def pause_thread(self, delay):
         # self.send_message(f'PAUSED for {delay} seconds')
         time.sleep(delay)
@@ -292,7 +295,7 @@ class Fisher(threading.Thread):
         # self.q.new_task([(100, 100)], self.fishing_window.hwnd)
         # self.send_message('fishing')
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('fishing', search=False), True, 'LEFT', False, False, False],
+                        [self.fishing_window.get_object('fishing', False), True, 'LEFT', False, False, False],
                         self.fishing_window)
 
     def pumping(self):
@@ -309,28 +312,29 @@ class Fisher(threading.Thread):
                         self.fishing_window)
         # self.q.new_task('mouse', [[(500, 500)], True, 'LEFT', False, False, False], self.fishing_window)
 
-    def rebuff(self):
+    def rebuff(self, search=False):
+        self.send_message('rebuff')
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('buff', False), True, 'LEFT', False, False, False],
+                        [self.fishing_window.get_object('buff', search), True, 'LEFT', False, False, False],
                         self.fishing_window)
         self.buff_time = time.time()
         self.pause_thread(1.5)
 
-    def turn_on_soski(self):
+    def switch_soski(self, search=False):
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('soski', True), True, 'RIGHT', False, False, False],
+                        [self.fishing_window.get_object('soski', search), True, 'RIGHT', False, False, False],
                         self.fishing_window)
 
-    def choose_night_bait(self):
+    def choose_night_bait(self, search=False):
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('luminous', False)[1], True, 'RIGHT', False, False, False],
+                        [self.fishing_window.get_object('luminous', search)[1], True, 'RIGHT', False, False, False],
                         self.fishing_window)
         self.current_baits = 'n_baits'
         self.pause_thread(0.7)
 
-    def choose_day_bait(self):
+    def choose_day_bait(self, search=False):
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('colored', False)[0], True, 'RIGHT', False, False, False],
+                        [self.fishing_window.get_object('colored', search)[0], True, 'RIGHT', False, False, False],
                         self.fishing_window)
         self.current_baits = 'd_baits'
         self.pause_thread(0.7)
@@ -338,7 +342,14 @@ class Fisher(threading.Thread):
     # def equipment_bag(self,
     #     self.q.new_task('mouse', [self.fishing_window.get_object('equipment_bag', False), True, 'RIGHT', False, False, False], self.fishing_window)
 
+    def record_game_time(self):
+        self.send_message('record_game_time')
+        return True
+
     def send_mail(self):
+        pass
+
+    def receive_mail(self):
         pass
 
     def send_trade(self):
@@ -347,13 +358,10 @@ class Fisher(threading.Thread):
     def wait_for_trade(self):
         pass
 
-    def receive_mail(self):
-        pass
-
     def change_bait(self):
         pass
 
-    def map(self):
+    def map(self, search=False):
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('map_button', False), True, 'RIGHT', False, False, False],
+                        [self.fishing_window.get_object('map_button', search), True, 'RIGHT', False, False, False],
                         self.fishing_window)
