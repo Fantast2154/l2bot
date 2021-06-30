@@ -166,11 +166,11 @@ class ActionQueue(threading.Thread):
                 # win32gui.SetForegroundWindow(window.hwnd)
                 # self.shell.SendKeys('%')
                 # self.focus_by_BOYKO(window.hwnd)
-                self.click2(x, y, param=True)
+                self.click(x, y, param=True)
 
             else:
 
-                self.click2(x, y, param=False)
+                self.click(x, y, param=False)
                 # temp = time.time() - temp_time
                 # if self.action_counter > 110:
                 #     self.send_message(f'avg = {sum(self.test_avg) / len(self.test_avg)}')
