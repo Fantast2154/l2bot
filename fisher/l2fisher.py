@@ -39,8 +39,8 @@ class Fisher(threading.Thread):
         self.buff_time = time.time()
 
         # fishing params
-        self.reeling_skill_CD = 2
-        self.pumping_skill_CD = 2
+        self.reeling_skill_CD = 2.0
+        self.pumping_skill_CD = 2.1
         self.pumping_CD = 1.05
 
         # overweight, soski, baits
@@ -85,7 +85,8 @@ class Fisher(threading.Thread):
         while not self.exit.is_set():  # or keyboard was pressed and not disconnected
 
             if not self.actions_while_fishing():
-                print('self.actions_while_fishing()')
+                pass
+                # print('self.actions_while_fishing()')
 
             if not self.actions_between_fishing_rod_casts():
                 self.send_message('actions_between_fishing_rod_casts FAILED')
@@ -110,16 +111,16 @@ class Fisher(threading.Thread):
             self.send_message(f'record_game_time FAILURE')
             self.stop_fishing()
 
-        if not self.record_game_time():
-            self.send_message(f'record_game_time FAILURE')
-            self.stop_fishing()
+        # if not self.record_game_time():
+        #     self.send_message(f'record_game_time FAILURE')
+        #     self.stop_fishing()
 
         # self.rebuff(search=True)
-        self.send_message('rebuff')
+        # self.send_message('rebuff')
         # self.choose_day_bait(search=True)
-        self.send_message('day baits has chosen FAILURE')
+        # self.send_message('day baits has chosen FAILURE')
         # self.switch_soski(search=True)
-        self.send_message('soski turned ON')
+        # self.send_message('soski turned ON')
 
         if not self.overweight_baits_soski_correction():
             self.send_message('overweight_baits_soski_correction FAILURE')
@@ -138,15 +139,26 @@ class Fisher(threading.Thread):
         return True
 
     def actions_while_fishing(self):
-        temp_timer = time.time()
-        searching_time = 20
+
 
         # if not self.new_task_loop(self.fishing_window.get_object, self.fishing, 10, 4, 'fishing_window', True):
-        if not self.new_task_loop(self.fishing_window.is_fishing_window, self.fishing, 20):
-            return False
 
-        if not self.new_task_loop(self.fishing_window.is_clock, None, 20):
-            return False
+        temp_timer = time.time()
+        self.fishing()
+        while not self.fishing_window.is_fishing_window():
+            if time.time() - temp_timer > 10:
+                return False
+
+        temp_timer = time.time()
+        while not self.fishing_window.is_clock():
+            if time.time() - temp_timer > 20:
+                return False
+
+        # if not self.new_task_loop(self.fishing_window.is_fishing_window, self.fishing, 20):
+        #     return False
+
+        # if not self.new_task_loop(self.fishing_window.is_clock, None, 20):
+        #     return False
 
         # while not self.fishing_window.get_object('clock', True):
         # while not self.fishing_window.get_object('clock', True):
@@ -169,16 +181,18 @@ class Fisher(threading.Thread):
         reel_timer_was_set = False
 
         # while self.fishing_window.get_object('clock', True):
-        while self.fishing_window.is_clock():
-            if time.time() - temp_timer > searching_time:
-                return False
+        while self.fishing_window.is_fishing_window():
+            # if time.time() - temp_timer > 25:
+            #     return False
+            if not self.fishing_window.is_clock():
+                continue
 
             if self.is_day_time():
                 temp = self.fishing_window.is_blue_bar()
             else:
                 temp = self.fishing_window.is_red_bar() + self.fishing_window.is_red_bar()
-                if not temp:
-                    continue
+            # if not temp:
+            #     continue
             # temp = self.fishing_window.get_object('blue_bar', True)
             # temp = self.fishing_window.is_blue_bar()
             # self.send_message(f'temp {temp}')
@@ -199,14 +213,14 @@ class Fisher(threading.Thread):
                 delta_pump_skill = time.time() - pump_skill_cast_time
                 delta_reel_skill = time.time() - reeling_skill_cast_time
 
-                if pump_was_pressed and 15 <= x_border - previous_position < 45 and delta_reel_skill >= self.reeling_skill_CD:
+                if pump_was_pressed and 15 <= x_border - previous_position < 35 and delta_reel_skill >= self.reeling_skill_CD:
                     pump_was_pressed = False
                     reel_count = 0
                     self.reeling()
                     reeling_skill_cast_time = time.time()
                     # self.send_message('ОШИБКА PUMP. ИСПРАВЛЯЮ.')
 
-                elif reel_was_pressed and 15 <= x_border - previous_position < 45 and delta_pump_skill >= self.pumping_skill_CD:
+                elif reel_was_pressed and 15 <= x_border - previous_position < 35 and delta_pump_skill >= self.pumping_skill_CD:
                     reel_was_pressed = False
                     reel_count = 0
                     self.pumping()
@@ -232,7 +246,7 @@ class Fisher(threading.Thread):
                         pump_was_pressed = True
                         reel_was_pressed = False
 
-                elif 4 <= x_border - previous_position < 15:
+                elif 4 <= x_border - previous_position < 12:
                     reel_count += 1
                     delta_reel_skill = time.time() - reeling_skill_cast_time
 
@@ -273,9 +287,6 @@ class Fisher(threading.Thread):
         attempt_counter = 0
         repeat_times = searching_time // 2.5
         temp_timer = time.time()
-        print('task_proc', task_proc)
-        #print('*ARGS', *args)
-        #print('condition(ARGS)', self.fisher_id, condition(*args))
 
         while not condition(*args):
 
@@ -286,8 +297,10 @@ class Fisher(threading.Thread):
                 if time.time() - temp_timer > (searching_time / repeat_times) * attempt_counter:
                     attempt_counter += 1
                     task_proc()
-            else:
+            elif task_proc is None:
+                print(time.time() - temp_timer)
                 if time.time() - temp_timer > searching_time:
+
                     return False
         return True
 

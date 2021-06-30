@@ -93,7 +93,7 @@ class ActionQueue(threading.Thread):
 
     def click(self, x, y, param=False):
 
-        self.lock.acquire()
+        # self.lock.acquire()
         win32api.SetCursorPos((x, y))
 
         if param:
@@ -102,16 +102,14 @@ class ActionQueue(threading.Thread):
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, 0, 0)
             time.sleep(0.01)
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, 0, 0)
-            time.sleep(0.01)
 
             for i in range(4):
                 win32api.SetCursorPos((x+i, y+i))
-        time.sleep(0.01)
+
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
         time.sleep(0.01)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
-        time.sleep(0.01)
-        self.lock.release()
+        # self.lock.release()
 
     def exitAutoHotKey(self, autohotpy, event):
         """

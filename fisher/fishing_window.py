@@ -3,6 +3,7 @@ import threading
 from system.screen_analyzer import *
 from system.l2window import L2window
 import cv2
+import time
 
 
 class FishingWindow(L2window):
@@ -19,7 +20,7 @@ class FishingWindow(L2window):
         self.accurate_search = False
         self.screenshot_accurate = None
         self.init_image_database = [
-            ['fishing', 'images/fishing.jpg', 0.8],
+            ['fishing', 'images/fishing.jpg', 0.87],
             ['pumping', 'images/pumping.jpg', 0.87],
             ['reeling', 'images/reeling.jpg', 0.87]]
 
@@ -33,7 +34,7 @@ class FishingWindow(L2window):
             ['map_button', 'images/map.jpg', 0.9],
             ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
             ['menu', 'images/menu.jpg', 0.6],
-            ['fishing_window', 'images/fishing_window.jpg', 0.6],
+            ['fishing_window', 'images/fishing_window.jpg', 0.7],
             ['red_bar', 'images/red_bar3.jpg', 0.8],
             ['buff', 'images/cdbuff.jpg', 0.87],
             ['soski_activated', 'images/soski_activated.jpg', 0.78],
@@ -60,12 +61,22 @@ class FishingWindow(L2window):
         self.send_message(f"destroyed")
 
     def update_screenshot(self):
-        self.screenshot = self.wincap.get_screenshot(self.hwnd)[self.hwnd]
+        [self.screenshot] = self.wincap.get_screenshot(self.hwnd)
         return self.screenshot
 
     def update_accurate_screenshot(self, object=False):
         if object:
-            self.screenshot_accurate = self.wincap.get_screenshot(self.hwnd)[object]
+            temp = self.wincap.get_screenshot(self.hwnd)
+            if object == 'fishing_window':
+                self.screenshot_accurate = temp[0]
+                # cv2.imshow(f'{self.window_id}', temp[0])
+                # cv2.waitKey(30)
+            elif object == 'clock':
+                self.screenshot_accurate = temp[1]
+            elif object == 'blue_bar':
+                self.screenshot_accurate = temp[2]
+            elif object == 'red_bar':
+                self.screenshot_accurate = temp[3]
             #self.send_message(f'{self.screenshot_accurate}')
             return self.screenshot_accurate
         else:
@@ -76,14 +87,13 @@ class FishingWindow(L2window):
 
     def find(self, object, accurate=False):  # returns list of positions
         try:
+            # timer = time.time()
             if not accurate:
                 position = self.library[object][0].find(self.update_screenshot())
             else:
-                t = self.update_accurate_screenshot(object=object)
-                #cv2.imshow(f'{self.window_id}', t)
-                #cv2.waitKey(20)
-                position = self.library[object][0].find(t)
-                #self.send_message(f'{object} {position}')
+                position = self.library[object][0].find(self.update_accurate_screenshot(object=object))
+
+            # self.send_message((f'TIMER {time.time() - timer}'))
             return position
         except KeyError:
             self.send_message(f'find function ERROR object search')
@@ -112,7 +122,7 @@ class FishingWindow(L2window):
     def is_fishing_window(self):
         temp = self.find('fishing_window', accurate=True)
         if temp:
-            return temp
+            return True
         else:
             return False
 
@@ -133,7 +143,7 @@ class FishingWindow(L2window):
     def is_clock(self):
         temp = self.find('clock', accurate=True)
         if temp:
-            return temp
+            return True
         else:
             return False
 
