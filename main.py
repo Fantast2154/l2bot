@@ -78,11 +78,22 @@ if __name__ == '__main__':
     # t = Telegram()
 
     # start fishing
-    FishingService(m, windows_f, queue)
+    F = FishingService(m, windows_f, queue)
+
+    F.start_fishing()
+
+    timer = time.time()
+
+    # while time.time() - timer < 70:
+    while True:
+        time.sleep(10)
 
     # stop everything
+    F.stop()
+
+    time.sleep(20)
     queue.stop()
-    queue.join()
+    # queue.join()
     win_capture.stop()
 
     del windows

@@ -3,7 +3,7 @@ import threading
 
 from fisher.l2fisher import Fisher
 from system.action_queue import *
-
+import threading
 from fisher.fishing_window import FishingWindow
 from system.action_queue import ActionQueue
 
@@ -14,6 +14,7 @@ class FishingService:
     fishers = []
     fishing_windows = []
     raised_error = False
+    exit = threading.Event()
 
     def __new__(cls, number_of_fishers, windows, q):
         if number_of_fishers < 1 or number_of_fishers > 3 or number_of_fishers != len(windows):
@@ -23,6 +24,8 @@ class FishingService:
 
     def __init__(self, number_of_fishers, windows, q):
         self.send_message(f'created')
+        self.exit = threading.Event()
+
         q.activate_l2windows(windows)
         for fisher_id in range(number_of_fishers):
 
@@ -43,7 +46,7 @@ class FishingService:
         self.offset_x = 0
         self.offset_y = 0
 
-        self.start_fishers()
+        self.start()
 
     def __del__(self):
         self.send_message("destroyed")
@@ -52,11 +55,12 @@ class FishingService:
 
     @classmethod
     def send_message(cls, message):
-        temp = 'FishingService:' + message
+        temp = 'FishingService: ' + message
         print(temp)
 
     @classmethod
-    def start_fishers(cls, fishers_list=None):
+    def start_fishing(cls, fishers_list=None):
+        time.sleep(1)
         cls.send_message(f'start_fishing() calling')
         if fishers_list is None:
             for fisher in cls.fishers:
@@ -64,7 +68,7 @@ class FishingService:
         else:
             for fisher in fishers_list:
                 fisher.start()
-        cls.run_loop()
+
 
     @classmethod
     def stop_fishers(cls, fishers_list=None):
@@ -78,9 +82,6 @@ class FishingService:
             for fisher in fishers_list:
                 fisher.stop_fishing()
                 # fisher.join()
-
-        del cls.fishers
-        del cls.fishing_windows
 
     @classmethod
     def pause_fishers(cls, fisher, delay=None):
@@ -117,12 +118,13 @@ class FishingService:
             # cls.raise_error()
 
     @classmethod
-    def run_loop(cls):
+    def run(cls):
         # cls.send_message(f'TEST FishingService run_loop() calling')
-        while True:
-            for fisher in cls.fishers:
-                cls.fisher_response(fisher.fisher_id, fisher.get_status())
-
+        while not cls.exit.is_set():
+            if cls.fishers:
+                for fisher in cls.fishers:
+                    cls.fisher_response(fisher.fisher_id, fisher.get_status())
+            time.sleep(5)
             #if key is pressed:
                 # cls.pause_fishers(fisher)
 
@@ -130,7 +132,23 @@ class FishingService:
             #     cls.stop_fishers()
             #     break
 
-    # @classmethod
-    # def raise_error(cls):
-    #     cls.send_message(f'TEST raise_error calling')
-    #     cls.raised_error = True
+    @classmethod
+    def start(cls):
+        cls.send_message('thread starts')
+        t = threading.Thread(target=cls.run)
+        t.start()
+
+    @classmethod
+    def stop(cls):
+        cls.stop_fishers()
+        cls.send_message('thread stops')
+        cls.exit.set()
+        closing_time = 20
+        timer = time.time()
+        while time.time() - timer < closing_time:
+            cls.send_message(f'timer before close ..... {time.time() - timer}')
+            time.sleep(2)
+
+        del cls.fishers
+        del cls.fishing_windows
+

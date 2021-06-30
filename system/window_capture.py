@@ -46,7 +46,6 @@ class WindowCapture:
     object_position_and_size = {}
     day_time = True
 
-    stopped = True
     lock = None
     screenshot = []
 
@@ -248,7 +247,6 @@ class WindowCapture:
         print(temp)
 
     def start_capturing(self):
-        self.stopped = False
         t = Thread(target=self.thread_run)
         t.start()
 
@@ -300,8 +298,7 @@ class WindowCapture:
     #         pass
 
     def stop(self):
-        self.stopped = True
-        # self.send_message(f'TEST ScreenshotMaster stopped\n')
+        self.send_message(f'destroyed')
         self.exit.set()
 
 # if __name__ == '__main__':

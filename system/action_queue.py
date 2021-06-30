@@ -84,8 +84,8 @@ class ActionQueue(threading.Thread):
         # for param in self.action_params:
         #     print('ACTION PARAM', param[0])
         self.windows.append(window)
-        # self.priority_list.append(priority)
-        # self.action_rate_list.append(action_rate)
+        self.priority_list.append(priority)
+        self.action_rate_list.append(action_rate)
         # self.action_rate_list.insert(0, action_rate)
 
     def new_mouse_task(self):
@@ -97,6 +97,7 @@ class ActionQueue(threading.Thread):
     def click(self, x, y, param=False):
 
         self.mouse.position = (x, y)
+        time.sleep(0.01)
         # win32api.SetCursorPos((x, y))
         if param:
             # time.sleep(0.01)
@@ -104,6 +105,7 @@ class ActionQueue(threading.Thread):
             # time.sleep(0.01)
             # win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, 0, 0)
             self.mouse.press(Button.right)
+            time.sleep(0.01)
             self.mouse.release(Button.right)
 
             # for i in range(4):
@@ -113,9 +115,11 @@ class ActionQueue(threading.Thread):
         # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
         # time.sleep(0.01)
         # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
-
+        time.sleep(0.01)
         self.mouse.press(Button.left)
+        time.sleep(0.01)
         self.mouse.release(Button.left)
+        time.sleep(0.01)
         # self.lock.release()
 
     def click2(self, x, y, param=False):
@@ -187,7 +191,7 @@ class ActionQueue(threading.Thread):
         pass
 
     def stop(self):
-        self.send_message(f'TEST Queue destroyed\n')
+        self.send_message(f'destroyed\n')
         self.exit.set()
 
     def run(self):
@@ -211,7 +215,8 @@ class ActionQueue(threading.Thread):
                     del self.windows[0]
                     del self.actions[0]
                     del self.action_params[0]
-
+                    del self.priority_list[0]
+                    del self.action_rate_list[0]
                     self.task_execution(action, action_param, window)
                 finally:
                     pass
