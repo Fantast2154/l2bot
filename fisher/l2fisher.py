@@ -108,7 +108,7 @@ class Fisher(threading.Thread):
         self.send_message(f'starts fishing')
 
         if not self.trial_rod_cast():
-            self.send_message(f'record_game_time FAILURE')
+            self.send_message(f'trial rod cast FAILURE')
             self.stop_fishing()
 
         # if not self.record_game_time():
@@ -122,9 +122,9 @@ class Fisher(threading.Thread):
         # self.switch_soski(search=True)
         # self.send_message('soski turned ON')
 
-        if not self.overweight_baits_soski_correction():
-            self.send_message('overweight_baits_soski_correction FAILURE')
-            self.stop_fishing()
+        # if not self.overweight_baits_soski_correction():
+        #     self.send_message('overweight_baits_soski_correction FAILURE')
+        #     self.stop_fishing()
 
         return True
 

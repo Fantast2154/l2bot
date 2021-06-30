@@ -25,7 +25,9 @@ import win32gui as wgui
 import win32process as wproc
 import win32api as wapi
 
+from pynput.mouse import Controller, Button
 import pyperclip
+
 
 class ActionQueue(threading.Thread):
     number = None
@@ -35,7 +37,6 @@ class ActionQueue(threading.Thread):
     windows = []
     priority_list = []
     action_rate_list = []
-
 
     def __init__(self):
         self.send_message(f'Queue created\n')
@@ -48,15 +49,17 @@ class ActionQueue(threading.Thread):
         self.shell = win32com.client.Dispatch("WScript.Shell")
         self.shell.SendKeys('%')
         self.last_active_window = None
+        self.test_avg = []
+        self.action_counter = 0
+        self.mouse = Controller()
         # self.auto = AutoHotPy()
         # self.auto.registerExit(self.auto.ESC, self.exitAutoHotKey)
         # t = threading.Thread(target=self.auto_start)
         # t.start()
 
-
     # def auto_start(self):
-          # Registering an end key is mandatory to be able tos top the program gracefully
-        # self.auto.start()
+    # Registering an end key is mandatory to be able tos top the program gracefully
+    # self.auto.start()
 
     def activate_l2windows(self, windows):
         try:
@@ -93,9 +96,31 @@ class ActionQueue(threading.Thread):
 
     def click(self, x, y, param=False):
 
-        # self.lock.acquire()
-        win32api.SetCursorPos((x, y))
+        self.mouse.position = (x, y)
+        # win32api.SetCursorPos((x, y))
+        if param:
+            # time.sleep(0.01)
+            # win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, 0, 0)
+            # time.sleep(0.01)
+            # win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, 0, 0)
+            self.mouse.press(Button.right)
+            self.mouse.release(Button.right)
 
+            # for i in range(4):
+            #     win32api.SetCursorPos((x+i, y+i))
+
+            self.mouse.move(4, 4)
+        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+        # time.sleep(0.01)
+        # win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+
+        self.mouse.press(Button.left)
+        self.mouse.release(Button.left)
+        # self.lock.release()
+
+    def click2(self, x, y, param=False):
+
+        win32api.SetCursorPos((x, y))
         if param:
 
             time.sleep(0.01)
@@ -104,11 +129,12 @@ class ActionQueue(threading.Thread):
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, 0, 0)
 
             for i in range(4):
-                win32api.SetCursorPos((x+i, y+i))
+                win32api.SetCursorPos((x + i, y + i))
 
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
         time.sleep(0.01)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+
         # self.lock.release()
 
     def exitAutoHotKey(self, autohotpy, event):
@@ -122,9 +148,9 @@ class ActionQueue(threading.Thread):
         # time.sleep(0.02)
         # self.auto.moveMouseToPosition(x, y)
 
-
     def task_execution(self, action, params, window, action_rate='High'):
-
+        # temp_time = time.time()
+        # self.action_counter += 1
         # params = [0]*6
         if action == 'mouse':
 
@@ -140,19 +166,21 @@ class ActionQueue(threading.Thread):
                 # win32gui.SetForegroundWindow(window.hwnd)
                 # self.shell.SendKeys('%')
                 # self.focus_by_BOYKO(window.hwnd)
-                self.click(x, y, param=True)
+                self.click2(x, y, param=True)
+
             else:
 
-                self.click(x, y, param=False)
-            # self.click_target(x, y)
+                self.click2(x, y, param=False)
+                # temp = time.time() - temp_time
+                # if self.action_counter > 110:
+                #     self.send_message(f'avg = {sum(self.test_avg) / len(self.test_avg)}')
+                # elif self.action_counter > 10:
+                #     self.test_avg.append(temp)
 
-        if action == 'keyboard':
-            if len(params) != 2:
-                return
-            # self.action_service.keyboard_master(params)
-        # except:
-        # print('TEST queue window activation error')
-
+        # if action == 'keyboard':
+        #     if len(params) != 2:
+        #         return
+        # self.action_service.keyboard_master(params)
 
     @classmethod
     def start_queueing(cls):
@@ -194,4 +222,3 @@ class ActionQueue(threading.Thread):
         prev_handle = wgui.SetFocus(HEX)
         self.shell.SendKeys('%')
         win32gui.SetForegroundWindow(HEX)
-
