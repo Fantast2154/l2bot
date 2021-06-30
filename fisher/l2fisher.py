@@ -84,6 +84,8 @@ class Fisher(threading.Thread):
             return
         while not self.exit.is_set():  # or keyboard was pressed and not disconnected
 
+            self.update_current_attempt()
+
             if not self.actions_while_fishing():
                 pass
                 # print('self.actions_while_fishing()')
@@ -146,8 +148,10 @@ class Fisher(threading.Thread):
         temp_timer = time.time()
         self.fishing()
         while not self.fishing_window.is_fishing_window():
-            if time.time() - temp_timer > 10:
+            if time.time() - temp_timer > 7:
                 return False
+        # if not self.new_task_loop(self.fishing_window.is_fishing_window, self.fishing, 10):
+        #     return False
 
         temp_timer = time.time()
         while not self.fishing_window.is_clock():
@@ -201,7 +205,10 @@ class Fisher(threading.Thread):
                 # self.send_message(f'temp {temp[-1]}')
                 x_border = x_temp
             else:
-                self.pumping()
+                delta_pump_skill = time.time() - pump_skill_cast_time
+                if delta_pump_skill >= self.pumping_skill_CD:
+                    self.pumping()
+                    pump_skill_cast_time = time.time()
 
             if not coords_saved and (x_border != None):
                 pumping_time = time.time()
@@ -285,7 +292,7 @@ class Fisher(threading.Thread):
 
     def new_task_loop(self, condition, task_proc, searching_time, *args):
         attempt_counter = 0
-        repeat_times = searching_time // 2.5
+        repeat_times = searching_time // 2
         temp_timer = time.time()
 
         while not condition(*args):
@@ -298,9 +305,7 @@ class Fisher(threading.Thread):
                     attempt_counter += 1
                     task_proc()
             elif task_proc is None:
-                print(time.time() - temp_timer)
                 if time.time() - temp_timer > searching_time:
-
                     return False
         return True
 
@@ -381,6 +386,11 @@ class Fisher(threading.Thread):
         self.send_message('record_game_time')
         # self.game_time = None
         return True
+
+    def update_current_attempt(self):
+        self.attempt_counter += 1
+        temp = '\t' * 10 * self.fisher_id
+        print(f'{temp}Fisher {self.fisher_id}: Attempt # {self.attempt_counter}')
 
     def send_mail(self):
         pass
