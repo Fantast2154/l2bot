@@ -279,9 +279,6 @@ class Fisher(threading.Thread):
         return True
 
     def actions_between_fishing_rod_casts(self):
-        pass
-        # rebuff
-        # overweight_supplies_correction
         return True
 
     def stop_fishing(self):
