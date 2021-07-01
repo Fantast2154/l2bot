@@ -1,3 +1,5 @@
+import keyboard
+
 from fisher.fishing_service import FishingService
 from system.telegram import Telegram
 from system.l2window import L2window
@@ -9,7 +11,6 @@ import win32gui
 import sys
 import time
 import threading
-
 
 def send_message(message):
     temp = 'MAIN' + ': ' + message
@@ -29,9 +30,21 @@ def input_number(message):
         else:
             return userInput
 
+def foo():
+    global pause
+    while True:
+        if keyboard.is_pressed('p'):
+            print('PRIVET!!!!!')
+            pause = True
+
+
+
 
 if __name__ == '__main__':
-
+    t = threading.Thread(target=foo)
+    t.start()
+    global pause
+    pause = False
     print('PROGRAM start--------------------------------------')
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
     # win_capture = ScreenCapture()
@@ -86,12 +99,16 @@ if __name__ == '__main__':
 
     # while time.time() - timer < 70:
     while True:
-        time.sleep(10)
+        #time.sleep(2)
+        if pause:
+            pause = False
+            t.join()
+            break
+
 
     # stop everything
     F.stop()
 
-    time.sleep(20)
     queue.stop()
     # queue.join()
     win_capture.stop()

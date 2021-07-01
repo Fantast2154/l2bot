@@ -39,8 +39,10 @@ class Fisher(threading.Thread):
         self.buff_time = time.time()
 
         # fishing params
-        self.reeling_skill_CD = 2.32
-        self.pumping_skill_CD = 2.13
+        # self.reeling_skill_CD = 2.32
+        # self.pumping_skill_CD = 2.13
+        self.reeling_skill_CD = 2.1
+        self.pumping_skill_CD = 2.1
         self.pumping_CD = 1.05
 
         # overweight, soski, baits
@@ -191,19 +193,21 @@ class Fisher(threading.Thread):
                 coords_saved = True
                 previous_position = x_border
                 # self.send_message('COORDS SAVED!!!!')
-
+            # self.send_message(previous_position - x_border)
             if previous_position != None and x_border != None:
                 delta_pump_skill = time.time() - pump_skill_cast_time
                 delta_reel_skill = time.time() - reeling_skill_cast_time
 
-                if pump_was_pressed and 15 <= x_border - previous_position < 35 and delta_reel_skill >= self.reeling_skill_CD:
+                if pump_was_pressed and 15 <= math.fabs(
+                        x_border - previous_position) < 35 and delta_reel_skill >= self.reeling_skill_CD:
                     pump_was_pressed = False
                     reel_count = 0
                     self.reeling()
                     reeling_skill_cast_time = time.time()
                     # self.send_message('ОШИБКА PUMP. ИСПРАВЛЯЮ.')
 
-                elif reel_was_pressed and 15 <= x_border - previous_position < 35 and delta_pump_skill >= self.pumping_skill_CD:
+                elif reel_was_pressed and 15 <= math.fabs(
+                        x_border - previous_position) < 35 and delta_pump_skill >= self.pumping_skill_CD:
                     reel_was_pressed = False
                     reel_count = 0
                     self.pumping()
@@ -250,7 +254,8 @@ class Fisher(threading.Thread):
                         if time.time() - reeling_time >= self.reeling_skill_CD:
                             reel_timer_was_set = False
 
-                previous_position = x_border
+                if math.fabs(x_border - previous_position) >= 36:
+                    previous_position = x_border
 
         return True
 
@@ -392,5 +397,5 @@ class Fisher(threading.Thread):
                         self.fishing_window)
 
     def is_day_time(self):
-        #if self.game_time is not None:
+        # if self.game_time is not None:
         return True

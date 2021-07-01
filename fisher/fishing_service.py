@@ -143,11 +143,11 @@ class FishingService:
         cls.stop_fishers()
         cls.send_message('thread stops')
         cls.exit.set()
-        closing_time = 20
+        closing_time = 5
         timer = time.time()
         while time.time() - timer < closing_time:
             cls.send_message(f'timer before close ..... {time.time() - timer}')
-            time.sleep(2)
+            time.sleep(1)
 
         del cls.fishers
         del cls.fishing_windows

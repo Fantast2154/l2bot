@@ -4,6 +4,7 @@ import win32gui
 import win32ui
 import win32con
 from threading import Thread, Lock
+import multiprocessing
 
 from system.l2window import L2window
 
@@ -247,8 +248,10 @@ class WindowCapture:
         print(temp)
 
     def start_capturing(self):
-        t = Thread(target=self.thread_run)
-        t.start()
+        #t = Thread(target=self.thread_run)
+        #t.start()
+        p = multiprocessing.Process(target=self.thread_run)
+        p.start()
 
     def set_accurate_param(self, accurate, hwnd):
         self.accurate[hwnd] = accurate

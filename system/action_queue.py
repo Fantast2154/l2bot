@@ -103,6 +103,7 @@ class ActionQueue(threading.Thread):
             self.mouse.press(Button.right)
             time.sleep(0.02)
             self.mouse.release(Button.right)
+            time.sleep(0.03)
 
             # for i in range(4):
             #     win32api.SetCursorPos((x+i, y+i))
