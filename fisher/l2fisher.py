@@ -39,8 +39,8 @@ class Fisher(threading.Thread):
         self.buff_time = time.time()
 
         # fishing params
-        self.reeling_skill_CD = 2.0
-        self.pumping_skill_CD = 2.1
+        self.reeling_skill_CD = 2.32
+        self.pumping_skill_CD = 2.13
         self.pumping_CD = 1.05
 
         # overweight, soski, baits
@@ -64,7 +64,7 @@ class Fisher(threading.Thread):
         self.send_message(f"destroyed")
 
     def send_message(self, message):
-        temp = 'Fisher' + f' {self.fisher_id}' + ': ' + message
+        temp = '\t' * 10 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
         print(temp)
 
     def test_action(self, count):
@@ -132,43 +132,21 @@ class Fisher(threading.Thread):
 
     def trial_rod_cast(self):
 
-        if not self.new_task_loop(self.fishing_window.get_object, self.fishing, 10, 'fishing_window', True):
+        if not self.search_loop_with_click(self.fishing_window.get_object, self.fishing, 10, 'fishing_window', True):
             return False
         self.fishing_window.record_fishing_window()
         self.fishing_window.start_accurate_search()
         self.fishing()
-        self.pause_thread(2)
+        self.pause_thread(3)
         return True
 
     def actions_while_fishing(self):
 
+        if not self.search_loop_with_click(self.fishing_window.is_fishing_window, self.fishing, 12):
+            return False
 
-        # if not self.new_task_loop(self.fishing_window.get_object, self.fishing, 10, 4, 'fishing_window', True):
-
-        temp_timer = time.time()
-        self.fishing()
-        while not self.fishing_window.is_fishing_window():
-            if time.time() - temp_timer > 7:
-                return False
-        # if not self.new_task_loop(self.fishing_window.is_fishing_window, self.fishing, 10):
-        #     return False
-
-        temp_timer = time.time()
-        while not self.fishing_window.is_clock():
-            if time.time() - temp_timer > 20:
-                return False
-
-        # if not self.new_task_loop(self.fishing_window.is_fishing_window, self.fishing, 20):
-        #     return False
-
-        # if not self.new_task_loop(self.fishing_window.is_clock, None, 20):
-        #     return False
-
-        # while not self.fishing_window.get_object('clock', True):
-        # while not self.fishing_window.get_object('clock', True):
-        #     if time.time() - temp_timer > searching_time:
-        #         return False
-        # self.send_message('clock found')
+        if not self.search_loop_without_click(self.fishing_window.is_clock, 12):
+            return False
 
         blue_bar_pos = 0
         coords_saved = False
@@ -184,12 +162,10 @@ class Fisher(threading.Thread):
         reel_count = 0
         reel_timer_was_set = False
 
-        # while self.fishing_window.get_object('clock', True):
         while self.fishing_window.is_fishing_window():
-            # if time.time() - temp_timer > 25:
-            #     return False
-            if not self.fishing_window.is_clock():
-                continue
+
+            # if not self.fishing_window.is_clock():
+            #     continue
 
             if self.is_day_time():
                 temp = self.fishing_window.is_blue_bar()
@@ -287,23 +263,29 @@ class Fisher(threading.Thread):
         self.exit.set()
         self.current_state = 9
 
-    def new_task_loop(self, condition, task_proc, searching_time, *args):
-        attempt_counter = 0
-        repeat_times = searching_time // 2
+    def search_loop_with_click(self, search_object, task_proc, searching_time, *args):
+        counter = 0
+        time_between_actions = 3
+        repeat_times = searching_time // time_between_actions
+        temp_timer = time.time()
+
+        while not search_object(*args):
+
+            if time.time() - temp_timer > time_between_actions * counter:
+                counter += 1
+                task_proc()
+
+            if time.time() - temp_timer > searching_time or counter > repeat_times:
+                return False
+
+        return True
+
+    def search_loop_without_click(self, condition, searching_time, *args):
         temp_timer = time.time()
 
         while not condition(*args):
-
-            if task_proc is not None:
-                if time.time() - temp_timer > searching_time or attempt_counter > repeat_times:
-                    return False
-
-                if time.time() - temp_timer > (searching_time / repeat_times) * attempt_counter:
-                    attempt_counter += 1
-                    task_proc()
-            elif task_proc is None:
-                if time.time() - temp_timer > searching_time:
-                    return False
+            if time.time() - temp_timer > searching_time:
+                return False
         return True
 
     def get_status(self):
