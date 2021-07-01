@@ -1,15 +1,4 @@
 import win32gui
-import win32com.client
-import re
-import win32con
-import psutil
-import win32process
-import win32process as wproc
-import win32api as wapi
-import time
-import pythoncom
-from threading import Lock
-
 
 class L2window:
 
@@ -19,10 +8,10 @@ class L2window:
         self.window_id = window_id
         x = 0
         y = 0
-        width = 650
-        height = 650
-        self.left_top_x = width * window_id + 200
-        self.left_top_y = y + 200
+        width = 1000
+        height = 1000
+        self.left_top_x = width * window_id
+        self.left_top_y = y
         self.width = width
         self.height = height
         self.window_name = window_name

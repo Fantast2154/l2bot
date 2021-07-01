@@ -139,7 +139,7 @@ class Fisher(threading.Thread):
         self.fishing_window.record_fishing_window()
         self.fishing_window.start_accurate_search()
         self.fishing()
-        self.pause_thread(3)
+        self.pause_thread(300)
         return True
 
     def actions_while_fishing(self):

@@ -61,12 +61,20 @@ class FishingWindow(L2window):
         self.send_message(f"destroyed")
 
     def update_screenshot(self):
-        [self.screenshot] = self.wincap.get_screenshot(self.hwnd)
+        # [self.screenshot] = self.wincap.get_screenshot(self.hwnd)
+        temp = self.wincap.get_screenshot(self.hwnd)
+        if not temp:
+            return self.screenshot
+        else:
+            self.screenshot = temp
+
         return self.screenshot
 
     def update_accurate_screenshot(self, object=False):
         if object:
             temp = self.wincap.get_screenshot(self.hwnd)
+            if not temp:
+                return []
             if object == 'fishing_window':
                 self.screenshot_accurate = temp[0]
                 # cv2.imshow(f'{self.window_id}', temp[0])

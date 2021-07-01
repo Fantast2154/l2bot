@@ -1,3 +1,5 @@
+from multiprocessing import Process, Value
+
 import keyboard
 
 from fisher.fishing_service import FishingService
@@ -11,6 +13,7 @@ import win32gui
 import sys
 import time
 import threading
+
 
 def send_message(message):
     temp = 'MAIN' + ': ' + message
@@ -30,21 +33,20 @@ def input_number(message):
         else:
             return userInput
 
-def foo():
-    global pause
-    while True:
-        if keyboard.is_pressed('p'):
-            print('PRIVET!!!!!')
-            pause = True
 
-
+# def foo():
+#     global pause
+#     while True:
+#         if keyboard.is_pressed('p'):
+#             print('PRIVET!!!!!')
+#             pause = True
 
 
 if __name__ == '__main__':
-    t = threading.Thread(target=foo)
-    t.start()
-    global pause
-    pause = False
+    # t = threading.Thread(target=foo)
+    # t.start()
+    # global pause
+    # pause = False
     print('PROGRAM start--------------------------------------')
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
     # win_capture = ScreenCapture()
@@ -79,7 +81,8 @@ if __name__ == '__main__':
     # start queueing of tasks
     queue.start()
     # start capturing screenshots
-    win_capture.start_capturing()
+    p = Process(target=win_capture.start_capturing)
+    p.start()
 
     delay = 3
     for i in range(delay):
@@ -99,11 +102,7 @@ if __name__ == '__main__':
 
     # while time.time() - timer < 70:
     while True:
-        #time.sleep(2)
-        if pause:
-            pause = False
-            t.join()
-            break
+        time.sleep(10)
 
 
     # stop everything
