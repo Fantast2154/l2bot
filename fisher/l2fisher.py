@@ -139,7 +139,7 @@ class Fisher(threading.Thread):
         self.fishing_window.record_fishing_window()
         self.fishing_window.start_accurate_search()
         self.fishing()
-        self.pause_thread(300)
+        self.pause_thread(2)
         return True
 
     def actions_while_fishing(self):
@@ -147,8 +147,14 @@ class Fisher(threading.Thread):
         if not self.search_loop_with_click(self.fishing_window.is_fishing_window, self.fishing, 12):
             return False
 
+        # if not self.search_loop_with_click(self.fishing_window.get_object, self.fishing, 10, 'fishing_window', True):
+        #     return False
+
         if not self.search_loop_without_click(self.fishing_window.is_clock, 12):
             return False
+
+        # if not self.search_loop_without_click(self.fishing_window.get_object, 10, 'clock', True):
+        #     return False
 
         blue_bar_pos = 0
         coords_saved = False
@@ -165,19 +171,17 @@ class Fisher(threading.Thread):
         reel_timer_was_set = False
 
         while self.fishing_window.is_fishing_window():
-
-            # if not self.fishing_window.is_clock():
-            #     continue
+        # while self.fishing_window.get_object('clock', True):
 
             if self.is_day_time():
                 temp = self.fishing_window.is_blue_bar()
             else:
                 temp = self.fishing_window.is_red_bar() + self.fishing_window.is_red_bar()
-            # if not temp:
-            #     continue
-            # temp = self.fishing_window.get_object('blue_bar', True)
-            # temp = self.fishing_window.is_blue_bar()
-            # self.send_message(f'temp {temp}')
+            # if self.is_day_time():
+            #     temp = self.fishing_window.get_object('blue_bar', True)
+            # else:
+            #     temp = self.fishing_window.get_object('blue_bar', True) + self.fishing_window.get_object('red_bar', True)
+
             if temp:
                 (x_temp, y_temp) = temp[-1]
                 # self.send_message(f'temp {temp[-1]}')

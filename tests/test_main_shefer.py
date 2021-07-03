@@ -1,34 +1,16 @@
 import sys
 import time
-from multiprocessing import Process
+import multiprocessing as mp
+from multiprocessing import sharedctypes
 from threading import Thread
+import ctypes
+import numpy as np
+from tempfile import TemporaryFile
 
 import win32gui
-
-from test_window_capture import *
-
-
-class Boyko:
-    def __init__(self):
-        self.i = 0
-
-    def update(self):
-        while True:
-            self.i += 1
-
-    def get(self):
-        return self.i
-
-    def start(self):
-        t = Thread(target=self.update)
-        t.start()
-
-
-def main_reader(a, hwnd):
-    while True:
-        # print(a.get_screenshot(hwnd))
-        pass
-
+from multiprocessing import Process, Manager
+from test_window_capture3 import *
+from test_fisher import *
 
 def list_window_names():
     temp = []
@@ -40,8 +22,7 @@ def list_window_names():
 
     win32gui.EnumWindows(winEnumHandler, None)
 
-    windows_param = temp
-    return windows_param
+    return temp
 
 
 def get_l2windows_param():
@@ -72,16 +53,24 @@ if __name__ == '__main__':
     for i in range(n):
         windows.append(L2window(i, win_capture, name_list[i], hash_list[i]))
 
-    # setting created windows to screenshot maker
     win_capture.set_windows(windows)
 
-    # start capturing screenshots
-    Process_wincap = Process(target=win_capture.start_capturing)
-    Process_wincap.start()
+    manager = Manager()
+    test = manager.list()
+    test.append(0)
 
-    litle_boyko = Boyko()
-    print(hash_list[0])
-    t = Thread(target=main_reader, args=(win_capture, hash_list[0]))
-    t.start()
-    t.join()
+    print('test', test)
+    Process_wincap = Process(target=win_capture.start_capturing, args=(test,))
+
+    Process_wincap.start()
+    time.sleep(1)
+    f = Fisher(test)
+    Process_fisher = Process(target=f.start)
+    Process_fisher.start()
+
+    # Process_wincap = mp.Pool(initializer=win_capture.start_capturing, initargs=(arr,))
+    time.sleep(10)
+    Process_fisher.join()
+    Process_wincap.join()
+
     sys.exit('PROGRAM ends ......... BYE BYE BYE BYE BYE BYE')

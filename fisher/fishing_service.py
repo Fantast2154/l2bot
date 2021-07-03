@@ -32,7 +32,8 @@ class FishingService:
             win_capture = windows[fisher_id].wincap
             window_name = windows[fisher_id].window_name
             hwnd = windows[fisher_id].hwnd
-            temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd)
+            screenshot = windows[fisher_id].screenshot
+            temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd, screenshot)
             self.fishing_windows.append(temp_fishing_window)
             # temp_fishing_window.start() # TEST
             temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)

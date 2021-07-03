@@ -189,7 +189,6 @@ class ActionQueue(threading.Thread):
         self.exit.set()
 
     def run(self):
-        self.start_queueing()
 
         while not self.exit.is_set():
             # while not self.queue_list.empty():

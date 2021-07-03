@@ -8,10 +8,10 @@ import time
 
 class FishingWindow(L2window):
 
-    def __init__(self, window_id, wincap, window_name, hwnd):
-        super().__init__(window_id, wincap, window_name, hwnd)
+    def __init__(self, window_id, wincap, window_name, hwnd, screenshot):
+        super().__init__(window_id, wincap, window_name, hwnd, screenshot)
         self.wincap = wincap
-        # self.screenshot = wincap.get_screenshot(window_id)
+        self.screenshot = screenshot
 
         self.hwnd = hwnd
         self.library = {}
@@ -61,30 +61,34 @@ class FishingWindow(L2window):
         self.send_message(f"destroyed")
 
     def update_screenshot(self):
-        # [self.screenshot] = self.wincap.get_screenshot(self.hwnd)
-        temp = self.wincap.get_screenshot(self.hwnd)
-        if not temp:
-            return self.screenshot
-        else:
-            self.screenshot = temp
+        temp = self.screenshot[-1][0]
 
-        return self.screenshot
+        if len(temp) != 0:
+            cv2.imshow('BOYKO MALCHISHKA', temp[0])
+            cv2.waitKey(1)
+            return temp[0]
+        else:
+            return []
 
     def update_accurate_screenshot(self, object=False):
         if object:
-            temp = self.wincap.get_screenshot(self.hwnd)
-            if not temp:
-                return []
+            temp = self.screenshot[-1][0]
             if object == 'fishing_window':
                 self.screenshot_accurate = temp[0]
-                # cv2.imshow(f'{self.window_id}', temp[0])
-                # cv2.waitKey(30)
+                cv2.imshow('BOYKO MALCHISHKA', temp[0])
+                cv2.waitKey(1)
             elif object == 'clock':
                 self.screenshot_accurate = temp[1]
+                cv2.imshow('BOYKO MALCHISHKA', temp[1])
+                cv2.waitKey(1)
             elif object == 'blue_bar':
                 self.screenshot_accurate = temp[2]
+                cv2.imshow('BOYKO MALCHISHKA', temp[2])
+                cv2.waitKey(1)
             elif object == 'red_bar':
                 self.screenshot_accurate = temp[3]
+                cv2.imshow('BOYKO MALCHISHKA', temp[3])
+                cv2.waitKey(1)
             #self.send_message(f'{self.screenshot_accurate}')
             return self.screenshot_accurate
         else:

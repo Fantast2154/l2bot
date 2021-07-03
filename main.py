@@ -1,4 +1,5 @@
-from multiprocessing import Process, Value
+import multiprocessing
+from multiprocessing import Process, Value, Manager
 
 import keyboard
 
@@ -19,6 +20,31 @@ def send_message(message):
     temp = 'MAIN' + ': ' + message
     print(temp)
 
+def list_window_names():
+    temp = []
+
+    def winEnumHandler(hwnd, ctx):
+        if win32gui.IsWindowVisible(hwnd):
+            # temp.append([hex(hwnd), win32gui.GetWindowText(hwnd)])
+            temp.append([hwnd, win32gui.GetWindowText(hwnd)])
+
+    win32gui.EnumWindows(winEnumHandler, None)
+
+    windows_param = temp
+    return windows_param
+
+
+def get_l2windows_param():
+    hash_list = []
+    name_list = []
+    list_window_names()  # СПИСОК ВСЕХ ДОСТУПНЫХ ОКОН
+    # list_all_windows = get_window_param()
+
+    for window in list_window_names():
+        if window[1] == l2window_name:
+            name_list.append(window[1])
+            hash_list.append(window[0])
+    return name_list, hash_list
 
 def input_number(message):
     while True:
@@ -33,20 +59,8 @@ def input_number(message):
         else:
             return userInput
 
-
-# def foo():
-#     global pause
-#     while True:
-#         if keyboard.is_pressed('p'):
-#             print('PRIVET!!!!!')
-#             pause = True
-
-
 if __name__ == '__main__':
-    # t = threading.Thread(target=foo)
-    # t.start()
-    # global pause
-    # pause = False
+
     print('PROGRAM start--------------------------------------')
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
     # win_capture = ScreenCapture()
@@ -55,8 +69,8 @@ if __name__ == '__main__':
     queue = ActionQueue()
 
     # searching running L2 windows
-    name_list, hash_list = win_capture.get_l2windows_param()
-
+    name_list, hash_list = get_l2windows_param()
+    print(hash_list[0])
     n = len(name_list)
     print('number of l2 windows:', n)
     max_number_of_fishers = 3
@@ -71,9 +85,13 @@ if __name__ == '__main__':
         sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
     # create n windows L2
+    manager = Manager()
+    screen_manager = manager.list()
+    screen_manager.append(0)
+
     windows = []
     for i in range(n):
-        windows.append(L2window(i, win_capture, name_list[i], hash_list[i]))
+        windows.append(L2window(i, win_capture, name_list[i], hash_list[i], screen_manager))
 
     # setting created windows to screenshot maker
     win_capture.set_windows(windows)
@@ -81,8 +99,9 @@ if __name__ == '__main__':
     # start queueing of tasks
     queue.start()
     # start capturing screenshots
-    p = Process(target=win_capture.start_capturing)
-    p.start()
+
+    Process_wincap = Process(target=win_capture.start_capturing, args=(screen_manager,))
+    Process_wincap.start()
 
     delay = 3
     for i in range(delay):

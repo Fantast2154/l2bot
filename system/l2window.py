@@ -15,17 +15,18 @@ class L2window:
 
     window_id = 0
 
-    def __init__(self, window_id, wincap, window_name, hwnd):
+    def __init__(self, window_id, wincap, window_name, hwnd, screenhot):
         self.window_id = window_id
         x = 0
         y = 0
         width = 650
         height = 650
-        self.left_top_x = width * window_id + 200
-        self.left_top_y = y + 200
+        self.left_top_x = width * window_id + 600
+        self.left_top_y = y
         self.width = width
         self.height = height
         self.window_name = window_name
+        self.screenshot = screenhot
         self.hwnd = hwnd
         self.wincap = wincap
         self.enum_handler()

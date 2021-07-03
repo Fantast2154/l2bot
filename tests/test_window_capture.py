@@ -43,19 +43,10 @@ class L2window_optimized:
 
 # class WindowCapture(threading.Thread):
 class WindowCapture:
-    x_fishwin = []
-    y_fishwin = []
-    w_fishwin = []
-    h_fishwin = []
 
-    accurate = {}
-    imgs = []
-
-    object_position_and_size = {}
     day_time = True
 
     lock = None
-    screenshot = []
 
     my_x = 0
     my_y = 0
@@ -68,13 +59,13 @@ class WindowCapture:
     hwnd = None
     cropped_x = 0
     cropped_y = 0
-    offset_x = []
-    offset_y = []
+    # offset_x = []
+    # offset_y = []
 
     new_windows = []
     l2window_name = 0
 
-    window_screenshot = []
+
 
     def __init__(self, l2win_name):
         # window_name=None
@@ -83,6 +74,7 @@ class WindowCapture:
         # self.exit = threading.Event()
         # entire window accurate = False
         # accurate = True
+        manager = Manager()
         self.fishing_window_pos_screenshots = []
         self.clock_pos_screenshots = []
         self.blue_bar_pos_screenshots = []
@@ -97,18 +89,33 @@ class WindowCapture:
         self.list_imgs1 = []
         self.dict_imgs2 = {}
 
+        self.x_fishwin = manager.list()
+        self.y_fishwin = manager.list()
+        self.w_fishwin = manager.list()
+        self.h_fishwin = manager.list()
+
+        self.accurate = manager.dict()
+
+        self.object_position_and_size = {}
+
         # self.game_windows = []
         # self.window_hwnd = []
         # self.window_id = []
         # self.windows_param = []
         # self.windows_list = []
 
-        manager = Manager()
+
         self.offset_x = manager.list()
         self.offset_y = manager.list()
         self.game_windows = manager.list()
         self.window_hwnd = manager.list()
         self.window_id = manager.list()
+
+        self.w_screenshot = manager.list()
+        self.temp = manager.list()
+
+        self.window_screenshot = manager.list()
+
 
     def set_windows(self, windows_list):
         print('windows_list', len(windows_list))
@@ -136,13 +143,12 @@ class WindowCapture:
     def append_multi(self, element):
         self.game_windows.append(element)
 
-    def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
+    def capture_screen(self, master):
 
-        w_screenshot = []
-
+        w_screenshot = master.list()
         for game_window in self.game_windows:
             hwnd_l = game_window.hwnd
-            temp = []
+            temp = master.list()
             # temp.append(hwnd_l)
 
             w = game_window.w
@@ -152,9 +158,7 @@ class WindowCapture:
 
             if self.accurate.get(hwnd_l, None) is not None:
 
-
                 for shefer in self.object_position_and_size[hwnd_l]:
-                    #print('shefer hwnd_l', shefer, hwnd_l)
                     [object_position, object_size, object_name] = shefer
                     wDC = win32gui.GetWindowDC(hwnd_l)
                     dcObj = win32ui.CreateDCFromHandle(wDC)
@@ -181,17 +185,15 @@ class WindowCapture:
                     img = img[..., :3]
                     img = np.ascontiguousarray(img)
 
-                    temp.append(img)
+                    self.temp.append(img)
 
                     # self.dict_imgs1[object_name] = img
 
                 # self.sreenshots_dict_SECOND[hwnd_l] = self.dict_imgs1.copy()
-                w_screenshot.append(temp)
+                self.w_screenshot.append(self.temp)
+                self.window_screenshot.append(self.w_screenshot)
                 #return self.sreenshots_dict_THIRD
 
-            # [hwndl, img1, img2, img3] hwnd -> #
-            # [hwndl, img1] hwnd -> #
-            # list[hwndl]
             else:
                 wDC = win32gui.GetWindowDC(hwnd_l)
                 dcObj = win32ui.CreateDCFromHandle(wDC)
@@ -215,23 +217,25 @@ class WindowCapture:
 
                 img = img[..., :3]
                 img = np.ascontiguousarray(img)
-
-                # self.dict_imgs2[hwnd_l] = img
-                # self.sreenshots_dict_THIRD[hwnd_l] = self.dict_imgs2.copy()
-                temp.append(img)
-                w_screenshot.append(temp)
+                cv2.imshow('123', img)
+                self.w_screenshot.append(self.temp)
+                self.window_screenshot.append(self.w_screenshot)
             # self.lock.release()
         # return self.sreenshots_dict_THIRD
-        self.window_screenshot = w_screenshot
+        # [[img1], [img2, img2b, img2c]]
+        # [[img1], [img2]]
 
-    def get_screenshot(self, window_hwnd):
-        # [[], []]
+    def get_screenshot(self, hwnd):
+        # [[]]
         # [12345, 12346]
         # [0, 1]
-        id = self.window_hwnd.index(window_hwnd)
-        id = 0
-        # return self.window_screenshot[id]
-        return 123
+        self.send_message(f'self.window_hwnd {hwnd}')
+        self.send_message(f'self.window_hwnd.index(self.window_hwnd) {self.window_hwnd.index(hwnd)}')
+        id = self.window_hwnd.index(hwnd)
+        self.send_message(f'len {len(self.window_screenshot)}')
+        if len(self.window_screenshot) == 0:
+            return []
+        return self.window_screenshot[id]
 
     def get(self):
         # [[], []]
@@ -249,7 +253,8 @@ class WindowCapture:
 
     def start_capturing(self):
         print('start capturing')
+        M = Manager()
         while True:
-            self.capture_screen()
-            cv2.imshow('123', self.window_screenshot[0][0])
-            cv2.waitKey(1)
+            self.capture_screen(M)
+            # cv2.imshow('123', self.window_screenshot[0][0])
+            # cv2.waitKey(1)
