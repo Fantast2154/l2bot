@@ -117,8 +117,9 @@ class WindowCapture:
                                                [(x_fishwin + 17, y_fishwin + 249), (231, 14), 'blue_bar'],
                                                [(x_fishwin + 17, y_fishwin + 249), (231, 14), 'red_bar']]
 
-    def __del__(self):
-        self.send_message(f'destroyed')
+    # def __del__(self):
+    #     self.send_message(f'destroyed')
+
 
     # @classmethod
     def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
@@ -205,9 +206,11 @@ class WindowCapture:
 
                 screenshot.append(w_screenshot)
                 screenshot.pop(0)
+                # cv2.imshow('wincap', screenshot[-1][0][0])
+                # cv2.waitKey(1)
             # self.lock.release()
         # return self.sreenshots_dict_THIRD
-        self.window_screenshot = w_screenshot
+
 
 
     def get_windows_param(self):

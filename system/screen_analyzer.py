@@ -1,6 +1,7 @@
 import numpy as np
 import cv2 as cv
-from threading import Thread, Lock
+from threading import Thread
+# from threading import Thread, Lock
 
 
 class DigitFinder:
@@ -17,7 +18,7 @@ class Vision:
     # THREADS EPTA
     points = None
     stopped = True
-    lock = None
+    # lock = None
 
     # properties
     needle_img = None
@@ -29,7 +30,7 @@ class Vision:
     # constructor
     def __init__(self, needle_img_path, threshold, method=cv.TM_CCOEFF_NORMED):  # method=cv.TM_CCOEFF_NORMED
         self.threshold = threshold
-        self.lock = Lock()
+        # self.lock = Lock()
         # load the image we're trying to match
         self.needle_img = cv.imread(needle_img_path, cv.IMREAD_UNCHANGED)
 
@@ -129,9 +130,9 @@ class Vision:
 
             try:
                 points = self.find(self.searching_image)
-                self.lock.acquire()
+                # self.lock.acquire()
                 self.points = points
-                self.lock.release()
+                # self.lock.release()
 
             except:
                 continue

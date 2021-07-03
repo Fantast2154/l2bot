@@ -55,40 +55,51 @@ class FishingWindow(L2window):
 
         self.vision_catcheditem_pos = [None] * 4
         self.send_message(f'<-L2window created')
+
         self.init_images()
 
-    def __del__(self):
-        self.send_message(f"destroyed")
+    # def __del__(self):
+    #     self.send_message(f"destroyed")
 
     def update_screenshot(self):
-        temp = self.screenshot[-1][0]
-
+        temp = self.screenshot[-1][0][0]
+        # while True:
+        #     temp = self.screenshot[-1][0][0]
+        #     cv2.imshow('BOYKO MALCHISHKA', temp)
+        #     cv2.waitKey(1)
         if len(temp) != 0:
-            cv2.imshow('BOYKO MALCHISHKA', temp[0])
-            cv2.waitKey(1)
-            return temp[0]
+            # cv2.imshow('BOYKO MALCHISHKA', temp[0])
+            # cv2.waitKey(1)
+            return temp
         else:
             return []
 
     def update_accurate_screenshot(self, object=False):
         if object:
             temp = self.screenshot[-1][0]
+            # while True:
+            #     temp = self.screenshot[-1][0]
+            #     cv2.imshow('BOYKO MALCHISHKA', temp[2])
+            #     cv2.waitKey(1)
+
             if object == 'fishing_window':
                 self.screenshot_accurate = temp[0]
-                cv2.imshow('BOYKO MALCHISHKA', temp[0])
+                cv2.imshow('fishing_window', temp[0])
                 cv2.waitKey(1)
             elif object == 'clock':
                 self.screenshot_accurate = temp[1]
-                cv2.imshow('BOYKO MALCHISHKA', temp[1])
+                cv2.imshow('clock', temp[1])
                 cv2.waitKey(1)
             elif object == 'blue_bar':
                 self.screenshot_accurate = temp[2]
-                cv2.imshow('BOYKO MALCHISHKA', temp[2])
+                cv2.imshow('blue_bar', temp[2])
                 cv2.waitKey(1)
             elif object == 'red_bar':
                 self.screenshot_accurate = temp[3]
-                cv2.imshow('BOYKO MALCHISHKA', temp[3])
+                cv2.imshow('red_bar', temp[3])
                 cv2.waitKey(1)
+            else:
+                return []
             #self.send_message(f'{self.screenshot_accurate}')
             return self.screenshot_accurate
         else:

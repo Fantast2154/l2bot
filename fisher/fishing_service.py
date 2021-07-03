@@ -5,6 +5,7 @@ from fisher.l2fisher import Fisher
 from system.action_queue import *
 import threading
 from fisher.fishing_window import FishingWindow
+from multiprocessing import Process, Value, Manager
 from system.action_queue import ActionQueue
 
 
@@ -13,7 +14,9 @@ from system.action_queue import ActionQueue
 class FishingService:
     fishers = []
     fishing_windows = []
+    process_fisher = []
     raised_error = False
+
     exit = threading.Event()
 
     def __new__(cls, number_of_fishers, windows, q):
@@ -29,16 +32,23 @@ class FishingService:
         q.activate_l2windows(windows)
         for fisher_id in range(number_of_fishers):
 
+            #windows
             win_capture = windows[fisher_id].wincap
             window_name = windows[fisher_id].window_name
             hwnd = windows[fisher_id].hwnd
             screenshot = windows[fisher_id].screenshot
             temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd, screenshot)
             self.fishing_windows.append(temp_fishing_window)
-            # temp_fishing_window.start() # TEST
+
+            #fishers
             temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
+            temp_fisher_process = Process(target=temp_fisher.run)
+            temp_fisher_process.start()
             # temp_fisher.start()
+            self.process_fisher.append(temp_fisher_process)
             self.fishers.append(temp_fisher)
+
+            #wincap
             self.win_capture = win_capture
 
         self.number_of_fishers = number_of_fishers
@@ -46,8 +56,6 @@ class FishingService:
 
         self.offset_x = 0
         self.offset_y = 0
-
-        self.start()
 
     def __del__(self):
         self.send_message("destroyed")
@@ -132,12 +140,6 @@ class FishingService:
             # if cls.raised_error:
             #     cls.stop_fishers()
             #     break
-
-    @classmethod
-    def start(cls):
-        cls.send_message('thread starts')
-        t = threading.Thread(target=cls.run)
-        t.start()
 
     @classmethod
     def stop(cls):

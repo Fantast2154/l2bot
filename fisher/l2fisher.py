@@ -1,23 +1,23 @@
 import math
-import threading
 import random
-from threading import Lock
 import time
+from multiprocessing import Manager
+
 import win32gui
 import cv2
 
 
-class Fisher(threading.Thread):
+class Fisher:
 
     def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
-        threading.Thread.__init__(self)
-        self.exit = threading.Event()
         self.fishing_window = fishing_window
         self.fisher_id = fisher_id
         self.number_of_fishers = number_of_fishers
         self.current_state = 0
         self.q = q
         self.send_message(f'created')
+        manager = Manager()
+        self.new_task_temp = manager.list()
 
         # fisher params
         # 0 - not fishing
@@ -83,8 +83,8 @@ class Fisher(threading.Thread):
         if not self.start_fishing():
             self.stop_fishing()
             self.send_message('ERROR start_fishing()')
-            return
-        while not self.exit.is_set():  # or keyboard was pressed and not disconnected
+
+        while True:  # or keyboard was pressed and not disconnected
 
             self.update_current_attempt()
 
@@ -269,12 +269,11 @@ class Fisher(threading.Thread):
     def stop_fishing(self):
         self.send_message(f'has finished fishing\n')
         self.paused = True
-        self.exit.set()
         self.current_state = 9
 
     def search_loop_with_click(self, search_object, task_proc, searching_time, *args):
         counter = 0
-        time_between_actions = 3
+        time_between_actions = 5
         repeat_times = searching_time // time_between_actions
         temp_timer = time.time()
 

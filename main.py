@@ -97,6 +97,8 @@ if __name__ == '__main__':
     win_capture.set_windows(windows)
 
     # start queueing of tasks
+    # Process_queue = Process(target=queue.run, args=())
+    # Process_queue.start()
     queue.start()
     # start capturing screenshots
 
@@ -115,7 +117,7 @@ if __name__ == '__main__':
     # start fishing
     F = FishingService(m, windows_f, queue)
 
-    F.start_fishing()
+    # F.start_fishing()
 
     timer = time.time()
 
@@ -123,11 +125,12 @@ if __name__ == '__main__':
     while True:
         time.sleep(10)
 
+    Process_wincap.join()
 
     # stop everything
     F.stop()
 
-    queue.stop()
+    # queue.stop()
     # queue.join()
     win_capture.stop()
 

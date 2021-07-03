@@ -21,7 +21,7 @@ class L2window:
         y = 0
         width = 650
         height = 650
-        self.left_top_x = width * window_id + 600
+        self.left_top_x = width * window_id + 640
         self.left_top_y = y
         self.width = width
         self.height = height
@@ -32,8 +32,8 @@ class L2window:
         self.enum_handler()
         self.send_message(f'created')
 
-    def __del__(self):
-        self.send_message(f'destroyed')
+    # def __del__(self):
+    #     self.send_message(f'destroyed')
 
     def enum_handler(self):
         if win32gui.IsWindowVisible(self.hwnd):
