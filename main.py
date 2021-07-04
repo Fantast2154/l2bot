@@ -83,9 +83,9 @@ if __name__ == '__main__':
     print('number of buffers: ', number_of_buffers)
     print('number of suppliers: ', number_of_suppliers)
 
-    if number_of_fishers < 1 or number_of_fishers > 3:
-        send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY <= 3 FISHERS! KEEP CALM!')
-        sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
+    # if number_of_fishers < 1 or number_of_fishers > max_number_of_fishers:
+    #     send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY <= 3 FISHERS! KEEP CALM!')
+    #     sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
     # create n windows L2
     manager = Manager()
