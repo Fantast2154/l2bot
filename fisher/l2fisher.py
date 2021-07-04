@@ -41,8 +41,8 @@ class Fisher:
         # fishing params
         # self.reeling_skill_CD = 2.32
         # self.pumping_skill_CD = 2.13
-        self.reeling_skill_CD = 2.2
-        self.pumping_skill_CD = 2.2
+        self.reeling_skill_CD = 2.3
+        self.pumping_skill_CD = 2.3
         self.pumping_CD = 1.05
 
         # overweight, soski, baits
@@ -202,16 +202,14 @@ class Fisher:
                 delta_pump_skill = time.time() - pump_skill_cast_time
                 delta_reel_skill = time.time() - reeling_skill_cast_time
 
-                if pump_was_pressed and 15 <= math.fabs(
-                        x_border - previous_position) < 35 and delta_reel_skill >= self.reeling_skill_CD:
+                if pump_was_pressed and 15 <= x_border - previous_position < 45 and delta_reel_skill >= self.reeling_skill_CD:
                     pump_was_pressed = False
                     reel_count = 0
                     self.reeling()
                     reeling_skill_cast_time = time.time()
                     # self.send_message('ОШИБКА PUMP. ИСПРАВЛЯЮ.')
 
-                elif reel_was_pressed and 15 <= math.fabs(
-                        x_border - previous_position) < 35 and delta_pump_skill >= self.pumping_skill_CD:
+                elif reel_was_pressed and 15 <= x_border - previous_position < 45 and delta_pump_skill >= self.pumping_skill_CD:
                     reel_was_pressed = False
                     reel_count = 0
                     self.pumping()
@@ -258,8 +256,8 @@ class Fisher:
                         if time.time() - reeling_time >= self.reeling_skill_CD:
                             reel_timer_was_set = False
 
-                if math.fabs(x_border - previous_position) >= 36:
-                    previous_position = x_border
+                #if math.fabs(x_border - previous_position) >= 36:
+                previous_position = x_border
 
         return True
 
