@@ -104,10 +104,12 @@ class FishingWindow(L2window):
                 # print('test --------------------------')
                 self.screenshot_accurate = temp[2]
                 cv2.imshow(f'blue_bar{self.window_id}', temp[2])
+                cv2.moveWindow(f'blue_bar{self.window_id}', self.left_top_x, self.left_top_y + self.height + 15)
                 cv2.waitKey(1)
             elif object == 'red_bar':
                 self.screenshot_accurate = temp[3]
-                cv2.imshow('red_bar', temp[3])
+                cv2.imshow(f'red_bar{self.window_id}', temp[3])
+                cv2.moveWindow(f'red_bar{self.window_id}', 40, 30)
                 cv2.waitKey(1)
             else:
                 return []

@@ -75,12 +75,12 @@ if __name__ == '__main__':
     print('number of l2 windows:', n)
     max_number_of_fishers = 3
     if n >= max_number_of_fishers:
-        m = max_number_of_fishers  # number of fishers
+        number_of_fishers = max_number_of_fishers  # number of fishers
     else:
-        m = n  # number of fishers
-    print('number of fishers: ', m)
+        number_of_fishers = n  # number of fishers
+    print('number of fishers: ', number_of_fishers)
 
-    if m < 1 or m > 3:
+    if number_of_fishers < 1 or number_of_fishers > 3:
         send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY < 3 FISHERS! KEEP CALM!')
         sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
@@ -110,12 +110,12 @@ if __name__ == '__main__':
         print(f'The window capturing will start in ........ {delay - i} sec')
         time.sleep(1)
 
-    windows_f = windows[:m]  # first m windows to be fishers. LATER FIX THIS
+    windows_f = windows[:number_of_fishers]  # first m windows to be fishers. LATER FIX THIS
 
     # t = Telegram()
 
     # start fishing
-    F = FishingService(m, windows_f, queue)
+    F = FishingService(number_of_fishers, 0, 0, windows_f, queue)
 
     # F.start_fishing()
 

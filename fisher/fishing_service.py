@@ -2,9 +2,13 @@ import time
 import threading
 
 from fisher.l2fisher import Fisher
+from fisher.l2supplier import Supplier
+from fisher.l2buffer import Buffer
 from system.action_queue import *
 import threading
 from fisher.fishing_window import FishingWindow
+from fisher.fishing_window_buffer import *
+from fisher.fishing_window_supplier import *
 from multiprocessing import Process, Value, Manager
 from system.action_queue import ActionQueue
 
@@ -13,25 +17,31 @@ from system.action_queue import ActionQueue
 
 class FishingService:
     fishers = []
+    suppliers = []
+    buffers = []
     fishing_windows = []
     process_fisher = []
+    process_buffer = []
     raised_error = False
 
     exit = threading.Event()
 
-    def __new__(cls, number_of_fishers, windows, q):
+    def __new__(cls, number_of_fishers, number_of_buffers, number_of_suppliers, windows, q):
+        if number_of_fishers + number_of_buffers + number_of_suppliers != len(windows):
+            print('FISHING SERVICE ERROR')
+            # warning
+            return None
         if number_of_fishers < 1 or number_of_fishers > 3 or number_of_fishers != len(windows):
             # warning
             return None
         return super(FishingService, cls).__new__(cls)
 
-    def __init__(self, number_of_fishers, windows, q):
+    def __init__(self, number_of_fishers, number_of_buffers, number_of_suppliers, windows, q):
         self.send_message(f'created')
         self.exit = threading.Event()
 
         q.activate_l2windows(windows)
         for fisher_id in range(number_of_fishers):
-
             #windows
             win_capture = windows[fisher_id].wincap
             window_name = windows[fisher_id].window_name
@@ -48,8 +58,43 @@ class FishingService:
             self.process_fisher.append(temp_fisher_process)
             self.fishers.append(temp_fisher)
 
-            #wincap
-            self.win_capture = win_capture
+        # for buffer_id in range(number_of_buffers):
+        #     pass
+            #windows
+            # win_capture = windows[buffer_id].wincap
+            # window_name = windows[buffer_id].window_name
+            # hwnd = windows[buffer_id].hwnd
+            # screenshot = windows[buffer_id].screenshot
+            # temp_buffer_window = FishingWindow(buffer_id, win_capture, window_name, hwnd, screenshot)
+            # self.fishing_windows.append(temp_buffer_window)
+
+            #fishers
+            # temp_buffer = Buffer(temp_buffer_window, buffer_id, number_of_buffers, q)
+            # temp_buffer_process = Process(target=temp_buffer.run)
+            # temp_buffer_process.start()
+            # temp_buffer.start()
+            # self.process_buffer.append(temp_buffer_process)
+            # self.buffers.append(temp_buffer)
+
+        # for supplier_id in range(number_of_suppliers):
+        #     pass
+            # win_capture = windows[supplier_id].wincap
+            # window_name = windows[supplier_id].window_name
+            # hwnd = windows[supplier_id].hwnd
+            # screenshot = windows[supplier_id].screenshot
+            # temp_supplier_window = FishingWindow(supplier_id, win_capture, window_name, hwnd, screenshot)
+            # self.fishing_windows.append(temp_supplier_window)
+
+            #fishers
+            # temp_supplier = Supplier(temp_supplier_window, supplier_id, number_of_suppliers, q)
+            # temp_supplier_process = Process(target=temp_supplier.run)
+            # temp_supplier_process.start()
+            # temp_supplier.start()
+            # self.process_supplier.append(temp_supplier_process)
+            # self.suppliers.append(temp_supplier)
+
+        #wincap
+        self.win_capture = windows[0].wincap
 
         self.number_of_fishers = number_of_fishers
         self.q = q
@@ -85,12 +130,12 @@ class FishingService:
         if fishers_list is None:
             for fisher in cls.fishers:
                 fisher.stop_fishing()
-                # fisher.join()
+                cls.process_fisher[fisher.fisher_id].join()
 
         else:
             for fisher in fishers_list:
                 fisher.stop_fishing()
-                # fisher.join()
+                cls.process_fisher[fisher.fisher_id].join()
 
     @classmethod
     def pause_fishers(cls, fisher, delay=None):
