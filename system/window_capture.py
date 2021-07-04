@@ -208,8 +208,6 @@ class WindowCapture:
             # self.lock.release()
         # return self.sreenshots_dict_THIRD
 
-
-
     def get_windows_param(self):
         return self.windows_param
 
@@ -220,7 +218,6 @@ class WindowCapture:
     def start_capturing(self, screenshot_):
         global screenshot
         screenshot = screenshot_
-        print('TESTTEST')
         self.thread_run()
 
     def set_accurate_param(self, accurate, hwnd):

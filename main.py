@@ -70,18 +70,21 @@ if __name__ == '__main__':
 
     # searching running L2 windows
     name_list, hash_list = get_l2windows_param()
-    print(hash_list[0])
     n = len(name_list)
     print('number of l2 windows:', n)
     max_number_of_fishers = 3
     if n >= max_number_of_fishers:
-        number_of_fishers = max_number_of_fishers  # number of fishers
+        number_of_fishers = max_number_of_fishers
     else:
-        number_of_fishers = n  # number of fishers
+        number_of_fishers = n
+    number_of_buffers = 0
+    number_of_suppliers = 0
     print('number of fishers: ', number_of_fishers)
+    print('number of buffers: ', number_of_buffers)
+    print('number of suppliers: ', number_of_suppliers)
 
     if number_of_fishers < 1 or number_of_fishers > 3:
-        send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY < 3 FISHERS! KEEP CALM!')
+        send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY <= 3 FISHERS! KEEP CALM!')
         sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
     # create n windows L2
@@ -115,7 +118,7 @@ if __name__ == '__main__':
     # t = Telegram()
 
     # start fishing
-    F = FishingService(number_of_fishers, 0, 0, windows_f, queue)
+    F = FishingService(number_of_fishers, number_of_buffers, number_of_suppliers, windows_f, queue)
 
     # F.start_fishing()
 
