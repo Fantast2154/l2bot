@@ -124,7 +124,7 @@ class WindowCapture:
     # @classmethod
     def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
         global screenshot
-        w_screenshot = []
+        w_screenshot = {}
 
         for game_window in self.game_windows:
             hwnd_l = game_window.hwnd
@@ -170,10 +170,7 @@ class WindowCapture:
 
                     temp.append(img)
 
-                w_screenshot.append(temp)
-                screenshot.append(w_screenshot)
-                screenshot.pop(0)
-
+                w_screenshot[game_window.hwnd] = temp
             else:
 
                 wDC = win32gui.GetWindowDC(hwnd_l)
@@ -202,10 +199,10 @@ class WindowCapture:
                 # self.dict_imgs2[hwnd_l] = img
                 # self.sreenshots_dict_THIRD[hwnd_l] = self.dict_imgs2.copy()
                 temp.append(img)
-                w_screenshot.append(temp)
+                w_screenshot[game_window.hwnd] = temp
 
-                screenshot.append(w_screenshot)
-                screenshot.pop(0)
+        screenshot.append(w_screenshot)
+        screenshot.pop(0)
                 # cv2.imshow('wincap', screenshot[-1][0][0])
                 # cv2.waitKey(1)
             # self.lock.release()

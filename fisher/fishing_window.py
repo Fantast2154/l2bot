@@ -30,7 +30,7 @@ class FishingWindow(L2window):
             ['blue_bar', 'images/blue_bar2.jpg', 0.8],
             ['colored', 'images/colored_2.jpg', 0.94],
             ['luminous', 'images/luminous_2.jpg', 0.94],
-            ['clock', 'images/clock3.jpg', 0.8],
+            ['clock', 'images/clock3.jpg', 0.7],
             ['map_button', 'images/map.jpg', 0.9],
             ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
             ['menu', 'images/menu.jpg', 0.6],
@@ -60,9 +60,11 @@ class FishingWindow(L2window):
 
     # def __del__(self):
     #     self.send_message(f"destroyed")
+    # [{hwnd1: [], hwnd2: []}]
+
 
     def update_screenshot(self):
-        temp = self.screenshot[-1][0][0]
+        temp = self.screenshot[-1][self.hwnd][0]
         # while True:
         #     temp = self.screenshot[-1][0][0]
         #     cv2.imshow('BOYKO MALCHISHKA', temp)
@@ -76,23 +78,32 @@ class FishingWindow(L2window):
 
     def update_accurate_screenshot(self, object=False):
         if object:
-            temp = self.screenshot[-1][0]
+            temp = self.screenshot[-1][self.hwnd]
+            # print('=============================================')
+            # print('1+++', type(self.screenshot[-1]))
+            # print(self.screenshot[-1])
+            # print('2++', type(self.screenshot[-1][self.hwnd]))
+            # print(self.screenshot[-1][self.hwnd])
+            # print(f'3 ------------{self.hwnd} -------------------------', type(self.screenshot[-1][self.hwnd][2]))
+            # print(self.screenshot[-1][self.hwnd][2])
+            # print('===THEEND===')
             # while True:
             #     temp = self.screenshot[-1][0]
             #     cv2.imshow('BOYKO MALCHISHKA', temp[2])
             #     cv2.waitKey(1)
-
+            # print(f'{self.window_id} ---', object)
             if object == 'fishing_window':
                 self.screenshot_accurate = temp[0]
-                cv2.imshow('fishing_window', temp[0])
-                cv2.waitKey(1)
+                # cv2.imshow('fishing_window', temp[0])
+                # cv2.waitKey(1)
             elif object == 'clock':
                 self.screenshot_accurate = temp[1]
-                cv2.imshow('clock', temp[1])
-                cv2.waitKey(1)
+                # cv2.imshow('clock', temp[1])
+                # cv2.waitKey(1)
             elif object == 'blue_bar':
+                # print('test --------------------------')
                 self.screenshot_accurate = temp[2]
-                cv2.imshow('blue_bar', temp[2])
+                cv2.imshow(f'blue_bar{self.window_id}', temp[2])
                 cv2.waitKey(1)
             elif object == 'red_bar':
                 self.screenshot_accurate = temp[3]
@@ -115,7 +126,6 @@ class FishingWindow(L2window):
                 position = self.library[object][0].find(self.update_screenshot())
             else:
                 position = self.library[object][0].find(self.update_accurate_screenshot(object=object))
-
             # self.send_message((f'TIMER {time.time() - timer}'))
             return position
         except KeyError:
@@ -166,7 +176,7 @@ class FishingWindow(L2window):
     def is_clock(self):
         temp = self.find('clock', accurate=True)
         if temp:
-            return True
+            return temp
         else:
             return False
 

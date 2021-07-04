@@ -41,8 +41,8 @@ class Fisher:
         # fishing params
         # self.reeling_skill_CD = 2.32
         # self.pumping_skill_CD = 2.13
-        self.reeling_skill_CD = 2.1
-        self.pumping_skill_CD = 2.1
+        self.reeling_skill_CD = 2.2
+        self.pumping_skill_CD = 2.2
         self.pumping_CD = 1.05
 
         # overweight, soski, baits
@@ -150,8 +150,8 @@ class Fisher:
         # if not self.search_loop_with_click(self.fishing_window.get_object, self.fishing, 10, 'fishing_window', True):
         #     return False
 
-        if not self.search_loop_without_click(self.fishing_window.is_clock, 12):
-            return False
+        # if not self.search_loop_without_click(self.fishing_window.is_clock, 12):
+        #     return False
 
         # if not self.search_loop_without_click(self.fishing_window.get_object, 10, 'clock', True):
         #     return False
@@ -186,7 +186,7 @@ class Fisher:
                 (x_temp, y_temp) = temp[-1]
                 # self.send_message(f'temp {temp[-1]}')
                 x_border = x_temp
-            else:
+            elif self.fishing_window.is_clock():
                 delta_pump_skill = time.time() - pump_skill_cast_time
                 if delta_pump_skill >= self.pumping_skill_CD:
                     self.pumping()
