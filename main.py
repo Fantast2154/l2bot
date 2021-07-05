@@ -61,7 +61,7 @@ def input_number(message):
 
 if __name__ == '__main__':
 
-    print('PROGRAM start--------------------------------------')
+    print('PROGRAM start--------------------------------------\n')
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
     # win_capture = ScreenCapture()
     win_capture = WindowCapture(l2window_name)

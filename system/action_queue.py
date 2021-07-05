@@ -140,7 +140,7 @@ class ActionQueue():
     def start_queueing(cls):
         pass
     def start(self):
-        self.send_message('start queueing')
+        # self.send_message('start queueing')
         t = threading.Thread(target=self.run)
         t.start()
 
