@@ -20,23 +20,23 @@ class FishingWindow(L2window):
         self.accurate_search = False
         self.screenshot_accurate = None
         self.init_image_database = [
-            ['fishing', 'images/fishing.jpg', 0.87],
-            ['pumping', 'images/pumping.jpg', 0.87],
-            ['reeling', 'images/reeling.jpg', 0.87]]
+            ['fishing', 'images/fishing/fishing.jpg', 0.87],
+            ['pumping', 'images/fishing/pumping.jpg', 0.87],
+            ['reeling', 'images/fishing/reeling.jpg', 0.87]]
 
         self.extended_image_database = [
-            ['bait', 'images/bait.jpg', 0.90],
+            ['bait', 'images/fishing/bait.jpg', 0.90],
             ['soski', 'images/soski.jpg', 0.7],
-            ['blue_bar', 'images/blue_bar2.jpg', 0.8],
-            ['colored', 'images/colored_2.jpg', 0.94],
-            ['luminous', 'images/luminous_2.jpg', 0.94],
-            ['clock', 'images/clock3.jpg', 0.85],
+            ['blue_bar', 'images/fishing/blue_bar2.jpg', 0.8],
+            ['colored', 'images/fishing/colored_2.jpg', 0.94],
+            ['luminous', 'images/fishing/luminous_2.jpg', 0.94],
+            ['clock', 'images/fishing/clock3.jpg', 0.85],
             ['map_button', 'images/map.jpg', 0.9],
             ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
             ['menu', 'images/menu.jpg', 0.6],
-            ['fishing_window', 'images/fishing_window.jpg', 0.7],
-            ['red_bar', 'images/red_bar3.jpg', 0.8],
-            ['buff', 'images/cdbuff.jpg', 0.87],
+            ['fishing_window', 'images/fishing/fishing_window.jpg', 0.7],
+            ['red_bar', 'images/fishing/red_bar3.jpg', 0.8],
+            ['buff', 'images/fishing/cdbuff.jpg', 0.87],
             ['soski_activated', 'images/soski_activated.jpg', 0.78],
             ['sun', 'images/sun2.jpg', 0.7],
             ['moon', 'images/moon2.jpg', 0.7],
@@ -48,10 +48,10 @@ class FishingWindow(L2window):
             ['send_button', 'images/send_button.jpg', 0.8],
             ['confirm_button', 'images/confirm_button.jpg', 0.8],
             ['claim_items_button', 'images/claim_items_button.jpg', 0.8],
-            ['catched_item_0', 'images/catcheditem1.jpg', 0.7],
-            ['catched_item_1', 'images/catcheditem2.jpg', 0.7],
-            ['catched_item_2', 'images/catcheditem3.jpg', 0.7],
-            ['catched_item_3', 'images/catcheditem4.jpg', 0.7]]
+            ['catched_item_0', 'images/items/catcheditem1.jpg', 0.7],
+            ['catched_item_1', 'images/items/catcheditem2.jpg', 0.7],
+            ['catched_item_2', 'images/items/catcheditem3.jpg', 0.7],
+            ['catched_item_3', 'images/items/catcheditem4.jpg', 0.7]]
 
         self.vision_catcheditem_pos = [None] * 4
         self.send_message(f'<-L2window created')
