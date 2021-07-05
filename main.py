@@ -3,7 +3,7 @@ from multiprocessing import Process, Value, Manager
 
 import keyboard
 
-from fisher.fishing_service import FishingService
+from _fisher.fishing_service import FishingService
 from system.telegram import Telegram
 from system.l2window import L2window
 from system.screen_capture import ScreenCapture
@@ -79,9 +79,11 @@ if __name__ == '__main__':
         number_of_fishers = n
     number_of_buffers = 0
     number_of_suppliers = 0
+    number_of_teleporters = 0
     print('number of fishers: ', number_of_fishers)
     print('number of buffers: ', number_of_buffers)
     print('number of suppliers: ', number_of_suppliers)
+    print('number of teleporters: ', number_of_teleporters)
 
     # if number_of_fishers < 1 or number_of_fishers > max_number_of_fishers:
     #     send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY <= 3 FISHERS! KEEP CALM!')
@@ -118,7 +120,7 @@ if __name__ == '__main__':
     # t = Telegram()
 
     # start fishing
-    F = FishingService(number_of_fishers, number_of_buffers, number_of_suppliers, windows_f, queue)
+    F = FishingService(number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows_f, queue)
 
     # F.start_fishing()
 

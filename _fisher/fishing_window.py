@@ -30,7 +30,7 @@ class FishingWindow(L2window):
             ['blue_bar', 'images/blue_bar2.jpg', 0.8],
             ['colored', 'images/colored_2.jpg', 0.94],
             ['luminous', 'images/luminous_2.jpg', 0.94],
-            ['clock', 'images/clock3.jpg', 0.7],
+            ['clock', 'images/clock3.jpg', 0.85],
             ['map_button', 'images/map.jpg', 0.9],
             ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
             ['menu', 'images/menu.jpg', 0.6],
@@ -98,19 +98,19 @@ class FishingWindow(L2window):
                 # cv2.waitKey(1)
             elif object == 'clock':
                 self.screenshot_accurate = temp[1]
-                # cv2.imshow('clock', temp[1])
+                # cv2.imshow(f'сlock{self.window_id}', temp[1])
                 # cv2.waitKey(1)
             elif object == 'blue_bar':
                 # print('test --------------------------')
                 self.screenshot_accurate = temp[2]
-                cv2.imshow(f'blue_bar{self.window_id}', temp[2])
-                cv2.moveWindow(f'blue_bar{self.window_id}', self.left_top_x, self.left_top_y + self.height + 15)
-                cv2.waitKey(1)
+                # cv2.imshow(f'blue_bar{self.window_id}', temp[2])
+                # cv2.moveWindow(f'blue_bar{self.window_id}', self.left_top_x, self.left_top_y + self.height + 15)
+                # cv2.waitKey(1)
             elif object == 'red_bar':
                 self.screenshot_accurate = temp[3]
-                cv2.imshow(f'red_bar{self.window_id}', temp[3])
-                cv2.moveWindow(f'red_bar{self.window_id}', 40, 30)
-                cv2.waitKey(1)
+                # cv2.imshow(f'red_bar{self.window_id}', temp[3])
+                # cv2.moveWindow(f'red_bar{self.window_id}', 40, 30)
+                # cv2.waitKey(1)
             else:
                 return []
             #self.send_message(f'{self.screenshot_accurate}')
@@ -178,6 +178,7 @@ class FishingWindow(L2window):
     def is_clock(self):
         temp = self.find('clock', accurate=True)
         if temp:
+
             return temp
         else:
             return False

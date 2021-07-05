@@ -1,14 +1,14 @@
 import time
 import threading
 
-from fisher.l2fisher import Fisher
-from fisher.l2supplier import Supplier
-from fisher.l2buffer import Buffer
+from _fisher.l2fisher import Fisher
+from _fisher.l2supplier import Supplier
+from _fisher.l2buffer import Buffer
 from system.action_queue import *
 import threading
-from fisher.fishing_window import FishingWindow
-from fisher.fishing_window_buffer import *
-from fisher.fishing_window_supplier import *
+from _fisher.fishing_window import FishingWindow
+from _fisher.fishing_window_buffer import *
+from _fisher.fishing_window_supplier import *
 from multiprocessing import Process, Value, Manager
 from system.action_queue import ActionQueue
 
@@ -26,8 +26,8 @@ class FishingService:
 
     exit = threading.Event()
 
-    def __new__(cls, number_of_fishers, number_of_buffers, number_of_suppliers, windows, q):
-        if number_of_fishers + number_of_buffers + number_of_suppliers != len(windows):
+    def __new__(cls, number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows, q):
+        if number_of_fishers + number_of_buffers + number_of_suppliers + number_of_teleporters != len(windows):
             print('FISHING SERVICE ERROR')
             # warning
             return None
@@ -36,7 +36,7 @@ class FishingService:
             return None
         return super(FishingService, cls).__new__(cls)
 
-    def __init__(self, number_of_fishers, number_of_buffers, number_of_suppliers, windows, q):
+    def __init__(self, number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows, q):
         self.send_message(f'created')
         self.exit = threading.Event()
 
