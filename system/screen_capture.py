@@ -29,7 +29,7 @@ class ScreenCapture(threading.Thread):
     windows_list = []
 
     def __init__(self, window_name=None):
-        self.send_message(f'TEST ScreenshotMaster created\n')
+        # self.send_message(f'TEST ScreenshotMaster created\n')
         threading.Thread.__init__(self)
         self.exit = threading.Event()
         self.screenshot = []

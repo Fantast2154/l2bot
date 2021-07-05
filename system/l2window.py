@@ -30,7 +30,7 @@ class L2window:
         self.hwnd = hwnd
         self.wincap = wincap
         self.enum_handler()
-        self.send_message(f'created')
+        # self.send_message(f'created')
 
     # def __del__(self):
     #     self.send_message(f'destroyed')

@@ -30,7 +30,7 @@ class L2window_optimized:
         self.cropped_y = titlebar_pixels
         self.offset_x = self.my_x + self.cropped_x
         self.offset_y = self.my_y + self.cropped_y
-        self.send_message(f'created')
+        # self.send_message(f'created')
 
     def send_message(self, message):
         temp = 'L2window_optimized' + f' {self.window_id}' + ': ' + message
@@ -77,7 +77,7 @@ class WindowCapture:
     def __init__(self, l2win_name):
         # window_name=None
         manager = Manager()
-        self.send_message(f'TEST ScreenshotMaster created\n')
+        # self.send_message(f'TEST ScreenshotMaster created\n')
         # entire window accurate = False
         # accurate = True
         self.fishing_window_pos_screenshots = []

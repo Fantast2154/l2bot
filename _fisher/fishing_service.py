@@ -37,7 +37,7 @@ class FishingService:
         return super(FishingService, cls).__new__(cls)
 
     def __init__(self, number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows, q):
-        self.send_message(f'created')
+        # self.send_message(f'created')
         self.exit = threading.Event()
 
         q.activate_l2windows(windows)

@@ -24,7 +24,8 @@ class ActionQueue():
     action_rate_list = []
 
     def __init__(self):
-        self.send_message(f'Queue created\n')
+        # self.send_message(f'Queue created\n')
+
         # threading.Thread.__init__(self)
         # self.action_service = ActionService(wincap)
 

@@ -54,7 +54,7 @@ class FishingWindow(L2window):
             ['catched_item_3', 'images/items/catcheditem4.jpg', 0.7]]
 
         self.vision_catcheditem_pos = [None] * 4
-        self.send_message(f'<-L2window created')
+        # self.send_message(f'<-L2window created')
 
         self.init_images()
 
@@ -196,7 +196,8 @@ class FishingWindow(L2window):
                 # {'key', [obj, [(x,y]/None]
                 self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]
             except:
-                self.send_message('Error finding images2')
+                pass
+                # self.send_message('Error finding images2')
 
     def get_object(self, name, search=False):
         if self.library[name][0]:

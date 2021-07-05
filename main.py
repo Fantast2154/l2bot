@@ -72,6 +72,7 @@ if __name__ == '__main__':
     name_list, hash_list = get_l2windows_param()
     n = len(name_list)
     print('number of l2 windows:', n)
+    print('-----')
     max_number_of_fishers = 3
     if n >= max_number_of_fishers:
         number_of_fishers = max_number_of_fishers
@@ -84,6 +85,7 @@ if __name__ == '__main__':
     print('number of buffers: ', number_of_buffers)
     print('number of suppliers: ', number_of_suppliers)
     print('number of teleporters: ', number_of_teleporters)
+    print('-----------------------')
 
     # if number_of_fishers < 1 or number_of_fishers > max_number_of_fishers:
     #     send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY <= 3 FISHERS! KEEP CALM!')
