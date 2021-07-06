@@ -7,13 +7,13 @@ import win32gui
 import cv2
 
 
-class Fisher(Client):
+class Fisher:
 
     def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
         self.fishing_window = fishing_window
         self.fisher_id = fisher_id
         self.number_of_fishers = number_of_fishers
-        self.current_state = 0
+        self.current_state = 'Waiting...'
         self.q = q
         self.send_message(f'created')
         manager = Manager()
@@ -67,12 +67,6 @@ class Fisher(Client):
     def __del__(self):
         self.send_message(f"destroyed")
 
-    def connect(self):
-        super().__init__(self.fisher_id)  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
-
-    def send_status_to_server(self, status):
-        if super().is_connected():
-            super().client_send(status)  # ШЛЁМ СООБЩЕНИЕ НА СЕРВЕР
 
     def send_message(self, message):
         temp = '\t' * 10 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
@@ -88,7 +82,7 @@ class Fisher(Client):
             self.pause_thread(delay)
 
     def run(self):
-        self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
+
         if not self.start_fishing():
             self.stop_fishing()
             self.send_message('ERROR start_fishing()')
@@ -109,8 +103,8 @@ class Fisher(Client):
             return
 
     def start_fishing(self):
-        self.send_status_to_server('start to fish')  # ПРИМЕР ОСТЫЛКИ СТАТУСА НА СЕРВЕР!!!
-        self.current_state = 0
+        #self.send_status_to_server('start to fish')  # ПРИМЕР ОСТЫЛКИ СТАТУСА НА СЕРВЕР!!!
+        self.current_state = 'Fishing'
         delay = 1.5
         delay_correction = delay + 6 * self.fisher_id
         self.send_message(f'will start fishing in ........ {delay_correction} sec')
@@ -285,7 +279,7 @@ class Fisher(Client):
     def stop_fishing(self):
         self.send_message(f'has finished fishing\n')
         self.paused = True
-        self.current_state = 9
+        self.current_state = 'Stopped fishing'
 
     def search_loop_with_click(self, search_object, task_proc, searching_time, *args):
         counter = 0

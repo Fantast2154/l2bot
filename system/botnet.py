@@ -26,32 +26,32 @@ class Server:
         while True:
             if not self.bots_list:
                 self.bots_data_collection.clear()
-                self.breaked = False
-            if not self.breaked:
-                for bot in self.bots_list:
-                    try:
-                        data = bot.recv(self.BUFFERSIZE_TEMPORARY)
-                        if data:
-                            decoded_data = pickle.loads(data)
-                            print(decoded_data)
-                            self.bots_data_collection.append(decoded_data)
-                    except ConnectionResetError:
-                        self.server_message(f'Ошибка получения данных от {bot}')
-                        bot.close()
-                        self.bots_list.remove(bot)
-                        self.server_message(f'Клиент удалён.')
-                        self.breaked = True
+
+            for bot in self.bots_list:
+                try:
+                    data = bot.recv(self.BUFFERSIZE_TEMPORARY)
+                    if data:
+                        decoded_data = pickle.loads(data)
+                        print(decoded_data)
+                        self.bots_data_collection.append(decoded_data)
+                except ConnectionResetError:
+                    self.server_message(f'Ошибка получения данных от {bot}')
+                    bot.close()
+                    self.bots_list.remove(bot)
+                    self.server_message(f'Клиент удалён.')
 
                 data_to_send = self.bots_data_collection
                 # data_to_send = decoded_data
                 encoded_data_to_send = pickle.dumps(data_to_send)
 
-                for bot in self.bots_list:
+                for bot_ in self.bots_list:
                     try:
-                        bot.send(encoded_data_to_send)
-                    except:
+                        bot_.send(encoded_data_to_send)
+                    except ConnectionResetError:
                         self.server_message('Ошибка передачи данных')
-                        self.breaked = True
+                        bot_.close()
+                        self.bots_list.remove(bot_)
+                        self.server_message(f'Клиент удалён.')
 
     def bots_accepting(self):
         self.server_message('Сервер запущен.')
@@ -70,8 +70,8 @@ class Server:
 
 
 class Client:
-    def __init__(self, bot_id, ip=None):
-        self.bot_id = bot_id
+    def __init__(self, bot_id=None, ip=None):
+        self.bot_id = 0
         self.HOST = '84.237.53.150'
         self.PORT = 27015
         self.ADDRESS = (self.HOST, self.PORT)
@@ -97,7 +97,7 @@ class Client:
                 time.sleep(1)
 
         self.bots_list = []
-        self.bots_data_collection = {}
+        self.bots_data_collection = ''
 
     def is_connected(self):
         return self.connected
@@ -106,31 +106,24 @@ class Client:
         print(f'Бот {self.bot_id}', text)
 
     def client_send(self, data):
-        data_to_encode = {self.bot_id: data}
+        #data_to_encode = {self.bot_id: data}
+        data_to_encode = data
         encoded_data_to_send = pickle.dumps(data_to_encode)
         self.client.send(encoded_data_to_send)
 
+    def client_receive_message(self):
+        return self.bots_data_collection
+
     def data_accepting(self):
         while self.connected:
-            for bot in self.bots_list:
-                try:
-                    data = bot.recv(self.BUFFERSIZE_TEMPORARY)
+            try:
+                data = self.client.recv(self.BUFFERSIZE_TEMPORARY)
+                if data:
                     decoded_data = pickle.loads(data)
-                    self.bots_data_collection.update(decoded_data)
-                except:
-                    self.client_message('Ошибка получения данных')
-                    continue
-
-            players_count = len(self.bots_list)
-            data_to_send = [self.bots_data_collection, players_count]
-            encoded_data_to_send = pickle.dumps(data_to_send)
-
-            for bot in self.bots_list:
-                try:
-                    bot.send(encoded_data_to_send)
-                except:
-                    self.client_message('Ошибка передачи данных')
-                    continue
+                    self.bots_data_collection = decoded_data
+                    print(decoded_data)
+            except ConnectionResetError:
+                self.client.close()
 
     def connect_to_server(self):
         t = threading.Thread(target=self.data_accepting)

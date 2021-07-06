@@ -11,11 +11,12 @@ from _fisher.fishing_window_buffer import *
 from _fisher.fishing_window_supplier import *
 from multiprocessing import Process, Value, Manager
 from system.action_queue import ActionQueue
+from system.botnet import Client
 
 
 # self.send_message(f'{self!r}')
 
-class FishingService:
+class FishingService(Client):
     fishers = []
     suppliers = []
     buffers = []
@@ -26,23 +27,25 @@ class FishingService:
 
     exit = threading.Event()
 
-    def __new__(cls, number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows, q):
+    def __init__(self, number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows, q):
+        super().__init__()  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС Client И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
         if number_of_fishers + number_of_buffers + number_of_suppliers + number_of_teleporters != len(windows):
             print('FISHING SERVICE ERROR')
-            # warning
-            return None
+        #     # warning
+        #     return None
         if number_of_fishers < 1 or number_of_fishers > 3 or number_of_fishers != len(windows):
-            # warning
-            return None
-        return super(FishingService, cls).__new__(cls)
+            #     # warning
+            print('FISHING SERVICE ERROR')
+        # return super(FishingService, cls).__new__(cls)
+        if number_of_suppliers != 0:
+            self.has_supplier = True
 
-    def __init__(self, number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows, q):
-        # self.send_message(f'created')
+        self.send_message(f'created')
         self.exit = threading.Event()
 
         q.activate_l2windows(windows)
         for fisher_id in range(number_of_fishers):
-            #windows
+            # windows
             win_capture = windows[fisher_id].wincap
             window_name = windows[fisher_id].window_name
             hwnd = windows[fisher_id].hwnd
@@ -50,7 +53,7 @@ class FishingService:
             temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd, screenshot)
             self.fishing_windows.append(temp_fishing_window)
 
-            #fishers
+            # fishers
             temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
             temp_fisher_process = Process(target=temp_fisher.run)
             temp_fisher_process.start()
@@ -60,40 +63,40 @@ class FishingService:
 
         # for buffer_id in range(number_of_buffers):
         #     pass
-            #windows
-            # win_capture = windows[buffer_id].wincap
-            # window_name = windows[buffer_id].window_name
-            # hwnd = windows[buffer_id].hwnd
-            # screenshot = windows[buffer_id].screenshot
-            # temp_buffer_window = FishingWindow(buffer_id, win_capture, window_name, hwnd, screenshot)
-            # self.fishing_windows.append(temp_buffer_window)
+        # windows
+        # win_capture = windows[buffer_id].wincap
+        # window_name = windows[buffer_id].window_name
+        # hwnd = windows[buffer_id].hwnd
+        # screenshot = windows[buffer_id].screenshot
+        # temp_buffer_window = FishingWindow(buffer_id, win_capture, window_name, hwnd, screenshot)
+        # self.fishing_windows.append(temp_buffer_window)
 
-            #fishers
-            # temp_buffer = Buffer(temp_buffer_window, buffer_id, number_of_buffers, q)
-            # temp_buffer_process = Process(target=temp_buffer.run)
-            # temp_buffer_process.start()
-            # temp_buffer.start()
-            # self.process_buffer.append(temp_buffer_process)
-            # self.buffers.append(temp_buffer)
+        # fishers
+        # temp_buffer = Buffer(temp_buffer_window, buffer_id, number_of_buffers, q)
+        # temp_buffer_process = Process(target=temp_buffer.run)
+        # temp_buffer_process.start()
+        # temp_buffer.start()
+        # self.process_buffer.append(temp_buffer_process)
+        # self.buffers.append(temp_buffer)
 
         # for supplier_id in range(number_of_suppliers):
         #     pass
-            # win_capture = windows[supplier_id].wincap
-            # window_name = windows[supplier_id].window_name
-            # hwnd = windows[supplier_id].hwnd
-            # screenshot = windows[supplier_id].screenshot
-            # temp_supplier_window = FishingWindow(supplier_id, win_capture, window_name, hwnd, screenshot)
-            # self.fishing_windows.append(temp_supplier_window)
+        # win_capture = windows[supplier_id].wincap
+        # window_name = windows[supplier_id].window_name
+        # hwnd = windows[supplier_id].hwnd
+        # screenshot = windows[supplier_id].screenshot
+        # temp_supplier_window = FishingWindow(supplier_id, win_capture, window_name, hwnd, screenshot)
+        # self.fishing_windows.append(temp_supplier_window)
 
-            #fishers
-            # temp_supplier = Supplier(temp_supplier_window, supplier_id, number_of_suppliers, q)
-            # temp_supplier_process = Process(target=temp_supplier.run)
-            # temp_supplier_process.start()
-            # temp_supplier.start()
-            # self.process_supplier.append(temp_supplier_process)
-            # self.suppliers.append(temp_supplier)
+        # fishers
+        # temp_supplier = Supplier(temp_supplier_window, supplier_id, number_of_suppliers, q)
+        # temp_supplier_process = Process(target=temp_supplier.run)
+        # temp_supplier_process.start()
+        # temp_supplier.start()
+        # self.process_supplier.append(temp_supplier_process)
+        # self.suppliers.append(temp_supplier)
 
-        #wincap
+        # wincap
         self.win_capture = windows[0].wincap
 
         self.number_of_fishers = number_of_fishers
@@ -123,7 +126,6 @@ class FishingService:
             for fisher in fishers_list:
                 fisher.start()
 
-
     @classmethod
     def stop_fishers(cls, fishers_list=None):
         cls.send_message(f'stop_fishing() calling')
@@ -140,15 +142,24 @@ class FishingService:
     @classmethod
     def pause_fishers(cls, fisher, delay=None):
         cls.send_message(f'stop_fishing() calling')
-        if delay is None: # infinit pausing
+        if delay is None:  # infinit pausing
             pass
             # while True:
             #     fisher.pause_fisher(None)
         else:
             fisher.pause_fisher(delay)
 
-    @classmethod
-    def fisher_response(cls, id, response):
+    def send_status_to_server(self, *status):
+        if super().is_connected():
+            super().client_send(status)  # ШЛЁМ СООБЩЕНИЕ НА СЕРВЕР
+
+    def get_status_from_server(self):
+        if super().is_connected():
+            return super().client_receive_message()  # ПОЛУЧАЕМ СООБЩЕНИЯ С СЕРВЕРА
+
+    def fisher_response(self, id, response):
+        self.send_status_to_server(id, response)
+        message_from_other_machines = self.get_status_from_server()
         # fisher params
         # 0 - not fishing
         # 1 - fishing
@@ -156,8 +167,15 @@ class FishingService:
         # 8 - paused
         # 9 - error/stucked
 
-        if response == 0:
-            pass
+        if 'Out of soski' in message_from_other_machines:
+            if self.has_supplier:
+                for sup in self.suppliers:
+                    sup.supply(id, 'soski')
+
+        if response == 'Out of soski':
+            if self.has_supplier:
+                for sup in self.suppliers:
+                    sup.supply(id, 'soski')
             # cls.send_message(f'fisher {id} is not fishing')
         if response == 1:
             pass
@@ -166,21 +184,23 @@ class FishingService:
             pass
             # cls.send_message(f'fisher {id} busy with action (mailing, trading and etc.)')
         if response == 8:
-            cls.send_message(f'fisher {id} is paused')
+            self.send_message(f'fisher {id} is paused')
         if response == 9:
-            cls.send_message(f'fisher {id} stucked (ERROR)')
+            self.send_message(f'fisher {id} stucked (ERROR)')
             # cls.raise_error()
 
-    @classmethod
-    def run(cls):
-        # cls.send_message(f'TEST FishingService run_loop() calling')
-        while not cls.exit.is_set():
-            if cls.fishers:
-                for fisher in cls.fishers:
-                    cls.fisher_response(fisher.fisher_id, fisher.get_status())
+    # @classmethod
+    def run(self):
+        self.send_message(f'TEST FishingService run_loop() calling')
+        # self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
+
+        while not self.exit.is_set():
+            if self.fishers:
+                for fisher in self.fishers:
+                    self.fisher_response(fisher.fisher_id, fisher.get_status())
             time.sleep(5)
-            #if key is pressed:
-                # cls.pause_fishers(fisher)
+            # if key is pressed:
+            # cls.pause_fishers(fisher)
 
             # if cls.raised_error:
             #     cls.stop_fishers()
@@ -199,4 +219,3 @@ class FishingService:
 
         del cls.fishers
         del cls.fishing_windows
-

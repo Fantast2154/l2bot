@@ -64,22 +64,23 @@ def input_number(message):
 
 
 def client_server(bots_id_list):
-    msg = input('s - Запустить сервер на этой машине\nc - Присоединиться к общему серверу \nn - Ничего не делать\n')
+    msg = input('y - Запустить сервер на этой машине\nn - Ничего не делать\n')
     if msg == 's' or msg == 'ы':
         server = Server()
         server_process = Process(target=server.server_start)
         server_process.start()
-        return None
-    elif msg == 'c' or msg == 'c':
-        connected_bots = []
-        for bot_id in bots_id_list:
-            client = Client(bot_id)
-            client_process = Process(target=client.connect_to_server)
-            client_process.start()
-            connected_bots.append(client)
-        return connected_bots
+        #return None
+    # elif msg == 'c' or msg == 'c':
+    #     connected_bots = []
+    #     for bot_id in bots_id_list:
+    #         client = Client(bot_id)
+    #         client_process = Process(target=client.connect_to_server)
+    #         client_process.start()
+    #         connected_bots.append(client)
+    #     return connected_bots
     else:
-        return None
+        pass
+        #return None
 
 
 if __name__ == '__main__':
@@ -112,11 +113,11 @@ if __name__ == '__main__':
     print('number of teleporters: ', number_of_teleporters)
     print('-----------------------')
 
-    bots_id_list = [0, 1]
-    connected_bots = client_server(bots_id_list)
-    if connected_bots:
-        for bot in connected_bots:
-            bot.client_send('ВО ИМЯ ЧЕГО') # Тестовая отправка сообщения. На сервере должны отобразиться ID бота и это послание
+    # bots_id_list = [0, 1]
+    # connected_bots = client_server(bots_id_list)
+    # if connected_bots:
+    #     for bot in connected_bots:
+    #         bot.client_send('ВО ИМЯ ЧЕГО') # Тестовая отправка сообщения. На сервере должны отобразиться ID бота и это послание
 
     # if number_of_fishers < 1 or number_of_fishers > max_number_of_fishers:
     #     send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY <= 3 FISHERS! KEEP CALM!')
@@ -155,7 +156,7 @@ if __name__ == '__main__':
     # start fishing
     F = FishingService(number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows_f,
                        queue)
-
+    F.run()
     # F.start_fishing()
 
     timer = time.time()
