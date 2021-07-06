@@ -270,7 +270,9 @@ class Fisher:
             return True
         self.time_between_rod_casts_avg.append(time.time() - self.time_since_last_rod_cast)
         self.time_since_last_rod_cast = time.time()
-        self.send_message(f'time_between_rod_casts_avg {sum(self.time_between_rod_casts_avg) / len(self.time_between_rod_casts_avg)}')
+        result = sum(self.time_between_rod_casts_avg) / len(self.time_between_rod_casts_avg)
+        self.send_message(f'Среднее время между забросами удочки {result}')
+        self.send_message(f'Средняя скорость ловли: {3600 // result} попыток в час')
         return True
 
     def stop_fishing(self):
