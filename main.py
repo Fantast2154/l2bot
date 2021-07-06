@@ -14,11 +14,13 @@ import win32gui
 import sys
 import time
 import threading
+from system.NET_connection import Server, Client
 
 
 def send_message(message):
     temp = 'MAIN' + ': ' + message
     print(temp)
+
 
 def list_window_names():
     temp = []
@@ -46,6 +48,7 @@ def get_l2windows_param():
             hash_list.append(window[0])
     return name_list, hash_list
 
+
 def input_number(message):
     while True:
         try:
@@ -59,9 +62,31 @@ def input_number(message):
         else:
             return userInput
 
+
+def client_server(bots_id_list):
+    msg = input('s - Запустить сервер на этой машине\nc - Присоединиться к общему серверу \nn - Ничего не делать\n')
+    if msg == 's' or msg == 'ы':
+        server = Server()
+        server_process = Process(target=server.server_start)
+        server_process.start()
+        return None
+    elif msg == 'c' or msg == 'c':
+        connected_bots = []
+        for bot_id in bots_id_list:
+            client = Client(bot_id)
+            client_process = Process(target=client.connect_to_server)
+            client_process.start()
+            connected_bots.append(client)
+        return connected_bots
+    else:
+        return None
+
+
 if __name__ == '__main__':
 
     print('PROGRAM start--------------------------------------\n')
+
+
     l2window_name = 'Asterios'  # НАЗВАНИЕ ОКНА, ГДЕ БУДЕТ ВЕСТИСЬ ПОИСК
     # win_capture = ScreenCapture()
     win_capture = WindowCapture(l2window_name)
@@ -86,6 +111,12 @@ if __name__ == '__main__':
     print('number of suppliers: ', number_of_suppliers)
     print('number of teleporters: ', number_of_teleporters)
     print('-----------------------')
+
+    bots_id_list = [0, 1]
+    connected_bots = client_server(bots_id_list)
+    if connected_bots:
+        for bot in connected_bots:
+            bot.client_send('ВО ИМЯ ЧЕГО')
 
     # if number_of_fishers < 1 or number_of_fishers > max_number_of_fishers:
     #     send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY <= 3 FISHERS! KEEP CALM!')
@@ -122,7 +153,8 @@ if __name__ == '__main__':
     # t = Telegram()
 
     # start fishing
-    F = FishingService(number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows_f, queue)
+    F = FishingService(number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows_f,
+                       queue)
 
     # F.start_fishing()
 
