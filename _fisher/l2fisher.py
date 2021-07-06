@@ -19,18 +19,29 @@ class Fisher:
         manager = Manager()
         self.new_task_temp = manager.list()
 
+        # communication with fisher service
+        self.paused = None # force pause the fisher
+        self.request = False # fisher wants supplying
+        self.request_proceed = False # request has been proceed by a fisher serivce
+        self.trading_is_allowed = False # ready to push trade
+
         # fisher params
         # 0 - not fishing
         # 1 - fishing
         # 2 - busy with actions (mail,trade and etc.)
         # 8 - paused
         # 9 - error/stucked
-        self.paused = None
+
 
         # send/receive counters
-        self.send_counter = 0
+        self.send_counter = 3
         self.receive_counter = 0
         self.attempt_counter = 0
+        self.request_from_supplier = [0]*3
+
+
+        # trading
+
 
         # fishing timers
         self.total_fishing_time = 0
@@ -274,6 +285,10 @@ class Fisher:
         result = sum(self.time_between_rod_casts_avg) / len(self.time_between_rod_casts_avg)
         self.send_message(f'Среднее время между забросами удочки {result}')
         self.send_message(f'Средняя скорость ловли: {3600 // result} попыток в час')
+
+        if self.attempt_counter > self.send_counter:
+            if not self.overweight_baits_soski_correction():
+                self.send_message('overweight_baits_soski_correction FAILURE')
         return True
 
     def stop_fishing(self):
@@ -310,8 +325,24 @@ class Fisher:
         return self.current_state
 
     def overweight_baits_soski_correction(self):
+
+        self.request = True
+        self.request_from_supplier[0] = 10
+        self.request_from_supplier[1] = 20
+        self.request_from_supplier[2] = 30
         self.send_message('overweight_baits_soski_correction')
+
         return True
+
+    def wait_for_trade(self):
+
+        while not self.request_proceed:
+            pass
+
+        while not self.trading_is_allowed:
+            pass
+
+        # self.trade()
 
     def buff_is_active(self):
         if time.time() - self.buff_time < 30:
