@@ -39,10 +39,8 @@ class Fisher:
         self.buff_time = time.time()
 
         # fishing params
-        # self.reeling_skill_CD = 2.32
-        # self.pumping_skill_CD = 2.13
-        self.reeling_skill_CD = 2.3
-        self.pumping_skill_CD = 2.3
+        self.reeling_skill_CD = 2.2
+        self.pumping_skill_CD = 2.2
         self.pumping_CD = 1.05
 
         # overweight, soski, baits
@@ -83,6 +81,7 @@ class Fisher:
         if not self.start_fishing():
             self.stop_fishing()
             self.send_message('ERROR start_fishing()')
+
 
         while True:  # or keyboard was pressed and not disconnected
 
@@ -150,8 +149,8 @@ class Fisher:
         # if not self.search_loop_with_click(self.fishing_window.get_object, self.fishing, 10, 'fishing_window', True):
         #     return False
 
-        # if not self.search_loop_without_click(self.fishing_window.is_clock, 12):
-        #     return False
+        if not self.search_loop_without_click(self.fishing_window.is_clock, 20):
+            return False
 
         # if not self.search_loop_without_click(self.fishing_window.get_object, 10, 'clock', True):
         #     return False

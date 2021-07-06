@@ -27,10 +27,10 @@ class FishingWindow(L2window):
         self.extended_image_database = [
             ['bait', 'images/fishing/bait.jpg', 0.90],
             ['soski', 'images/soski.jpg', 0.7],
-            ['blue_bar', 'images/fishing/blue_bar2.jpg', 0.8],
+            ['blue_bar', 'images/fishing/blue_bar2.jpg', 0.75],
             ['colored', 'images/fishing/colored_2.jpg', 0.94],
             ['luminous', 'images/fishing/luminous_2.jpg', 0.94],
-            ['clock', 'images/fishing/clock3.jpg', 0.85],
+            ['clock', 'images/fishing/clock2.jpg', 0.7],
             ['map_button', 'images/map.jpg', 0.9],
             ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
             ['menu', 'images/menu.jpg', 0.6],
