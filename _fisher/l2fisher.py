@@ -331,7 +331,7 @@ class Fisher:
         self.request_from_supplier[1] = 20
         self.request_from_supplier[2] = 30
         self.send_message('overweight_baits_soski_correction')
-
+        self.wait_for_trade()
         return True
 
     def wait_for_trade(self):
@@ -340,9 +340,10 @@ class Fisher:
             pass
 
         while not self.trading_is_allowed:
+            # self.trade()
             pass
 
-        # self.trade()
+
 
     def buff_is_active(self):
         if time.time() - self.buff_time < 30:
