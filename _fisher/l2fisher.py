@@ -2,12 +2,12 @@ import math
 import random
 import time
 from multiprocessing import Manager
-
+from system.botnet import Client
 import win32gui
 import cv2
 
 
-class Fisher:
+class Fisher(Client):
 
     def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
         self.fishing_window = fishing_window
@@ -67,6 +67,13 @@ class Fisher:
     def __del__(self):
         self.send_message(f"destroyed")
 
+    def connect(self):
+        super().__init__(self.fisher_id)  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
+
+    def send_status_to_server(self, status):
+        if super().is_connected():
+            super().client_send(status)  # ШЛЁМ СООБЩЕНИЕ НА СЕРВЕР
+
     def send_message(self, message):
         temp = '\t' * 10 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
         print(temp)
@@ -81,11 +88,10 @@ class Fisher:
             self.pause_thread(delay)
 
     def run(self):
-
+        self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
         if not self.start_fishing():
             self.stop_fishing()
             self.send_message('ERROR start_fishing()')
-
 
         while True:  # or keyboard was pressed and not disconnected
 
@@ -103,6 +109,7 @@ class Fisher:
             return
 
     def start_fishing(self):
+        self.send_status_to_server('start to fish')  # ПРИМЕР ОСТЫЛКИ СТАТУСА НА СЕРВЕР!!!
         self.current_state = 0
         delay = 1.5
         delay_correction = delay + 6 * self.fisher_id
@@ -174,7 +181,7 @@ class Fisher:
         reel_timer_was_set = False
 
         while self.fishing_window.is_fishing_window():
-        # while self.fishing_window.get_object('clock', True):
+            # while self.fishing_window.get_object('clock', True):
 
             if self.is_day_time():
                 temp = self.fishing_window.is_blue_bar()
@@ -259,7 +266,7 @@ class Fisher:
                         if time.time() - reeling_time >= self.reeling_skill_CD:
                             reel_timer_was_set = False
 
-                #if math.fabs(x_border - previous_position) >= 36:
+                # if math.fabs(x_border - previous_position) >= 36:
                 previous_position = x_border
 
         return True

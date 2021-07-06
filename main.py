@@ -14,7 +14,7 @@ import win32gui
 import sys
 import time
 import threading
-from system.NET_connection import Server, Client
+from system.botnet import Server, Client
 
 
 def send_message(message):
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     connected_bots = client_server(bots_id_list)
     if connected_bots:
         for bot in connected_bots:
-            bot.client_send('ВО ИМЯ ЧЕГО')
+            bot.client_send('ВО ИМЯ ЧЕГО') # Тестовая отправка сообщения. На сервере должны отобразиться ID бота и это послание
 
     # if number_of_fishers < 1 or number_of_fishers > max_number_of_fishers:
     #     send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY <= 3 FISHERS! KEEP CALM!')
