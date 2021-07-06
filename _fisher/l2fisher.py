@@ -60,6 +60,10 @@ class Fisher:
         self.bot_is_connected = True
         self.it_is_almost_server_restart_time = False
 
+        # test params
+        self.time_since_last_rod_cast = time.time()
+        self.time_between_rod_casts_avg = []
+
     def __del__(self):
         self.send_message(f"destroyed")
 
@@ -261,6 +265,12 @@ class Fisher:
         return True
 
     def actions_between_fishing_rod_casts(self):
+        if self.attempt_counter == 1:
+            self.time_since_last_rod_cast = time.time()
+            return True
+        self.time_between_rod_casts_avg.append(time.time() - self.time_since_last_rod_cast)
+        self.time_since_last_rod_cast = time.time()
+        self.send_message(f'time_between_rod_casts_avg {sum(self.time_between_rod_casts_avg) / len(self.time_between_rod_casts_avg)}')
         return True
 
     def stop_fishing(self):
