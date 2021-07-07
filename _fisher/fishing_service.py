@@ -24,11 +24,13 @@ class FishingService(Client):
     process_fisher = []
     process_buffer = []
     raised_error = False
+    fishing_service_client = {}
 
     exit = threading.Event()
 
     def __init__(self, number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows, q):
         super().__init__()  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС Client И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
+        self.machine_id = 0
         if number_of_fishers + number_of_buffers + number_of_suppliers + number_of_teleporters != len(windows):
             print('FISHING SERVICE ERROR')
         #     # warning
@@ -39,6 +41,7 @@ class FishingService(Client):
         # return super(FishingService, cls).__new__(cls)
         if number_of_suppliers != 0:
             self.has_supplier = True
+            self.queue_list = []
 
         self.send_message(f'created')
         self.exit = threading.Event()
@@ -71,7 +74,7 @@ class FishingService(Client):
         # temp_buffer_window = FishingWindow(buffer_id, win_capture, window_name, hwnd, screenshot)
         # self.fishing_windows.append(temp_buffer_window)
 
-        # fishers
+        # buffers
         # temp_buffer = Buffer(temp_buffer_window, buffer_id, number_of_buffers, q)
         # temp_buffer_process = Process(target=temp_buffer.run)
         # temp_buffer_process.start()
@@ -88,7 +91,7 @@ class FishingService(Client):
         # temp_supplier_window = FishingWindow(supplier_id, win_capture, window_name, hwnd, screenshot)
         # self.fishing_windows.append(temp_supplier_window)
 
-        # fishers
+        # suppliers
         # temp_supplier = Supplier(temp_supplier_window, supplier_id, number_of_suppliers, q)
         # temp_supplier_process = Process(target=temp_supplier.run)
         # temp_supplier_process.start()
@@ -189,6 +192,23 @@ class FishingService(Client):
             self.send_message(f'fisher {id} stucked (ERROR)')
             # cls.raise_error()
 
+    def request_server_for_supplying(self, fisher_id, list):
+        self.send_status_to_server(fisher_id, self.machine_id, list)
+
+    def allow_fisher_to_trade(self, id):
+        self.fishers[id].trading_is_allowed = True
+
+    def listen_to_server(self):
+        fisher_receiver_id, machine_recevier_id, machine_supplier_id, list = self.get_status_from_server() # как разделить сообщения - для рыбака или для саплаера?
+        if self.has_supplier and self.machine_id == machine_supplier_id:
+            if self.machine_id == machine_recevier_id:
+                if self.fishers[fisher_receiver_id]:
+                    self.allow_fisher_to_trade(fisher_receiver_id)
+            self.suppliers[0].supply(list)
+        else:
+            if self.fishers[fisher_receiver_id]:
+                self.allow_fisher_to_trade(fisher_receiver_id)
+
     # @classmethod
     def run(self):
         self.send_message(f'TEST FishingService run_loop() calling')
@@ -198,13 +218,13 @@ class FishingService(Client):
             if self.fishers:
                 for fisher in self.fishers:
                     self.fisher_response(fisher.fisher_id, fisher.get_status())
-            time.sleep(5)
-            # if key is pressed:
-            # cls.pause_fishers(fisher)
+                    if fisher.supply_request:
+                        self.request_server_for_supplying(fisher.fisher_id, fisher.requested_items_to_supply)
+                        fisher.supply_request = False
+                        fisher.request_proceed = True
 
-            # if cls.raised_error:
-            #     cls.stop_fishers()
-            #     break
+            self.listen_to_server()
+            time.sleep(1)
 
     @classmethod
     def stop(cls):

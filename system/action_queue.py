@@ -156,18 +156,18 @@ class ActionQueue():
                 try:
                     # priority = self.priority_list[0]
                     if self.windows:
-                        window = self.windows[-1]
-                        action = self.actions[-1]
-                        action_param = self.action_params[-1]
+                        window = self.windows[0]
+                        action = self.actions[0]
+                        action_param = self.action_params[0]
                     else:
                         continue
                     # action = self.actions[0]
 
                     # del self.priority_list[0]
 
-                    self.windows.pop(-1)
-                    self.actions.pop(-1)
-                    self.action_params.pop(-1)
+                    self.windows.pop(0)
+                    self.actions.pop(0)
+                    self.action_params.pop(0)
                     # self.priority_list.pop(0)
                     # self.action_rate_list.pop(0)
 

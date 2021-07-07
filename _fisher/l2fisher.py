@@ -21,7 +21,7 @@ class Fisher:
 
         # communication with fisher service
         self.paused = None # force pause the fisher
-        self.request = False # fisher wants supplying
+        self.supply_request = False # fisher wants supplying
         self.request_proceed = False # request has been proceed by a fisher serivce
         self.trading_is_allowed = False # ready to push trade
 
@@ -37,7 +37,7 @@ class Fisher:
         self.send_counter = 3
         self.receive_counter = 0
         self.attempt_counter = 0
-        self.request_from_supplier = [0]*3
+        self.requested_items_to_supply = [0]*3
 
 
         # trading
@@ -326,10 +326,10 @@ class Fisher:
 
     def overweight_baits_soski_correction(self):
 
-        self.request = True
-        self.request_from_supplier[0] = 10
-        self.request_from_supplier[1] = 20
-        self.request_from_supplier[2] = 30
+        self.supply_request = True
+        self.requested_items_to_supply[0] = 10
+        self.requested_items_to_supply[1] = 20
+        self.requested_items_to_supply[2] = 30
         self.send_message('overweight_baits_soski_correction')
         self.wait_for_trade()
         return True
@@ -343,6 +343,9 @@ class Fisher:
             # self.trade()
             pass
 
+
+        self.request_proceed = False
+        self.trading_is_allowed = False
 
 
     def buff_is_active(self):

@@ -1,4 +1,3 @@
-import datetime
 import threading
 import socket
 import pickle
@@ -21,7 +20,7 @@ class Server:
         self.breaked = False
 
     def server_message(self, text):
-        print(datetime.datetime.now().time(), 'Сервер:', text)
+        print('Сервер:', text)
 
     def data_accepting(self):
         while True:
@@ -33,7 +32,7 @@ class Server:
                     data = bot.recv(self.BUFFERSIZE_TEMPORARY)
                     if data:
                         decoded_data = pickle.loads(data)
-                        print(datetime.datetime.now().time(), decoded_data)
+                        print(decoded_data)
                         self.bots_data_collection.append(decoded_data)
                 except ConnectionResetError:
                     self.server_message(f'Ошибка получения данных от {bot}')
@@ -104,7 +103,7 @@ class Client:
         return self.connected
 
     def client_message(self, text):
-        print(datetime.datetime.now().time(), f'Бот {self.bot_id}', text)
+        print(f'Бот {self.bot_id}', text)
 
     def client_send(self, data):
         #data_to_encode = {self.bot_id: data}
