@@ -12,6 +12,7 @@ from _fisher.fishing_window_supplier import *
 from multiprocessing import Process, Value, Manager
 from system.action_queue import ActionQueue
 from system.botnet import Client
+import random
 
 
 # self.send_message(f'{self!r}')
@@ -29,8 +30,8 @@ class FishingService(Client):
     exit = threading.Event()
 
     def __init__(self, number_of_fishers, number_of_buffers, number_of_suppliers, number_of_teleporters, windows, q):
-        super().__init__()  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС Client И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
-        self.machine_id = 0
+        self.machine_id = random.randint(0, 10000000)
+        super().__init__(self.machine_id)  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС Client И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
         if number_of_fishers + number_of_buffers + number_of_suppliers + number_of_teleporters != len(windows):
             print('FISHING SERVICE ERROR')
         #     # warning
@@ -192,22 +193,39 @@ class FishingService(Client):
             self.send_message(f'fisher {id} stucked (ERROR)')
             # cls.raise_error()
 
-    def request_server_for_supplying(self, fisher_id, list):
-        self.send_status_to_server(fisher_id, self.machine_id, list)
+    def request_server_for_supplying(self, fisher_id, dict):
+        data_to_send = {fisher_id: dict}
+        self.send_status_to_server(fisher_id, dict)
 
     def allow_fisher_to_trade(self, id):
         self.fishers[id].trading_is_allowed = True
 
+    def start_supply(self, q):
+        pass
+
     def listen_to_server(self):
-        fisher_receiver_id, machine_recevier_id, machine_supplier_id, list = self.get_status_from_server() # как разделить сообщения - для рыбака или для саплаера?
-        if self.has_supplier and self.machine_id == machine_supplier_id:
-            if self.machine_id == machine_recevier_id:
-                if self.fishers[fisher_receiver_id]:
-                    self.allow_fisher_to_trade(fisher_receiver_id)
-            self.suppliers[0].supply(list)
-        else:
-            if self.fishers[fisher_receiver_id]:
-                self.allow_fisher_to_trade(fisher_receiver_id)
+        # {уникальный ID машины-отправителя: [сообщение1, сообщение2, ...]} - вид отправляемого сообщения
+        # сообщение1 имеет вид {fisher_id: dict} -> {fisher_id: {'d_baits': a, 'n_baits': b, 'soski': c}}, где a, b и c - количество дневных наживок,
+        # ночных наживок и сосок соответственно
+        if self.has_supplier:
+            message = self.get_status_from_server()
+            if message:
+                q = []
+                need_to_supply = False
+                for sender_id, msg in message.items():
+                    fisher_dict = {}
+                    for fisher, supplies in msg.items():
+                        for resource, amount in supplies.items():
+                            if amount != 0:
+                                need_to_supply = True
+                                if fisher_dict.get(fisher) is not None:
+                                    fisher_dict[fisher].update({resource: amount})
+                                else:
+                                    fisher_dict[fisher] = {resource: amount}
+                        q.append(fisher_dict.copy())
+                    fisher_dict.clear()
+                if need_to_supply:
+                    self.start_supply(q)
 
     # @classmethod
     def run(self):
@@ -219,9 +237,15 @@ class FishingService(Client):
                 for fisher in self.fishers:
                     self.fisher_response(fisher.fisher_id, fisher.get_status())
                     if fisher.supply_request:
-                        self.request_server_for_supplying(fisher.fisher_id, fisher.requested_items_to_supply)
-                        fisher.supply_request = False
-                        fisher.request_proceed = True
+                        if not self.has_supplier:
+                            self.request_server_for_supplying(fisher.fisher_id, fisher.requested_items_to_supply)
+                            self.allow_fisher_to_trade(fisher.fisher_id)
+                            fisher.supply_request = False
+                            fisher.request_proceed = True
+                        else:
+                            self.allow_fisher_to_trade(fisher.fisher_id)
+                            fisher.supply_request = False
+                            fisher.request_proceed = True
 
             self.listen_to_server()
             time.sleep(1)

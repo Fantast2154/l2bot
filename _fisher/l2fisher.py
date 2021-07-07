@@ -37,7 +37,8 @@ class Fisher:
         self.send_counter = 3
         self.receive_counter = 0
         self.attempt_counter = 0
-        self.requested_items_to_supply = [0]*3
+        #self.requested_items_to_supply = [0]*3
+        self.requested_items_to_supply = {}
 
 
         # trading
@@ -327,9 +328,12 @@ class Fisher:
     def overweight_baits_soski_correction(self):
 
         self.supply_request = True
-        self.requested_items_to_supply[0] = 10
-        self.requested_items_to_supply[1] = 20
-        self.requested_items_to_supply[2] = 30
+        # self.requested_items_to_supply[0] = 10
+        # self.requested_items_to_supply[1] = 20
+        # self.requested_items_to_supply[2] = 30
+        self.requested_items_to_supply['d_baits'] = 10
+        self.requested_items_to_supply['n_baits'] = 20
+        self.requested_items_to_supply['soski'] = 30
         self.send_message('overweight_baits_soski_correction')
         self.wait_for_trade()
         return True
@@ -433,8 +437,8 @@ class Fisher:
     def send_trade(self):
         pass
 
-    def wait_for_trade(self):
-        pass
+    # def wait_for_trade(self):
+    #     pass
 
     def change_bait(self):
         pass

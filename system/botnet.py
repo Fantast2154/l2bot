@@ -6,7 +6,8 @@ import time
 
 
 class Server:
-    def __init__(self):
+    def __init__(self, machine_id):
+        self.id = machine_id
         self.HOST = ''
         self.PORT = 27015
         self.ADDRESS = (self.HOST, self.PORT)
@@ -24,6 +25,7 @@ class Server:
         print(datetime.datetime.now().time(), 'Сервер:', text)
 
     def data_accepting(self):
+        data_storage_dict = {}
         while True:
             if not self.bots_list:
                 self.bots_data_collection.clear()
@@ -41,9 +43,19 @@ class Server:
                     self.bots_list.remove(bot)
                     self.server_message(f'Клиент удалён.')
 
-                data_to_send = self.bots_data_collection
+                for item in self.bots_data_collection:
+                    for key, value in item.items():
+                        if data_storage_dict.get(key) is not None:
+                            data_storage_dict[key].append(value)
+                        else:
+                            data_storage_dict[key] = [value]
+
+                # {уникальный ID машины-отправителя: [сообщение1, сообщение2, ...]} - вид отправляемого сообщения
+                #data_to_send = self.bots_data_collection
+                data_to_send = data_storage_dict.copy()
                 # data_to_send = decoded_data
                 encoded_data_to_send = pickle.dumps(data_to_send)
+                data_storage_dict.clear()
 
                 for bot_ in self.bots_list:
                     try:
@@ -71,8 +83,8 @@ class Server:
 
 
 class Client:
-    def __init__(self, bot_id=None, ip=None):
-        self.bot_id = 0
+    def __init__(self, machine_id, ip=None):
+        self.id = machine_id
         self.HOST = '84.237.53.150'
         self.PORT = 27015
         self.ADDRESS = (self.HOST, self.PORT)
@@ -104,11 +116,11 @@ class Client:
         return self.connected
 
     def client_message(self, text):
-        print(datetime.datetime.now().time(), f'Бот {self.bot_id}', text)
+        print(datetime.datetime.now().time(), f'Бот {self.id}', text)
 
     def client_send(self, data):
-        #data_to_encode = {self.bot_id: data}
-        data_to_encode = data
+        data_to_encode = {self.id: data}
+        #data_to_encode = data
         encoded_data_to_send = pickle.dumps(data_to_encode)
         self.client.send(encoded_data_to_send)
 
