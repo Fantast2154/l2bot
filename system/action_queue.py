@@ -79,16 +79,16 @@ class ActionQueue():
     def new_keyboard_task(self):
         pass
 
-    def click(self, x, y, param=False, params=False):
-        print('params', params)
+    def click(self, x, y, param=False, params=[]):
+        # print('params', params)
         self.mouse.position = (x, y)
         time.sleep(0.03)
 
         if 'not_click' not in params:
-            print('click_params', params)
-            if True:
+            # print('click_params', params)
+            if param:
                 if 'double' in params:
-                    print('double click')
+                    # print('double click')
                     self.mouse.press(Button.left)
                     time.sleep(0.02)
                     self.mouse.release(Button.left)

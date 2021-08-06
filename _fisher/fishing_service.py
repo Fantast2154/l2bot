@@ -61,7 +61,9 @@ class FishingService(Client):
         # self.exit = threading.Event()
 
         q.activate_l2windows(self.windows)
+        print('numb')
         for fisher_id in range(number_of_fishers):
+            print(fisher_id)
             # window_fishers
             win_capture = window_fishers[fisher_id].wincap
             window_name = window_fishers[fisher_id].window_name
@@ -96,24 +98,6 @@ class FishingService(Client):
         # temp_buffer.start()
         # self.process_buffer.append(temp_buffer_process)
         # self.buffers.append(temp_buffer)
-        for fisher_id in range(number_of_fishers):
-            # window_fishers
-            win_capture = window_fishers[fisher_id].wincap
-            window_name = window_fishers[fisher_id].window_name
-            hwnd = window_fishers[fisher_id].hwnd
-            screenshot = window_fishers[fisher_id].screenshot
-            temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd, screenshot)
-            temp_fishing_window.window_id = window_fishers[fisher_id].window_id
-            self.fishing_windows.append(temp_fishing_window)
-
-            # fishers
-            temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
-            temp_fisher_process = Process(target=temp_fisher.run)
-            temp_fisher_process.start()
-            # temp_fisher.start()
-            self.process_fisher.append(temp_fisher_process)
-            self.fishers.append(temp_fisher)
-
 
         for supplier_id in range(number_of_suppliers):
             win_capture = window_suppliers[supplier_id].wincap
