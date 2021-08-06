@@ -117,6 +117,7 @@ class FishingWindow(L2window):
             return self.screenshot_accurate
         else:
             return []
+
     def send_message(self, message):
         temp = 'FishingWindow' + f' {self.window_id}' + ': ' + message
         print(temp)
@@ -199,24 +200,26 @@ class FishingWindow(L2window):
                 pass
                 # self.send_message('Error finding images2')
 
-    def get_object(self, name, search=False):
-        if self.library[name][0]:
+    def get_object(self, object, search=False):
+        if self.library[object][0]:
             pass
         else:
-            temp = 'ERROR referring to the unknown object: ' + name
+            temp = 'ERROR referring to the unknown object: ' + object
             self.send_message(temp)
             return False
 
         if search:
-            pos = self.library[name][0].find(self.update_screenshot())
+            # pos = self.library[object][0].find(self.update_screenshot())
+            pos = self.find(object)
+
             if pos:
-                self.library[name][1] = pos
+                self.library[object][1] = pos
                 # print(f'DATABASE IF {self.window_id}: {pos}')
                 return pos
             else:
                 return []
         else:
-            return self.library[name][1]
+            return self.library[object][1]
 
     def init_search(self):
         try:

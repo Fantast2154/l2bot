@@ -25,6 +25,7 @@ class FishingService(Client):
     fishing_windows = []
     process_fisher = []
     process_buffer = []
+    process_supplier = []
     raised_error = False
     fishing_service_client = {}
     sg_gui = None
@@ -95,26 +96,43 @@ class FishingService(Client):
         # temp_buffer.start()
         # self.process_buffer.append(temp_buffer_process)
         # self.buffers.append(temp_buffer)
+        for fisher_id in range(number_of_fishers):
+            # window_fishers
+            win_capture = window_fishers[fisher_id].wincap
+            window_name = window_fishers[fisher_id].window_name
+            hwnd = window_fishers[fisher_id].hwnd
+            screenshot = window_fishers[fisher_id].screenshot
+            temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd, screenshot)
+            temp_fishing_window.window_id = window_fishers[fisher_id].window_id
+            self.fishing_windows.append(temp_fishing_window)
 
-        # for supplier_id in range(number_of_suppliers):
-        #     pass
-        # win_capture = windows[supplier_id].wincap
-        # window_name = windows[supplier_id].window_name
-        # hwnd = windows[supplier_id].hwnd
-        # screenshot = windows[supplier_id].screenshot
-        # temp_supplier_window = FishingWindow(supplier_id, win_capture, window_name, hwnd, screenshot)
-        # self.fishing_windows.append(temp_supplier_window)
+            # fishers
+            temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
+            temp_fisher_process = Process(target=temp_fisher.run)
+            temp_fisher_process.start()
+            # temp_fisher.start()
+            self.process_fisher.append(temp_fisher_process)
+            self.fishers.append(temp_fisher)
 
-        # suppliers
-        # temp_supplier = Supplier(temp_supplier_window, supplier_id, number_of_suppliers, q)
-        # temp_supplier_process = Process(target=temp_supplier.run)
-        # temp_supplier_process.start()
-        # temp_supplier.start()
-        # self.process_supplier.append(temp_supplier_process)
-        # self.suppliers.append(temp_supplier)
+
+        for supplier_id in range(number_of_suppliers):
+            win_capture = window_suppliers[supplier_id].wincap
+            window_name = window_suppliers[supplier_id].window_name
+            hwnd = window_suppliers[supplier_id].hwnd
+            screenshot = window_suppliers[supplier_id].screenshot
+            temp_supplier_window = FishingSupplierWindow(supplier_id, win_capture, window_name, hwnd, screenshot)
+            temp_supplier_window.window_id = window_suppliers[supplier_id].window_id
+            self.fishing_windows.append(temp_supplier_window)
+
+            temp_supplier = Supplier(temp_supplier_window, supplier_id, number_of_suppliers, q)
+            temp_supplier_process = Process(target=temp_supplier.run)
+            temp_supplier_process.start()
+            # temp_supplier.start()
+            self.process_supplier.append(temp_supplier_process)
+            self.suppliers.append(temp_supplier)
 
         # wincap
-        self.win_capture = window_fishers[0].wincap
+        self.win_capture = self.windows[0].wincap
 
         self.number_of_fishers = number_of_fishers
         self.q = q
