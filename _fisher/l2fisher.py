@@ -36,7 +36,8 @@ class Fisher:
         # send/receive counters
         self.send_counter = 3
         self.receive_counter = 0
-        self.attempt_counter = 0
+        self.attempt_counter = manager.list()
+        self.attempt_counter.append(0)
         #self.requested_items_to_supply = [0]*3
         self.requested_items_to_supply = {}
 
@@ -149,7 +150,8 @@ class Fisher:
         return True
 
     def trial_rod_cast(self):
-
+        self.fishing()
+        self.pause_thread(0.5)
         if not self.search_loop_with_click(self.fishing_window.get_object, self.fishing, 10, 'fishing_window', True):
             return False
         self.fishing_window.record_fishing_window()
@@ -278,7 +280,7 @@ class Fisher:
         return True
 
     def actions_between_fishing_rod_casts(self):
-        if self.attempt_counter == 1:
+        if self.attempt_counter[0] == 1:
             self.time_since_last_rod_cast = time.time()
             return True
         self.time_between_rod_casts_avg.append(time.time() - self.time_since_last_rod_cast)
@@ -287,7 +289,7 @@ class Fisher:
         self.send_message(f'Среднее время между забросами удочки {result}')
         self.send_message(f'Средняя скорость ловли: {3600 // result} попыток в час')
 
-        if self.attempt_counter > self.send_counter:
+        if self.attempt_counter[0] > self.send_counter:
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
         return True
@@ -424,9 +426,9 @@ class Fisher:
         return True
 
     def update_current_attempt(self):
-        self.attempt_counter += 1
+        self.attempt_counter[0] += 1
         temp = '\t' * 10 * self.fisher_id
-        print(f'{temp}Fisher {self.fisher_id}: Attempt # {self.attempt_counter}')
+        print(f'{temp}Fisher {self.fisher_id}: Attempt # {self.attempt_counter[0]}')
 
     def send_mail(self):
         pass

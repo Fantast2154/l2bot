@@ -98,7 +98,6 @@ class WindowCapture:
         self.accurate = manager.dict()
         self.object_position_and_size = manager.dict()
 
-
     def set_windows(self, windows_list):
         if windows_list:
             for window in windows_list:
@@ -120,7 +119,6 @@ class WindowCapture:
     # def __del__(self):
     #     self.send_message(f'destroyed')
 
-
     # @classmethod
     def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
         global screenshot
@@ -138,10 +136,8 @@ class WindowCapture:
 
             if self.accurate[game_window.hwnd]:
 
-
                 for shefer in self.object_position_and_size[hwnd_l]:
-
-                    #print('shefer hwnd_l', shefer, hwnd_l)
+                    # print('shefer hwnd_l', shefer, hwnd_l)
                     [object_position, object_size, object_name] = shefer
                     wDC = win32gui.GetWindowDC(hwnd_l)
                     dcObj = win32ui.CreateDCFromHandle(wDC)
@@ -185,7 +181,7 @@ class WindowCapture:
                 signedIntsArray = dataBitMap.GetBitmapBits(True)
                 img = np.fromstring(signedIntsArray, dtype='uint8')
                 img.shape = (h, w, 4)
-                #self.imgs.append(img)
+                # self.imgs.append(img)
 
                 # free resources
                 dcObj.DeleteDC()
@@ -203,9 +199,9 @@ class WindowCapture:
 
         screenshot.append(w_screenshot)
         screenshot.pop(0)
-                # cv2.imshow('wincap', screenshot[-1][0][0])
-                # cv2.waitKey(1)
-            # self.lock.release()
+        # cv2.imshow('wincap', screenshot[-1][0][0])
+        # cv2.waitKey(1)
+        # self.lock.release()
         # return self.sreenshots_dict_THIRD
 
     def get_windows_param(self):

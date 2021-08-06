@@ -19,9 +19,10 @@ class L2window:
         self.window_id = window_id
         x = 0
         y = 0
-        width = 650
-        height = 650
-        self.left_top_x = width * window_id + 500
+        width = 625
+        height = 625
+        # self.shell = win32com.client.Dispatch("WScript.Shell")
+        self.left_top_x = width * window_id + 0
         self.left_top_y = y
         self.width = width
         self.height = height
@@ -29,7 +30,10 @@ class L2window:
         self.screenshot = screenhot
         self.hwnd = hwnd
         self.wincap = wincap
-        self.enum_handler()
+
+        # self.enum_handler()
+        self.activate_window()
+
         # self.send_message(f'created')
 
     # def __del__(self):
@@ -39,6 +43,12 @@ class L2window:
         if win32gui.IsWindowVisible(self.hwnd):
             if self.window_name in win32gui.GetWindowText(self.hwnd):
                 win32gui.MoveWindow(self.hwnd, self.left_top_x, self.left_top_y, self.width, self.height, True)
+
+    def activate_window(self):
+        time.sleep(0.05)
+        # self.shell.SendKeys('%')
+        # win32gui.SetForegroundWindow(self.hwnd)
+        time.sleep(0.05)
 
     def send_message(self, message):
         temp = 'L2window' + f' {self.window_id}' + ': ' + message
