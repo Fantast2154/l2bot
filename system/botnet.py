@@ -144,7 +144,7 @@ class Client:
 
 
 if __name__ == '__main__':
-    s = Server()
+    s = Server(123)
     s.server_start()
 
     # time.sleep(2)
