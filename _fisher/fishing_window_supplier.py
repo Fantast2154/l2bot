@@ -22,9 +22,9 @@ class FishingSupplierWindow(L2window):
 
         self.extended_image_database = [
             ['map_button', 'images/map.jpg', 0.9],
-            ['baits', 'images/items/bait.jpg', 0.90],
+            ['baits', 'images/trade/bait.jpg', 0.80],
             ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
-            ['soski', 'images/items/soski.jpg', 0.8],
+            ['soski', 'images/items/soski_test.jpg', 0.8],
             ['menu', 'images/menu.jpg', 0.6],
             ['disconnect_EN', 'images/disconnect_EN.jpg', 0.4],
             ['weight_icon', 'images/weight.jpg', 0.9],
@@ -37,7 +37,7 @@ class FishingSupplierWindow(L2window):
             ['ok_button', 'images/trade/ok_button.jpg', 0.8],
             ['cancel_button', 'images/trade/cancel_button.jpg', 0.8],
             ['small_bag', 'images/trade/small_bag.jpg', 0.8],
-            ['confirm_button', 'images/items/confirm_button.jpg', 0.8],
+            ['confirm_button', 'images/trade/confirm_button.jpg', 0.7],
             ['trade_request', 'images/trade/trade_request_icon2.jpg', 0.8],
             ['catched_item0', 'images/items/catcheditem0.jpg', 0.8],
             ['catched_item1', 'images/items/catcheditem1.jpg', 0.8],
@@ -103,7 +103,8 @@ class FishingSupplierWindow(L2window):
             [(x, y)] = temp_coordinates
             temp_coordinates2 = [(x-260//2, y-35//2)]
             coordinates = self.find('soski', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            return coordinates
+            [(out_x, out_y)] = coordinates
+            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
 
@@ -112,8 +113,11 @@ class FishingSupplierWindow(L2window):
         if temp_coordinates:
             [(x, y)] = temp_coordinates
             temp_coordinates2 = [(x-260//2, y-35//2)]
-            coordinates = self.find('soski', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            return coordinates
+            coordinates = self.find('baits', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
+            print(coordinates)
+            if coordinates:
+                [(out_x, out_y)] = coordinates
+                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
     def is_input_field(self):
@@ -126,12 +130,10 @@ class FishingSupplierWindow(L2window):
             return []
 
     def is_confirm_button(self):
-        temp_coordinates = self.find('exchange_menu')
+        temp_coordinates = self.find('confirm_button')
+        print(temp_coordinates)
         if temp_coordinates:
-            [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x-260//2, y-35//2)]
-            coordinates = self.find('confirm_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            return coordinates
+            return temp_coordinates
         else:
             return []
 
@@ -141,7 +143,8 @@ class FishingSupplierWindow(L2window):
             [(x, y)] = temp_coordinates
             temp_coordinates2 = [(x-260//2, y-35//2)]
             coordinates = self.find('small_bag', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            return coordinates
+            [(out_x, out_y)] = coordinates
+            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
 
@@ -151,7 +154,8 @@ class FishingSupplierWindow(L2window):
             [(x, y)] = temp_coordinates
             temp_coordinates2 = [(x-260//2, y-35//2)]
             coordinates = self.find('ok_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            return coordinates
+            [(out_x, out_y)] = coordinates
+            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
 
@@ -161,7 +165,8 @@ class FishingSupplierWindow(L2window):
             [(x, y)] = temp_coordinates
             temp_coordinates2 = [(x-260//2, y-35//2)]
             coordinates = self.find('cancel_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            return coordinates
+            [(out_x, out_y)] = coordinates
+            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
 

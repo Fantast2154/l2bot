@@ -64,6 +64,7 @@ class ActionQueue():
         print(temp)
 
     def new_task(self, action, action_param, window, priority='Normal', action_rate='High'):
+        # print(action_param)
         self.queue_list.append(1)
         self.actions.append(action)
         self.action_params.append(action_param)
@@ -79,25 +80,27 @@ class ActionQueue():
         pass
 
     def click(self, x, y, param=False, params=False):
-
+        print('params', params)
         self.mouse.position = (x, y)
         time.sleep(0.03)
 
         if 'not_click' not in params:
-            if param:
-                if "double" in params:
-                    self.mouse.press(Button.right)
+            print('click_params', params)
+            if True:
+                if 'double' in params:
+                    print('double click')
+                    self.mouse.press(Button.left)
                     time.sleep(0.02)
-                    self.mouse.release(Button.right)
+                    self.mouse.release(Button.left)
                     time.sleep(0.03)
-                    self.mouse.press(Button.right)
+                    self.mouse.press(Button.left)
                     time.sleep(0.02)
-                    self.mouse.release(Button.right)
+                    self.mouse.release(Button.left)
                     time.sleep(0.03)
                 else:
-                    self.mouse.press(Button.right)
+                    self.mouse.press(Button.left)
                     time.sleep(0.02)
-                    self.mouse.release(Button.right)
+                    self.mouse.release(Button.left)
                     time.sleep(0.03)
 
                     # for i in range(4):
