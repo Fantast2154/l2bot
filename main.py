@@ -11,7 +11,7 @@ import win32gui
 import sys
 import time
 import threading
-# from system.botnet import Server, Client
+from system.botnet import Server, Client
 import keyboard
 import PySimpleGUI as sg
 
@@ -187,10 +187,10 @@ def input_number(message):
 def client_server(bots_id_list):
     msg = input('y - Запустить сервер на этой машине\nn - Ничего не делать\n')
     if msg == 's' or msg == 'ы':
-        pass
-        # server = Server()
-        # server_process = Process(target=server.server_start)
-        # server_process.start()
+
+        server = Server()
+        server_process = Process(target=server.server_start)
+        server_process.start()
         # return None
     # elif msg == 'c' or msg == 'c':
     #     connected_bots = []

@@ -11,13 +11,13 @@ from _fisher.fishing_window_buffer import *
 from _fisher.fishing_window_supplier import *
 from multiprocessing import Process, Value, Manager
 from system.action_queue import ActionQueue
-# from system.botnet import Client
+from system.botnet import Client
 import random
 
 
 # self.send_message(f'{self!r}')
 
-class FishingService():
+class FishingService(Client):
     fishers = []
     suppliers = []
     buffers = []
@@ -38,8 +38,8 @@ class FishingService():
             self.windows.append(s)
         for t in window_teleporters:
             self.windows.append(t)
-        # self.machine_id = random.randint(0, 10000000)
-        # super().__init__(self.machine_id)  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС Client И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
+        self.machine_id = random.randint(0, 10000000)
+        super().__init__(self.machine_id)  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС Client И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
         #     # warning
         #     return None
         number_of_fishers = len(window_fishers)
@@ -166,18 +166,18 @@ class FishingService():
         else:
             fisher.pause_fisher(delay)
 
-    # def send_status_to_server(self, *status):
-    #     if super().is_connected():
-    #         super().client_send(status)  # ШЛЁМ СООБЩЕНИЕ НА СЕРВЕР
-    #
-    # def get_status_from_server(self):
-    #     if super().is_connected():
-    #         return super().client_receive_message()  # ПОЛУЧАЕМ СООБЩЕНИЯ С СЕРВЕРА
+    def send_status_to_server(self, *status):
+        if super().is_connected():
+            super().client_send(status)  # ШЛЁМ СООБЩЕНИЕ НА СЕРВЕР
+
+    def get_status_from_server(self):
+        if super().is_connected():
+            return super().client_receive_message()  # ПОЛУЧАЕМ СООБЩЕНИЯ С СЕРВЕРА
 
     def fisher_response(self, id, response):
 
-        # self.send_status_to_server(id, response)
-        # message_from_other_machines = self.get_status_from_server()
+        self.send_status_to_server(id, response)
+        message_from_other_machines = self.get_status_from_server()
 
         # fisher params
         # 0 - not fishing
@@ -186,10 +186,10 @@ class FishingService():
         # 8 - paused
         # 9 - error/stucked
 
-        # if 'Out of soski' in message_from_other_machines:
-        #     if self.has_supplier:
-        #         for sup in self.suppliers:
-        #             sup.supply(id, 'soski')
+        if 'Out of soski' in message_from_other_machines:
+            if self.has_supplier:
+                for sup in self.suppliers:
+                    sup.supply(id, 'soski')
 
         if response == 'Out of soski':
             if self.has_supplier:
@@ -208,9 +208,9 @@ class FishingService():
             self.send_message(f'fisher {id} stucked (ERROR)')
             # cls.raise_error()
 
-    # def request_server_for_supplying(self, fisher_id, dict):
-    #     data_to_send = {fisher_id: dict}
-    #     self.send_status_to_server(fisher_id, dict)
+    def request_server_for_supplying(self, fisher_id, dict):
+        data_to_send = {fisher_id: dict}
+        self.send_status_to_server(fisher_id, data_to_send)
 
     def allow_fisher_to_trade(self, id):
         self.fishers[id].trading_is_allowed = True
@@ -218,40 +218,40 @@ class FishingService():
     def start_supply(self, q):
         pass
 
-    # def listen_to_server(self):
-    #     # {уникальный ID машины-отправителя: [сообщение1, сообщение2, ...]} - вид отправляемого сообщения
-    #     # сообщение1 имеет вид {fisher_id: dict} -> {fisher_id: {'d_baits': a, 'n_baits': b, 'soski': c}}, где a, b и c - количество дневных наживок,
-    #     # ночных наживок и сосок соответственно
-    #     if self.has_supplier:
-    #         message = self.get_status_from_server()
-    #         if message:
-    #             q = []
-    #             need_to_supply = False
-    #             for sender_id, msg in message.items():
-    #                 fisher_dict = {}
-    #                 for fisher, supplies in msg.items():
-    #                     for resource, amount in supplies.items():
-    #                         if amount != 0:
-    #                             need_to_supply = True
-    #                             if fisher_dict.get(fisher) is not None:
-    #                                 fisher_dict[fisher].update({resource: amount})
-    #                             else:
-    #                                 fisher_dict[fisher] = {resource: amount}
-    #                     q.append(fisher_dict.copy())
-    #                 fisher_dict.clear()
-    #             if need_to_supply:
-    #                 self.start_supply(q)
+    def listen_to_server(self):
+        # {уникальный ID машины-отправителя: [сообщение1, сообщение2, ...]} - вид отправляемого сообщения
+        # сообщение1 имеет вид {fisher_id: dict} -> {fisher_id: {'d_baits': a, 'n_baits': b, 'soski': c}}, где a, b и c - количество дневных наживок,
+        # ночных наживок и сосок соответственно
+        if self.has_supplier:
+            message = self.get_status_from_server()
+            if message:
+                q = []
+                need_to_supply = False
+                for sender_id, msg in message.items():
+                    fisher_dict = {}
+                    for fisher, supplies in msg.items():
+                        for resource, amount in supplies.items():
+                            if amount != 0:
+                                need_to_supply = True
+                                if fisher_dict.get(fisher) is not None:
+                                    fisher_dict[fisher].update({resource: amount})
+                                else:
+                                    fisher_dict[fisher] = {resource: amount}
+                        q.append(fisher_dict.copy())
+                    fisher_dict.clear()
+                if need_to_supply:
+                    self.start_supply(q)
 
     def run(self):
         self.send_message(f'TEST FishingService run_loop() calling')
-        # self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
+        #self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
         while True:
             for fisher in self.fishers:
-                # self.fisher_response(fisher.fisher_id, fisher.get_status())
-                # self.update_fishers_attempt(fisher.fisher_id, fisher.attempt_counter)
+                self.fisher_response(fisher.fisher_id, fisher.get_status())
+                self.update_fishers_attempt(fisher.fisher_id, fisher.attempt_counter)
                 if fisher.supply_request:
                     if not self.has_supplier:
-                        # self.request_server_for_supplying(fisher.fisher_id, fisher.requested_items_to_supply)
+                        self.request_server_for_supplying(fisher.fisher_id, fisher.requested_items_to_supply)
                         self.allow_fisher_to_trade(fisher.fisher_id)
                         fisher.supply_request = False
                         fisher.request_proceed = True
@@ -260,7 +260,7 @@ class FishingService():
                         fisher.supply_request = False
                         fisher.request_proceed = True
 
-            # self.listen_to_server()
+            self.listen_to_server()
             time.sleep(1)
 
 
@@ -276,8 +276,8 @@ class FishingService():
         del cls.fishers
         del cls.fishing_windows
 
-    # def update_fishers_attempt(self, id, attempt):
-    #     temp = f'fisher_{id}'
-    #     print(attempt)
-    #     global sg_gui
-    #     sg_gui[temp].update(f'{attempt}')
+    def update_fishers_attempt(self, id, attempt):
+        temp = f'fisher_{id}'
+        print(attempt)
+        global sg_gui
+        sg_gui[temp].update(f'{attempt}')
