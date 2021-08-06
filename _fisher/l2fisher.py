@@ -96,8 +96,8 @@ class Fisher:
 
 
     def send_message(self, message):
-        temp = '\t' * 10 * self.fisher_id[0] + 'Fisher ' + f'{self.fisher_id[0]}: {message}'
-        print(temp)
+        #temp = '\t' * 10 * self.fisher_id[0] + 'Fisher ' + f'{self.fisher_id[0]}: {message}'
+        print('temp')
 
     def test_action(self, count):
         self.q.new_task(count, self.fishing_window)
