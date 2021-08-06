@@ -1,3 +1,5 @@
+import keyboard
+
 from system.action_service import ActionService
 import time
 import threading
@@ -131,6 +133,7 @@ class ActionQueue():
 
     def task_execution(self, action, params, window, action_rate='High'):
         if action == 'mouse':
+
             parameters = params
             if len(params) != 6:
                 return
@@ -144,6 +147,9 @@ class ActionQueue():
                 self.click(x, y, param=True, params=parameters)
             else:
                 self.click(x, y, param=False, params=parameters)
+
+            if 'insert' in params:
+                keyboard.send('ctrl+v')
 
     @classmethod
     def start_queueing(cls):
