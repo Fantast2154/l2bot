@@ -219,9 +219,9 @@ class FishingService(Client):
         pass
 
     def listen_to_server(self):
-        # {уникальный ID машины-отправителя: [сообщение1, сообщение2, ...]} - вид отправляемого сообщения
-        # сообщение1 имеет вид {fisher_id: dict} -> {fisher_id: {'d_baits': a, 'n_baits': b, 'soski': c}}, где a, b и c - количество дневных наживок,
-        # ночных наживок и сосок соответственно
+        # {уникальный ID машины-отправителя: [сообщение1, сообщение2, ...]} - вид отправляемого сообщения сообщение1
+        # имеет вид {fisher_id: dict} -> {fisher_id: {'d_baits': a, 'n_baits': b, 'soski': c}}, где a,
+        # b и c - количество дневных наживок, ночных наживок и сосок соответственно
         if self.has_supplier:
             message = self.get_status_from_server()
             if message:

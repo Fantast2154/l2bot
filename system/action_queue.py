@@ -49,7 +49,6 @@ class ActionQueue():
     def activate_l2windows(self, windows):
         try:
             for window in windows:
-
                 time.sleep(0.05)
                 # self.shell.SendKeys('%')
                 win32gui.SetForegroundWindow(window.hwnd)
@@ -77,22 +76,32 @@ class ActionQueue():
     def new_keyboard_task(self):
         pass
 
-    def click(self, x, y, param=False):
+    def click(self, x, y, param=False, params=False):
 
         self.mouse.position = (x, y)
         time.sleep(0.03)
 
         if param:
-            self.mouse.press(Button.right)
-            time.sleep(0.02)
-            self.mouse.release(Button.right)
-            time.sleep(0.03)
+            if "double" in params:
+                self.mouse.press(Button.right)
+                time.sleep(0.02)
+                self.mouse.release(Button.right)
+                time.sleep(0.03)
+                self.mouse.press(Button.right)
+                time.sleep(0.02)
+                self.mouse.release(Button.right)
+                time.sleep(0.03)
+            else:
+                self.mouse.press(Button.right)
+                time.sleep(0.02)
+                self.mouse.release(Button.right)
+                time.sleep(0.03)
 
-            # for i in range(4):
-            #     win32api.SetCursorPos((x+i, y+i))
+                # for i in range(4):
+                #     win32api.SetCursorPos((x+i, y+i))
 
-            self.mouse.move(4, 4)
-            time.sleep(0.01)
+                self.mouse.move(4, 4)
+                time.sleep(0.01)
 
         self.mouse.press(Button.left)
         time.sleep(0.07)
@@ -119,10 +128,9 @@ class ActionQueue():
     def click_target(self, x, y):
         pass
 
-
     def task_execution(self, action, params, window, action_rate='High'):
         if action == 'mouse':
-
+            parameters = params
             if len(params) != 6:
                 return
 
@@ -132,13 +140,14 @@ class ActionQueue():
 
             if window.hwnd != self.last_active_window:
                 self.last_active_window = window.hwnd
-                self.click(x, y, param=True)
+                self.click(x, y, param=True, params=parameters)
             else:
-                self.click(x, y, param=False)
+                self.click(x, y, param=False, params=parameters)
 
     @classmethod
     def start_queueing(cls):
         pass
+
     def start(self):
         # self.send_message('start queueing')
         t = threading.Thread(target=self.run)
