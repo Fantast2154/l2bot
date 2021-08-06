@@ -81,32 +81,33 @@ class ActionQueue():
         self.mouse.position = (x, y)
         time.sleep(0.03)
 
-        if param:
-            if "double" in params:
-                self.mouse.press(Button.right)
-                time.sleep(0.02)
-                self.mouse.release(Button.right)
-                time.sleep(0.03)
-                self.mouse.press(Button.right)
-                time.sleep(0.02)
-                self.mouse.release(Button.right)
-                time.sleep(0.03)
-            else:
-                self.mouse.press(Button.right)
-                time.sleep(0.02)
-                self.mouse.release(Button.right)
-                time.sleep(0.03)
+        if 'not_click' not in params:
+            if param:
+                if "double" in params:
+                    self.mouse.press(Button.right)
+                    time.sleep(0.02)
+                    self.mouse.release(Button.right)
+                    time.sleep(0.03)
+                    self.mouse.press(Button.right)
+                    time.sleep(0.02)
+                    self.mouse.release(Button.right)
+                    time.sleep(0.03)
+                else:
+                    self.mouse.press(Button.right)
+                    time.sleep(0.02)
+                    self.mouse.release(Button.right)
+                    time.sleep(0.03)
 
-                # for i in range(4):
-                #     win32api.SetCursorPos((x+i, y+i))
+                    # for i in range(4):
+                    #     win32api.SetCursorPos((x+i, y+i))
 
-                self.mouse.move(4, 4)
-                time.sleep(0.01)
+                    self.mouse.move(4, 4)
+                    time.sleep(0.01)
 
-        self.mouse.press(Button.left)
-        time.sleep(0.07)
-        self.mouse.release(Button.left)
-        time.sleep(0.03)
+            self.mouse.press(Button.left)
+            time.sleep(0.07)
+            self.mouse.release(Button.left)
+            time.sleep(0.03)
 
     def click2(self, x, y, param=False):
 
