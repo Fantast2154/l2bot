@@ -318,8 +318,8 @@ if __name__ == '__main__':
         event, values = sg_gui.Read(timeout=2)
 
         for fisher in F.fishers:
-            temp = f'fisher_{fisher.fisher_id[0]}'
-            sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
+            temp = f'fisher_{fisher.fisher_id}'
+            sg_gui[temp].update(f'{fisher.attempt_counter}')
 
 
     # while True:
