@@ -67,6 +67,7 @@ def sg_gui(windows_f, windows_b, windows_s, windows_t):
     index_list = []
     counter = 0
     l2window_workers = [0]*len(windows)
+    l2attempt_counter = [0]*len(windows)
 
     for out_msg in window_input_msg_box:
         sg_gui_temp['msg'].Update(out_msg)
@@ -83,6 +84,7 @@ def sg_gui(windows_f, windows_b, windows_s, windows_t):
                         workers[i] = 'fisher'
                         windows_left -= 1
                         l2window_workers[i] = sg.Text(f'{workers[i]}_{counter}', size=(l2button_width, 1), justification='center')
+                        l2attempt_counter[i] = sg.Text(f'', size=(l2button_width, 1), justification='center', key=f'fisher_{counter}')
                         # l2window_workers.append(sg.Text(f'{workers[i]}_{counter}', size=(l2button_width, 1), justification='center'))
                         counter += 1
                     if out_msg == 'choose buffer windows':
@@ -104,6 +106,7 @@ def sg_gui(windows_f, windows_b, windows_s, windows_t):
                     if workers[i] != 'fisher':
                         # l2window_workers.append(sg.Text(f'{workers[i]}', size=(l2button_width, 1), justification='center'))
                         l2window_workers[i] = sg.Text(f'{workers[i]}', size=(l2button_width, 1), justification='center')
+                        l2attempt_counter[i] = sg.Text(f'', size=(l2button_width, 1), justification='center')
 
                     sg_gui_temp['unresolved'].Update(f'number of unresolved windows: {windows_left}')
                     index_list.append(i)
@@ -125,16 +128,6 @@ def sg_gui(windows_f, windows_b, windows_s, windows_t):
         # else:
         #     l2window_workers.append(sg.Text(f'{workers[i]}', size=(l2button_width, 1), justification='center'))
 
-
-    counter = 0
-    print(workers)
-    print(index_list)
-    for j in range(len(workers)):
-        if workers[j] == 'fisher':
-            l2attempt_counter.append(sg.Text(f'', size=(l2button_width, 1), justification='center', key=f'fisher_{counter}'))
-            counter += 1
-        else:
-            l2attempt_counter.append(sg.Text(f'', size=(l2button_width, 1), justification='center'))
 
     layout2 = [
         [*l2window_rectangles],

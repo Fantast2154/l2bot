@@ -21,7 +21,6 @@ class L2window:
         y = 0
         width = 625
         height = 625
-        # self.shell = win32com.client.Dispatch("WScript.Shell")
         self.left_top_x = width * window_id + 0
         self.left_top_y = y
         self.width = width
@@ -32,7 +31,7 @@ class L2window:
         self.wincap = wincap
 
         # self.enum_handler()
-        self.activate_window()
+        # self.activate_window()
 
         # self.send_message(f'created')
 

@@ -119,7 +119,7 @@ class Fisher:
         #self.send_status_to_server('start to fish')  # ПРИМЕР ОСТЫЛКИ СТАТУСА НА СЕРВЕР!!!
         self.current_state = 'Fishing'
         delay = 1.5
-        delay_correction = delay + 6 * self.fisher_id
+        delay_correction = delay + 9 * self.fisher_id
         self.send_message(f'will start fishing in ........ {delay_correction} sec')
         self.pause_thread(delay_correction)
 
@@ -151,8 +151,8 @@ class Fisher:
 
     def trial_rod_cast(self):
         self.fishing()
-        self.pause_thread(0.5)
-        if not self.search_loop_with_click(self.fishing_window.get_object, self.fishing, 10, 'fishing_window', True):
+        self.pause_thread(0.7)
+        if not self.search_loop_with_click(self.fishing_window.get_object, self.fishing, 18, 'fishing_window', True):
             return False
         self.fishing_window.record_fishing_window()
         self.fishing_window.start_accurate_search()
@@ -289,9 +289,9 @@ class Fisher:
         self.send_message(f'Среднее время между забросами удочки {result}')
         self.send_message(f'Средняя скорость ловли: {3600 // result} попыток в час')
 
-        if self.attempt_counter[0] > self.send_counter:
-            if not self.overweight_baits_soski_correction():
-                self.send_message('overweight_baits_soski_correction FAILURE')
+        # if self.attempt_counter[0] > self.send_counter:
+        #     if not self.overweight_baits_soski_correction():
+        #         self.send_message('overweight_baits_soski_correction FAILURE')
         return True
 
     def stop_fishing(self):
