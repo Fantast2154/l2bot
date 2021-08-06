@@ -119,6 +119,7 @@ class Client:
         print(datetime.datetime.now().time(), f'Бот {self.id}', text)
 
     def client_send(self, data):
+        print('client_send', data)
         data_to_encode = {self.id: data}
         #data_to_encode = data
         encoded_data_to_send = pickle.dumps(data_to_encode)

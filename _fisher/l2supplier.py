@@ -32,7 +32,7 @@ class Supplier:
         self.trade_request = manager.list()
         self.trade_request.append(False)
 
-        self.supply_items= manager.list()
+        self.supply_items = manager.list()
         self.supply_items = [0]*3
 
         # send/receive counters
@@ -82,81 +82,52 @@ class Supplier:
 
 
     def wait_for_supply_request(self):
-        self.supply_request[0] = True
-
-        while not self.supply_request[0] and not self.exit_is_set:
+        while not self.supply_request[0] and self.exit_is_set:
             self.pause_thread(0.1)
 
     def wait_for_trade(self):
-        print('TRADE DETECTED')
-        self.pause_thread(1)
         waiting_time = 180
         temp = time.time()
-        while not self.exit_is_set or time.time() - temp < waiting_time:
+        while self.exit_is_set or time.time() - temp < waiting_time:
             self.pause_thread(0.1)
+            if self.supplier_window.is_trade_request():
+                self.pause_thread(0.5)
+                if not self.search_loop_with_click(self.supplier_window.is_exchange_menu, self.click, self.supplier_window.is_ok_button, 15):
+                    return True
 
-            temp = self.supplier_window.is_trade_request()
-            if temp:
-                [(x, y)] = temp
-                new_temp = [(x-39, y+76)]
-                # confirm_button_pos = self.supplier_window.is_confirm_button()
-                # if confirm_button_pos:
-                #     print('CONFIRM BUTTON')
-                #     self.pause_thread(0.7)
-                #     self.click(new_temp)
-                #     self.pause_thread(0.7)
-                #     return True
-                self.pause_thread(0.7)
-                self.click(new_temp)
-                self.pause_thread(0.7)
-            return True
         return False
 
     def supply_goods(self):
-        self.supply_items = [10, 20, 30]
-        small_bag_pos = self.supplier_window.is_small_bag()
-        if not small_bag_pos:
-            print('small bag fail')
+
+        if not self.search_loop_without_click(self.supplier_window.is_small_bag, 15):
             return False
-        print('small bag')
+
         self.pause_thread(0.7)
 
         soski_pos = self.supplier_window.is_soski()
         if not soski_pos:
-            print('soski_pos fail')
             return False
-        print('soski_pos')
 
         baits_pos = self.supplier_window.is_baits()
         if not baits_pos:
-            print('baits_pos fail')
             return False
-        print('baits_pos')
 
         ok_button_pos = self.supplier_window.is_ok_button()
         if not ok_button_pos:
-            print('ok_button_pos fail')
             return False
-        print('ok_button_pos')
 
         pyperclip.copy(self.supply_items[2])
-        self.pause_thread(0.7)
         self.trade_item(soski_pos)
-        self.pause_thread(2)
+        self.pause_thread(0.7)
 
-        confirm_button_pos = self.supplier_window.is_confirm_button()
-        if not confirm_button_pos:
-            print('confirm_button_pos fail')
-            return False
-        print('confirm_button_pos')
 
         input_field_pos = self.supplier_window.is_input_field()
         if not input_field_pos:
-            print('input_field_pos fail')
             return False
-        print('input_field_pos')
 
-        # self.pause_thread(2)
+        confirm_button_pos = self.supplier_window.is_confirm_button()
+        if not confirm_button_pos:
+            return False
 
         self.pause_thread(0.7)
         self.enter_number(input_field_pos)
@@ -178,25 +149,15 @@ class Supplier:
         self.click(ok_button_pos)
         self.pause_thread(0.7)
 
-        waiting_time = 180
-        temp = time.time()
-        while not self.supplier_window.is_exchange_menu():
-            self.pause_thread(0.1)
-            if time.time() - temp < waiting_time:
-                return False
-
-
-
-
         pyperclip.copy(0)
         self.supply_items[2] = 0
         self.supply_items[1] = 0
         self.supply_items[0] = 0
 
-        self.supply_request[0] = False
-        self.trade_request[0] = False
+        self.supply_request = False
+        self.trade_request = False
+        self.supply = False
 
-        time.sleep(1)
         return True
 
 

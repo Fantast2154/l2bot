@@ -10,20 +10,34 @@ import cv2
 class Fisher:
 
     def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
+        manager = Manager()
         self.fishing_window = fishing_window
-        self.fisher_id = fisher_id
+        #self.fisher_id[0] = fisher_id
+
+        self.fisher_id = manager.list()
+        self.fisher_id.append(fisher_id)
+
         self.number_of_fishers = number_of_fishers
-        self.current_state = 'Waiting...'
+        self.current_state = manager.list()
+        self.current_state.append('Waiting...')
+        #self.current_state = 'Waiting...'
         self.q = q
         self.send_message(f'created')
-        manager = Manager()
+
         self.new_task_temp = manager.list()
 
         # communication with fisher service
         self.paused = None # force pause the fisher
-        self.supply_request = False # fisher wants supplying
-        self.request_proceed = False # request has been proceed by a fisher serivce
-        self.trading_is_allowed = False # ready to push trade
+        #self.supply_request[0] = True # fisher wants supplying
+        #self.request_proceed[0] = False # request has been proceed by a fisher serivce
+        #self.trading_is_allowed[0] = False # ready to push trade
+
+        self.supply_request = manager.list()
+        self.supply_request.append(True)
+        self.request_proceed = manager.list()
+        self.request_proceed.append(False)
+        self.trading_is_allowed = manager.list()
+        self.trading_is_allowed.append(False)
 
         # fisher params
         # 0 - not fishing
@@ -82,7 +96,7 @@ class Fisher:
 
 
     def send_message(self, message):
-        temp = '\t' * 10 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
+        temp = '\t' * 10 * self.fisher_id[0] + 'Fisher ' + f'{self.fisher_id[0]}: {message}'
         print(temp)
 
     def test_action(self, count):
@@ -119,7 +133,7 @@ class Fisher:
         #self.send_status_to_server('start to fish')  # ПРИМЕР ОСТЫЛКИ СТАТУСА НА СЕРВЕР!!!
         self.current_state = 'Fishing'
         delay = 1.5
-        delay_correction = delay + 9 * self.fisher_id
+        delay_correction = delay + 9 * self.fisher_id[0]
         self.send_message(f'will start fishing in ........ {delay_correction} sec')
         self.pause_thread(delay_correction)
 
@@ -325,7 +339,7 @@ class Fisher:
         return True
 
     def get_status(self):
-        return self.current_state
+        return self.current_state[0]
 
     def overweight_baits_soski_correction(self):
 
@@ -427,8 +441,8 @@ class Fisher:
 
     def update_current_attempt(self):
         self.attempt_counter[0] += 1
-        temp = '\t' * 10 * self.fisher_id
-        print(f'{temp}Fisher {self.fisher_id}: Attempt # {self.attempt_counter[0]}')
+        temp = '\t' * 10 * self.fisher_id[0]
+        print(f'{temp}Fisher {self.fisher_id[0]}: Attempt # {self.attempt_counter[0]}')
 
     def send_mail(self):
         pass

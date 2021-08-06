@@ -186,9 +186,9 @@ def input_number(message):
 
 def client_server(bots_id_list):
     msg = input('y - Запустить сервер на этой машине\nn - Ничего не делать\n')
-    if msg == 's' or msg == 'ы':
+    if msg == 'y' or msg == 'н':
 
-        server = Server()
+        server = Server(123)
         server_process = Process(target=server.server_start)
         server_process.start()
         # return None
@@ -246,7 +246,7 @@ if __name__ == '__main__':
     # print('-----------------------')
 
     # bots_id_list = [0, 1]
-    # connected_bots = client_server(bots_id_list)
+    #connected_bots = client_server([1, 2])
     # if connected_bots:
     #     for bot in connected_bots:
     #         bot.client_send('ВО ИМЯ ЧЕГО') # Тестовая отправка сообщения. На сервере должны отобразиться ID бота и это послание
@@ -318,7 +318,7 @@ if __name__ == '__main__':
         event, values = sg_gui.Read(timeout=2)
 
         for fisher in F.fishers:
-            temp = f'fisher_{fisher.fisher_id}'
+            temp = f'fisher_{fisher.fisher_id[0]}'
             sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
 
