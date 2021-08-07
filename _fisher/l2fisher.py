@@ -39,6 +39,9 @@ class Fisher:
         self.trading_is_allowed = manager.list()
         self.trading_is_allowed.append(False)
         self.requested_items_to_supply = manager.list()
+        # self.requested_items_to_supply.append(10)
+        # self.requested_items_to_supply.append(1)
+        # self.requested_items_to_supply.append(12)
 
 
 
@@ -345,7 +348,7 @@ class Fisher:
 
         self.send_message('overweight_baits_soski_correction')
         self.requested_items_to_supply.append(12) # dbaits
-        self.requested_items_to_supply.append(0) # nbaits
+        self.requested_items_to_supply.append(1) # nbaits
         self.requested_items_to_supply.append(15) # soski
 
         self.trading()
@@ -353,24 +356,26 @@ class Fisher:
         return True
 
     def trading(self):
+        print('IS PIDORAS?_BEFORE', self.trading_is_allowed)
         self.current_state[0] = 'requests supplying'
         # print(self.current_state[0])
 
         while not self.supply_request_proceed[0]:
             time.sleep(0.5)
-
+        print('IS PIDORAS?_BEFORE 2', self.trading_is_allowed)
 
         self.current_state[0] = 'busy'
 
         while not self.trading_is_allowed[0]:
             time.sleep(0.5)
-
+        print('IS PIDORAS?_BEFORE 3', self.trading_is_allowed)
         self.send_message('trading_is_allowed')
         self.fishing_window.stop_accurate_search()
         self.pause_thread(1)
 
         waiting_time2 = 15
         temp_timer2 = time.time()
+        print('self.fishing_window.is_exchange_menu()', self.fishing_window.is_exchange_menu())
         while time.time() - temp_timer2 < waiting_time2 and not self.fishing_window.is_exchange_menu():
             self.send_trade_to_supplier()
             self.pause_thread(6)
@@ -421,11 +426,14 @@ class Fisher:
                         self.fishing_window)
 
     def press_ok_button(self):
+
         self.q.new_task('mouse',
                         [self.fishing_window.get_object('ok_button', True), True, 'LEFT', False, False, False],
                         self.fishing_window)
 
     def send_trade_to_supplier(self):
+
+        print('**********************************send_trade_to_supplier')
         self.q.new_task('mouse',
                         [self.fishing_window.get_object('trade_supplier', False), True, 'LEFT', False, False, False],
                         self.fishing_window)

@@ -67,9 +67,9 @@ class Supplier:
         self.supply_request[0] = True
         self.current_state[0] = 'busy'
         self.supplied_clients.append(bot_id)
-        self.requested_items_to_supply.append(goods[0])
-        self.requested_items_to_supply.append(goods[1])
-        self.requested_items_to_supply.append(goods[2])
+        self.requested_items_to_supply.append(goods['dbaits'])
+        self.requested_items_to_supply.append(goods['nbaits'])
+        self.requested_items_to_supply.append(goods['soski'])
         print('111111111', self.requested_items_to_supply)
 
     def __del__(self):

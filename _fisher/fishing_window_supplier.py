@@ -114,7 +114,7 @@ class FishingSupplierWindow(L2window):
             [(x, y)] = temp_coordinates
             temp_coordinates2 = [(x-260//2, y-35//2)]
             coordinates = self.find('baits', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            print(coordinates)
+            #print(coordinates)
             if coordinates:
                 [(out_x, out_y)] = coordinates
                 return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
@@ -131,7 +131,7 @@ class FishingSupplierWindow(L2window):
 
     def is_confirm_button(self):
         temp_coordinates = self.find('confirm_button')
-        print(temp_coordinates)
+        #print(temp_coordinates)
         if temp_coordinates:
             return temp_coordinates
         else:

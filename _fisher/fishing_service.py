@@ -65,7 +65,7 @@ class FishingService(Client):
         q.activate_l2windows(self.windows)
 
         for fisher_id in range(number_of_fishers):
-            print(fisher_id)
+            print('fisher_id', fisher_id)
             # window_fishers
             win_capture = window_fishers[fisher_id].wincap
             window_name = window_fishers[fisher_id].window_name
@@ -170,7 +170,7 @@ class FishingService(Client):
         else:
             fisher.pause_fisher(delay)
 
-    def send_status_to_server(self, *status):
+    def send_status_to_server(self, status):
         # print('super().is_connected()', super().is_connected())
         if super().is_connected():
             super().client_send(status)  # ШЛЁМ СООБЩЕНИЕ НА СЕРВЕР
@@ -179,9 +179,15 @@ class FishingService(Client):
         if super().is_connected():
             return super().client_receive_message()  # ПОЛУЧАЕМ СООБЩЕНИЯ С СЕРВЕРА
 
-    def fisher_response(self, id, response):
-        self.send_status_to_server(id, response)
-        message_from_other_machines = self.get_status_from_server()
+    def fisher_response(self, fisher_id, response):
+        if response == 'requests supplying':
+            temp_dict = {'dbaits': 0, 'nbaits': 0, 'soski': 0}
+            for index, key in enumerate(temp_dict):
+                temp_dict[key] = self.fishers[fisher_id].requested_items_to_supply[index]
+
+            resource = temp_dict.copy()
+            self.request_server_for_supplying(fisher_id, resource)
+        # self.send_status_to_server(id, response)
 
         # current_state params
         # 'not fishing'
@@ -190,46 +196,53 @@ class FishingService(Client):
         # 'requests supplying'
         # 'paused'
         # 'error'
-        if response == 'requests supplying':
-            self.send_message('fisher requests supplying')
-            if self.has_supplier:
-                self.fishers[id].supply_request_proceed[0] = True
-                exit = False
-                while not exit:
-                    for sup in self.suppliers:
-                        self.send_message(sup.current_state[0])
-                        if sup.current_state[0] == 'available':
-                            self.send_message('REQUESTED ITEMS')
-                            self.send_message(f'{self.fishers[id].requested_items_to_supply}')
-                            self.fishers[id].current_state[0] = 'busy'
-                            sup.supply(id, self.fishers[id].requested_items_to_supply)
-                            time.sleep(0.5)
-                            self.fishers[id].trading_is_allowed[0] = True
-                            exit = True
-                        else:
-                            continue
-            else:
-                # self.request_server_for_supplying(self.fishers[id].fisher_id, self.fishers[id].requested_items_to_supply)
-                # self.allow_fisher_to_trade(self.fishers[id].fisher_id)
-                # self.fishers[id].supply_request[0] = False
-                # self.fishers[id].request_proceed[0] = True
-                pass
-
-
-
+        # if response == 'requests supplying':
+        #     self.send_message('fisher requests supplying')
+        #     if self.has_supplier:
+        #         self.fishers[id].supply_request_proceed[0] = True
+        #         exit = False
+        #         while not exit:
+        #             for sup in self.suppliers:
+        #                 if sup.current_state[0] == 'available':
+        #                     self.fishers[id].current_state[0] = 'busy'
+        #                     sup.supply(id, self.fishers[id].requested_items_to_supply)
+        #                     time.sleep(0.5)
+        #                     self.fishers[id].trading_is_allowed[0] = True
+        #                     exit = True
+        #                 else:
+        #                     continue
+        #     else:
+        #         # self.request_server_for_supplying(self.fishers[id].fisher_id, self.fishers[id].requested_items_to_supply)
+        #         # self.allow_fisher_to_trade(self.fishers[id].fisher_id)
+        #         # self.fishers[id].supply_request[0] = False
+        #         # self.fishers[id].request_proceed[0] = True
+        #         pass
 
     def request_server_for_supplying(self, fisher_id, dic):
+        print('request_server_for_supplying fisher_id, dic', fisher_id, dic)
         data_to_send = {fisher_id: dic}
-        self.send_status_to_server(fisher_id, data_to_send)
+        print('data_to_send', data_to_send)
+        self.send_status_to_server(data_to_send)
 
     def start_supply(self, q):
-        for supp in self.suppliers:
-            supp.supply_request[0] = True
-            supp.supply[0] = [10, 15, 20]
-            self.send_status_to_server([10, 15, 20])
-            for fisher in self.fishers:
-                if fisher.trading_is_allowed:
-                    supp.trade_request[0] = True
+
+        exit_ = False
+        while not exit_:
+            for supp in self.suppliers:
+                if supp.current_state[0] == 'available':
+                    for t in q:
+                        for fisher_ID, resource in t.items():
+                            self.fishers[fisher_ID].supply_request_proceed[0] = True
+                            self.fishers[fisher_ID].current_state[0] = 'busy'
+                            print('fisher_ID', fisher_ID)
+                            self.fishers[fisher_ID].trading_is_allowed[0] = True
+                            time.sleep(0.5)
+                            supp.supply(fisher_ID, resource)
+                            time.sleep(0.5)
+                            print('!!!!!!!!!!!!!!!!!!!!!!.trading_is_allowed[0]', self.fishers[fisher_ID].trading_is_allowed[0])
+                            exit_ = True
+                else:
+                    continue
 
         print('start_supply q', q)
 
@@ -240,11 +253,12 @@ class FishingService(Client):
         # b и c - количество дневных наживок, ночных наживок и сосок соответственно
         if self.has_supplier:
             message = self.get_status_from_server()
-            # print('message', message)
+            print('message', message)
             if message:
                 q = []
                 need_to_supply = False
-                for sender_id, msg in message.items():
+                for sender_id, [msg] in message.items():
+                    print('[MSG]', [msg])
                     fisher_dict = {}
                     for fisher, supplies in msg.items():
                         for resource, amount in supplies.items():
@@ -257,15 +271,17 @@ class FishingService(Client):
                         q.append(fisher_dict.copy())
                     fisher_dict.clear()
                 if need_to_supply:
+                    print('Q', q)
                     self.start_supply(q)
 
     def run(self):
+        flag = False
         self.send_message(f'TEST FishingService run_loop() calling')
         # self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
         while True:
 
             for fisher in self.fishers:
-                # print(fisher.current_state[0])
+                print('fisher.current_state[0]', fisher.current_state[0])
                 self.fisher_response(fisher.fisher_id, fisher.current_state[0])
 
             self.listen_to_server()
