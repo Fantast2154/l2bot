@@ -229,8 +229,10 @@ if __name__ == '__main__':
     # searching running L2 windows
     name_list, hash_list = get_l2windows_param()
     n = len(name_list)
-    # print('number of l2 windows:', n)
-    # print('-----')
+    print('number of l2 windows:', n)
+    print('-----')
+    if n < 1:
+        sys.exit('NO L2 WINDOWS DETECTED. PROGRAM ENDS.......')
     # max_number_of_fishers = 3
     # if n >= max_number_of_fishers:
     #     number_of_fishers = max_number_of_fishers
@@ -306,20 +308,20 @@ if __name__ == '__main__':
     # start fishing
     F = FishingService(windows_f, windows_b, windows_s, windows_t, queue)
 
-    Process_fishingservice = Process(target=F.run)
-    Process_fishingservice.start()
-    # t = threading.Thread(target=F.run, args=(sg_gui,))
-    # t.start()
+    # Process_fishingservice = Process(target=F.run)
+    # Process_fishingservice.start()
+    t = threading.Thread(target=F.run)
+    t.start()
     # F.run()
     # F.start_fishing()
 
     # timer = time.time()
     while True:
-        event, values = sg_gui.Read(timeout=2)
+        event, values = sg_gui.Read(timeout=4)
 
         for fisher in F.fishers:
             temp = f'fisher_{fisher.fisher_id}'
-            sg_gui[temp].update(f'{fisher.attempt_counter}')
+            sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
 
     # while True:

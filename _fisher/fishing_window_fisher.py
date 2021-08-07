@@ -22,7 +22,8 @@ class FishingWindow(L2window):
         self.init_image_database = [
             ['fishing', 'images/fishing/fishing.jpg', 0.87],
             ['pumping', 'images/fishing/pumping.jpg', 0.87],
-            ['reeling', 'images/fishing/reeling.jpg', 0.87]]
+            ['reeling', 'images/fishing/reeling.jpg', 0.87],
+            ['trade_supplier', 'images/trade/trade_icon.jpg', 0.83]]
 
         self.extended_image_database = [
             ['bait', 'images/fishing/bait.jpg', 0.90],
@@ -40,8 +41,10 @@ class FishingWindow(L2window):
             ['soski_activated', 'images/soski_activated.jpg', 0.78],
             ['sun', 'images/sun2.jpg', 0.7],
             ['moon', 'images/moon2.jpg', 0.7],
+            ['ok_button', 'images/trade/ok_button.jpg', 0.8],
             ['disconnect_EN', 'images/disconnect_EN.jpg', 0.4],
             ['weight_icon', 'images/weight.jpg', 0.9],
+            ['exchange_menu', 'images/trade/exchange_menu2.jpg', 0.8],
             ['login', 'images/login.jpg', 0.95],
             ['mailbox', 'images/mailbox.jpg', 0.8],
             ['sendmail_button', 'images/sendmail_button.jpg', 0.8],
@@ -154,6 +157,13 @@ class FishingWindow(L2window):
             self.send_message('fishing window has been recorded')
         except:
             self.send_message('Error recording fishing window')
+
+    def is_exchange_menu(self):
+        temp_coordinates = self.find('exchange_menu')
+        if temp_coordinates:
+            return temp_coordinates
+        else:
+            return []
 
     def is_fishing_window(self):
         temp = self.find('fishing_window', accurate=True)

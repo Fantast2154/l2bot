@@ -79,40 +79,34 @@ class ActionQueue():
     def new_keyboard_task(self):
         pass
 
-    def click(self, x, y, param=False, params=[]):
+    def click(self, x, y, param=False, params=False):
         # print('params', params)
         self.mouse.position = (x, y)
         time.sleep(0.03)
-
-        if 'not_click' not in params:
-            # print('click_params', params)
-            if param:
-                if 'double' in params:
-                    # print('double click')
-                    self.mouse.press(Button.left)
-                    time.sleep(0.02)
-                    self.mouse.release(Button.left)
-                    time.sleep(0.03)
-                    self.mouse.press(Button.left)
-                    time.sleep(0.02)
-                    self.mouse.release(Button.left)
-                    time.sleep(0.03)
-                else:
-                    self.mouse.press(Button.left)
-                    time.sleep(0.02)
-                    self.mouse.release(Button.left)
-                    time.sleep(0.03)
-
-                    # for i in range(4):
-                    #     win32api.SetCursorPos((x+i, y+i))
-
-                    self.mouse.move(4, 4)
-                    time.sleep(0.01)
-
+        if 'double' in params:
+            print('double click')
             self.mouse.press(Button.left)
-            time.sleep(0.07)
+            time.sleep(0.02)
             self.mouse.release(Button.left)
             time.sleep(0.03)
+            self.mouse.press(Button.left)
+            time.sleep(0.02)
+            self.mouse.release(Button.left)
+            time.sleep(0.03)
+            return
+
+        if param:
+            self.mouse.press(Button.left)
+            time.sleep(0.02)
+            self.mouse.release(Button.left)
+            time.sleep(0.03)
+            self.mouse.move(4, 4)
+            time.sleep(0.01)
+
+        self.mouse.press(Button.left)
+        time.sleep(0.07)
+        self.mouse.release(Button.left)
+        time.sleep(0.03)
 
     def click2(self, x, y, param=False):
 
@@ -147,9 +141,9 @@ class ActionQueue():
 
             if window.hwnd != self.last_active_window:
                 self.last_active_window = window.hwnd
-                self.click(x, y, param=True, params=parameters)
+                self.click(x, y, param=True, params=params)
             else:
-                self.click(x, y, param=False, params=parameters)
+                self.click(x, y, param=False, params=params)
 
             if 'insert' in params:
                 keyboard.send('ctrl+v')
