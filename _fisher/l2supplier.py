@@ -62,7 +62,7 @@ class Supplier:
         self.exit_is_set = False
         self.paused = None  # force pause the fisher
 
-    def supply(self, bot_id, goods):
+    def supply(self, machine_id, bot_id, goods):
         print('goods', goods)
         self.supply_request[0] = True
         self.current_state[0] = 'busy'
