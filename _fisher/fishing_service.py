@@ -366,11 +366,12 @@ class FishingService(Client):
                     print('who_requests_supplying', who_requests_supplying)
 
                 if self.message.get(self.machine_id) is not None:
+                    shefer = self.message.get(self.machine_id)
                     self_proceed = True
 
             if self_proceed:
                 # print('self_proceed', self_proceed)
-                for data in self.message.get(self.machine_id):
+                for data in shefer:
                     # print("data['status']['fishers']", data['status']['fishers'])
                     # print('fishers amount', data['amount']['fishers'])
                     # print('fishers status ', data['status']['fishers'])
