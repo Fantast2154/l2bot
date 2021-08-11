@@ -72,7 +72,6 @@ class FishingService(Client):
         self.message = {}
 
         if number_of_fishers < 1 or number_of_fishers > 3:
-            #     # warning
             print('FISHING SERVICE ERROR')
         # return super(FishingService, cls).__new__(cls)
         if number_of_suppliers != 0:
@@ -87,7 +86,7 @@ class FishingService(Client):
         q.activate_l2windows(self.windows)
 
         for fisher_id in range(number_of_fishers):
-            print('fisher_id', fisher_id)
+            # print('fisher_id', fisher_id)
             # window_fishers
             win_capture = window_fishers[fisher_id].wincap
             window_name = window_fishers[fisher_id].window_name
@@ -156,7 +155,7 @@ class FishingService(Client):
 
     def start_fishers(self, fisher_id=None):
         time.sleep(1)
-        self.send_message(f'start_fishing() calling')
+        self.send_message(f'start_fishing')
         if fisher_id is None:
             for fisher in self.fishers:
                 temp_fisher_process = Process(target=fisher.start_fishing)
@@ -169,7 +168,7 @@ class FishingService(Client):
                 self.process_fishers[fisher_id].start()
 
     def stop_fishers(self, fisher_id=None):
-        self.send_message(f'stop_fishing() calling')
+        self.send_message(f'stop_fishing')
         if fisher_id is None:
             for fisher in self.fishers:
                 fisher.stop_fishing()
@@ -194,7 +193,7 @@ class FishingService(Client):
 
     def start_suppliers(self, supplier_id=None):
         time.sleep(1)
-        self.send_message(f'start_fishing() calling')
+        self.send_message(f'start_suppliers')
         if supplier_id is None:
             for supplier in self.suppliers:
                 temp_supplier_process = Process(target=supplier.run)
@@ -207,7 +206,7 @@ class FishingService(Client):
                 self.process_suppliers[supplier_id].start()
 
     # def stop_suppliers(self, supplier_id=None):
-    #     self.send_message(f'stop_fishing() calling')
+    #     self.send_message(f'stop_suppliers)
     #     if supplier_id is None:
     #         for supplier in self.suppliers:
     #             supplier.stop_fishing()
@@ -406,7 +405,7 @@ class FishingService(Client):
                     for fishers_status in data['status']['fishers']:
                         for fisher_id, status in fishers_status.items():
                             if status == 'requests supplying' and numpy.array(any_supp_is_available).any():
-                                print("status", status)
+                                # print("status", status)
                                 temp_dict = {'dbaits': 0, 'nbaits': 0, 'soski': 0}
                                 for index, key in enumerate(temp_dict):
                                     temp_dict[key] = self.fishers[fisher_id].requested_items_to_supply[index]
@@ -426,17 +425,17 @@ class FishingService(Client):
                 # print('!!!!!!!!!!!!!!self.has_supplier and proceed!!!!!!!!!!!!!!!!!!', who_requests_supplying)
                 need_to_supply = False
                 proceed = False
-                print('(((((((((((((((((((( who_requests_supplying', who_requests_supplying)
+                # print('(((((((((((((((((((( who_requests_supplying', who_requests_supplying)
                 for sender_id, fishers_ids in who_requests_supplying.items():
                     for fisher_index in fishers_ids:
                         # dic_resource = {'d_baits': a, 'n_baits': b, 'soski': c}
                         if supplies[sender_id][fisher_index].values():
-                            print('000000000000000000need_to_supply!!!!')
+                            # print('000000000000000000need_to_supply!!!!')
                             need_to_supply = True
 
 
                 if need_to_supply:
-                    print('start_supply', supplies)
+                    # print('start_supply', supplies)
                     self.start_supply(supplies)
                     who_requests_supplying.clear()
 

@@ -453,6 +453,9 @@ class Fisher:
         return switcher.get(i, 'error')
 
     def smart_press_button(self, button_input, control_window, searching_time, *args):
+        # function:
+        # pushing button 'button input' every 6 seconds for 'searching time' until  window 'control_window' appears
+
         temp_timer = time.time()
         button = self.button_name(button_input)
         if button != 'error':
