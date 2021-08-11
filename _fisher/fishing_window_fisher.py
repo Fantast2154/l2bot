@@ -50,6 +50,7 @@ class FishingWindow(L2window):
             ['sendmail_button', 'images/sendmail_button.jpg', 0.8],
             ['send_button', 'images/send_button.jpg', 0.8],
             ['confirm_button', 'images/confirm_button.jpg', 0.8],
+            ['cancel_button', 'images/cancel_button.jpg', 0.8],
             ['claim_items_button', 'images/claim_items_button.jpg', 0.8],
             ['catched_item_0', 'images/items/catcheditem1.jpg', 0.7],
             ['catched_item_1', 'images/items/catcheditem2.jpg', 0.7],

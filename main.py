@@ -15,17 +15,23 @@ from system.botnet import Server, Client
 import keyboard
 import PySimpleGUI as sg
 
-def sg_gui(windows_f, windows_b, windows_s, windows_t):
+def gui_window1(windows_f, windows_b, windows_s, windows_t):
+    global L2_total_height
+    global L2_min_x
     L2_total_height = 0
     L2_min_x = 10000
     l2button_width = 12
     l2button_height = 6
 
-    sggui = None
+    global app_height
+    global app_width
     app_height = 400
     app_width = 300
 
     manager = Manager()
+    global l2window_rectangles
+    global l2window_workers
+    global l2attempt_counter
     l2window_rectangles = manager.list()
     l2window_workers = manager.list()
     l2attempt_counter = manager.list()
@@ -51,10 +57,11 @@ def sg_gui(windows_f, windows_b, windows_s, windows_t):
         [*l2window_rectangles_temp],
         [*l2window_workers_temp],
         [sg.Text(f'', size=(15, 1), key='out')],
-        [sg.Button(f'OK', size=(4, 1))]
+        [sg.Button(f'OK', size=(4, 1)), sg.Exit()]
     ]
 
-    sg_gui_temp = sg.FlexForm(title=")", layout=layout1, size=(400, 300),
+    global sg_gui_temp
+    sg_gui_temp = sg.FlexForm(title=")", layout=layout1, size=(app_height, app_width),
                          location=(L2_min_x, L2_total_height))
 
 
@@ -75,6 +82,9 @@ def sg_gui(windows_f, windows_b, windows_s, windows_t):
             if windows_left <= 0:
                 break
             event, values = sg_gui_temp.Read()
+            if event == sg.WIN_CLOSED or event == 'Exit':
+                sg_gui_temp.Close()
+                return False
             for i in range(len(windows)):
                 temp = f'{i}'
                 if event == temp:
@@ -108,6 +118,7 @@ def sg_gui(windows_f, windows_b, windows_s, windows_t):
                         l2window_workers[i] = sg.Text(f'{workers[i]}', size=(l2button_width, 1), justification='center')
                         l2attempt_counter[i] = sg.Text(f'', size=(l2button_width, 1), justification='center')
 
+
                     sg_gui_temp['unresolved'].Update(f'number of unresolved windows: {windows_left}')
                     index_list.append(i)
                     sg_gui_temp[temp].Update(disabled=True)
@@ -117,10 +128,14 @@ def sg_gui(windows_f, windows_b, windows_s, windows_t):
                 break
 
     layout1 = []
-    sg_gui_temp.Close()
+
     # counter = 0
     for i in range(len(windows)):
         l2window_rectangles.append(sg.Button(f'WINDOW_{i}', size=(l2button_width, l2button_height), button_color='red'))
+
+    sg_gui_temp['msg'].Update('')
+    sg_gui_temp.Read(timeout=1)
+    return True
         # if workers[i] == 'fisher':
         #     pass
         #     l2window_workers.append(sg.Text(f'{workers[i]}_{index_list[i]}', size=(l2button_width, 1), justification='center'))
@@ -128,14 +143,24 @@ def sg_gui(windows_f, windows_b, windows_s, windows_t):
         # else:
         #     l2window_workers.append(sg.Text(f'{workers[i]}', size=(l2button_width, 1), justification='center'))
 
-
+def gui_window2():
+    # global app_height
+    # global app_width
+    # global l2window_rectangles
+    # global l2window_workers
+    # global l2attempt_counter
+    # global L2_total_height
+    # global L2_min_x
+    sg_gui_temp.Close()
     layout2 = [
         [*l2window_rectangles],
         [*l2window_workers],
-        [*l2attempt_counter]
+        [*l2attempt_counter],
+        [sg.Exit()]
     ]
     sg_gui = sg.FlexForm(title="PIDAR RADAR", layout=layout2, size=(app_height, app_width),
                          location=(L2_min_x, L2_total_height))
+    sg_gui.Read(timeout=0)
     return sg_gui
 
 def send_message(message):
@@ -233,29 +258,6 @@ if __name__ == '__main__':
     print('-----')
     if n < 1:
         sys.exit('NO L2 WINDOWS DETECTED. PROGRAM ENDS.......')
-    # max_number_of_fishers = 3
-    # if n >= max_number_of_fishers:
-    #     number_of_fishers = max_number_of_fishers
-    # else:
-    #     number_of_fishers = n
-    # number_of_buffers = 0
-    # number_of_suppliers = 0
-    # number_of_teleporters = 0
-    # print('number of fishers: ', number_of_fishers)
-    # print('number of buffers: ', number_of_buffers)
-    # print('number of suppliers: ', number_of_suppliers)
-    # print('number of teleporters: ', number_of_teleporters)
-    # print('-----------------------')
-
-    # bots_id_list = [0, 1]
-    #connected_bots = client_server([1, 2])
-    # if connected_bots:
-    #     for bot in connected_bots:
-    #         bot.client_send('ВО ИМЯ ЧЕГО') # Тестовая отправка сообщения. На сервере должны отобразиться ID бота и это послание
-
-    # if number_of_fishers < 1 or number_of_fishers > max_number_of_fishers:
-    #     send_message('OMG,  ARE YOU KIDDING ME? I SUPPORT ONLY <= 3 FISHERS! KEEP CALM!')
-    #     sys.exit('PROGRAM ends ......... BY E BYE BYE BYE BYE BYE')
 
     # create n windows L2
     manager = Manager()
@@ -274,9 +276,6 @@ if __name__ == '__main__':
         temp_window = L2window(i, win_capture, name_list[i], hash_list[i], screen_manager)
         temp_window.enum_handler()
         windows.append(temp_window)
-
-
-
 
     # t = threading.Thread(target=gui_run_application, args=(gui(),))
     # t.start()
@@ -303,7 +302,12 @@ if __name__ == '__main__':
 
     # t = Telegram()
 
-    sg_gui = sg_gui(windows_f, windows_b, windows_s, windows_t)
+    if not gui_window1(windows_f, windows_b, windows_s, windows_t):
+        Process_wincap.terminate()
+        queue.stop()
+        global sg_gui_temp
+        sg_gui_temp.close()
+        sys.exit('GUI EXIT EVENT. PROGRAM ENDS.......')
 
     # start fishing
     F = FishingService(windows_f, windows_b, windows_s, windows_t, queue)
@@ -316,6 +320,7 @@ if __name__ == '__main__':
     # F.start_fishing()
 
     # timer = time.time()
+    sg_gui = gui_window2()
     while True:
         event, values = sg_gui.Read(timeout=4)
 
@@ -323,19 +328,14 @@ if __name__ == '__main__':
             temp = f'fisher_{fisher.fisher_id}'
             sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
+        if event == sg.WIN_CLOSED or event == 'Exit':
+            break
 
-    # while True:
-    #     time.sleep(1)
-    # while time.time() - timer < 70:
-
-    Process_wincap.join()
+    t.join()
+    Process_wincap.terminate()
 
     # stop everything
     F.stop()
-
-    # queue.stop()
-    # queue.join()
-    win_capture.stop()
 
     del windows
     sg_gui.Close()

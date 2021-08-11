@@ -1,5 +1,4 @@
 import time
-import threading
 
 import numpy
 
@@ -26,7 +25,7 @@ class FishingService(Client):
     buffers = []
     windows = []
     fishing_windows = []
-    process_fisher = []
+    process_fishers = []
     process_buffer = []
     process_supplier = []
     raised_error = False
@@ -62,6 +61,8 @@ class FishingService(Client):
         self.buffers = []
         self.suppliers = []
         self.teleporters = []
+        self.process_fishers = list(range(number_of_fishers))
+        self.process_suppliers = list(range(number_of_suppliers))
 
         self.fishers_request = {}
         self.suppliers_request = {}
@@ -98,14 +99,8 @@ class FishingService(Client):
 
             # fishers
             temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
-            # self.cur_state = manager.list()
-            # temp_fisher_process = Process(target=temp_fisher.run, args=(self.cur_state,))
-            temp_fisher_process = Process(target=temp_fisher.run)
-            temp_fisher_process.start()
-            # temp_fisher.start()
-            self.process_fisher.append(temp_fisher_process)
             self.fishers.append(temp_fisher)
-            # self.fishers.append(cur_state)
+
 
         # for buffer_id in range(number_of_buffers):
         #     pass
@@ -135,10 +130,6 @@ class FishingService(Client):
             self.fishing_windows.append(temp_supplier_window)
 
             temp_supplier = Supplier(temp_supplier_window, supplier_id, number_of_suppliers, q)
-            temp_supplier_process = Process(target=temp_supplier.run)
-            temp_supplier_process.start()
-            # temp_supplier.start()
-            self.process_supplier.append(temp_supplier_process)
             self.suppliers.append(temp_supplier)
 
         # wincap
@@ -150,6 +141,9 @@ class FishingService(Client):
         self.offset_x = 0
         self.offset_y = 0
 
+        self.start_fishers()
+        self.start_suppliers()
+
     def __del__(self):
         self.send_message("destroyed")
 
@@ -160,36 +154,69 @@ class FishingService(Client):
         temp = 'FishingService: ' + message
         print(temp)
 
-    def start_fishing(cls, fishers_list=None):
+    def start_fishers(self, fisher_id=None):
         time.sleep(1)
-        cls.send_message(f'start_fishing() calling')
-        if fishers_list is None:
-            for fisher in cls.fishers:
-                fisher.start()
+        self.send_message(f'start_fishing() calling')
+        if fisher_id is None:
+            for fisher in self.fishers:
+                temp_fisher_process = Process(target=fisher.start_fishing)
+                self.process_fishers[fisher.fisher_id] = temp_fisher_process
+                temp_fisher_process.start()
         else:
-            for fisher in fishers_list:
-                fisher.start()
+            if fisher_id < len(self.process_fishers):
+                temp_fisher_process = Process(target=self.fishers[fisher_id].start_fishing)
+                self.process_fishers[fisher_id] = temp_fisher_process
+                self.process_fishers[fisher_id].start()
 
-    def stop_fishers(cls, fishers_list=None):
-        cls.send_message(f'stop_fishing() calling')
-        if fishers_list is None:
-            for fisher in cls.fishers:
+    def stop_fishers(self, fisher_id=None):
+        self.send_message(f'stop_fishing() calling')
+        if fisher_id is None:
+            for fisher in self.fishers:
                 fisher.stop_fishing()
-                cls.process_fisher[fisher.fisher_id].join()
+                self.process_fishers[fisher.fisher_id].terminate()
 
         else:
-            for fisher in fishers_list:
-                fisher.stop_fishing()
-                cls.process_fisher[fisher.fisher_id].join()
+            if fisher_id < len(self.process_fishers):
+                self.fishers[fisher_id].stop_fishing()
+                self.process_fishers[fisher_id].terminate()
 
-    def pause_fishers(cls, fisher, delay=None):
-        cls.send_message(f'stop_fishing() calling')
-        if delay is None:  # infinit pausing
-            pass
-            # while True:
-            #     fisher.pause_fisher(None)
+    # def pause_fishers(self, fisher_id=None, delay=None):
+    #     self.send_message(f'pause_fishing() calling')
+    #     if fisher_id is None:
+    #         for fisher in self.fishers:
+    #             fisher.stop_fishing()
+    #             # self.process_fishers[fisher.fisher_id].terminate()
+    #
+    #     else:
+    #         if fisher_id < len(self.process_fishers):
+    #             self.fishers[fisher_id].stop_fishing()
+    #             # self.process_fishers[fisher_id].terminate()
+
+    def start_suppliers(self, supplier_id=None):
+        time.sleep(1)
+        self.send_message(f'start_fishing() calling')
+        if supplier_id is None:
+            for supplier in self.suppliers:
+                temp_supplier_process = Process(target=supplier.run)
+                self.process_suppliers[supplier.supplier_id] = temp_supplier_process
+                temp_supplier_process.start()
         else:
-            fisher.pause_fisher(delay)
+            if supplier_id < len(self.process_suppliers):
+                temp_supplier_process = Process(target=self.suppliers[supplier_id].run)
+                self.process_suppliers[supplier_id] = temp_supplier_process
+                self.process_suppliers[supplier_id].start()
+
+    # def stop_suppliers(self, supplier_id=None):
+    #     self.send_message(f'stop_fishing() calling')
+    #     if supplier_id is None:
+    #         for supplier in self.suppliers:
+    #             supplier.stop_fishing()
+    #             self.process_suppliers[supplier.supplier_id].terminate()
+    #
+    #     else:
+    #         if supplier_id < len(self.process_suppliers):
+    #             self.suppliers[supplier_id].stop_fishing()
+    #             self.process_suppliers[supplier_id].terminate()
 
     def send_to_server(self, status):
         # print('super().is_connected()', super().is_connected())
@@ -363,7 +390,7 @@ class FishingService(Client):
                                 any_supp_is_available.append(True)
                     if temp_fishers_ids:
                         who_requests_supplying[sender_id] = temp_fishers_ids
-                    print('who_requests_supplying', who_requests_supplying)
+                    # print('who_requests_supplying', who_requests_supplying)
 
                 if self.message.get(self.machine_id) is not None:
                     shefer = self.message.get(self.machine_id)
@@ -441,16 +468,16 @@ class FishingService(Client):
         flag = False
         self.send_message(f'TEST FishingService run_loop() calling')
         # self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
-        self.server_update_start()
+        # self.server_update_start()
         while True:
-            self.process_server_data()
+            # self.process_server_data()
 
             # for fisher in self.fishers:
             # print('fisher.current_state[0]', fisher.current_state[0])
             # self.fisher_response(fisher.fisher_id, fisher.current_state[0])
 
             # self.listen_to_server()
-            # time.sleep(0.2)
+            time.sleep(1)
 
     def stop(cls):
         cls.stop_fishers()
@@ -477,6 +504,7 @@ class FishingService(Client):
 
     def process_server_data_start(self):
         while True:
+            time.sleep(0.2)
             self.process_server_data()
 
     def server_update_start(self):
