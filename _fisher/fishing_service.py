@@ -468,9 +468,9 @@ class FishingService(Client):
         flag = False
         self.send_message(f'TEST FishingService run_loop() calling')
         # self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
-        # self.server_update_start()
+        self.server_update_start()
         while True:
-            # self.process_server_data()
+            self.process_server_data()
 
             # for fisher in self.fishers:
             # print('fisher.current_state[0]', fisher.current_state[0])
