@@ -23,11 +23,13 @@ class FishingWindow(L2window):
             ['fishing', 'images/fishing/fishing.jpg', 0.87],
             ['pumping', 'images/fishing/pumping.jpg', 0.87],
             ['reeling', 'images/fishing/reeling.jpg', 0.87],
+            ['attack', 'images/fishing/attack.jpg', 0.87],
             ['trade_supplier', 'images/trade/trade_icon.jpg', 0.83]]
 
         self.extended_image_database = [
             ['bait', 'images/fishing/bait.jpg', 0.90],
             ['soski', 'images/soski.jpg', 0.7],
+            ['hp_window', 'images/farming/hp_window.jpg', 0.87],
             ['blue_bar', 'images/fishing/blue_bar2.jpg', 0.75],
             ['colored', 'images/fishing/colored_2.jpg', 0.94],
             ['luminous', 'images/fishing/luminous_2.jpg', 0.94],

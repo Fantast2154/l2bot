@@ -46,7 +46,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 1
+        self.send_counter = 100
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -87,8 +87,8 @@ class Fisher:
         self.send_message(f"destroyed")
 
     def send_message(self, message):
-        # temp = '\t' * 10 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
-        print('temp')
+        temp = '\t' * 10 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
+        print(temp)
 
     def test_action(self, count):
         self.q.new_task(count, self.fishing_window)
@@ -188,6 +188,8 @@ class Fisher:
         if not self.search_object_without_click(self.fishing_window.is_clock, 20):
             return False
 
+        self.attack()
+
         blue_bar_pos = 0
         coords_saved = False
         x_border = None
@@ -201,6 +203,7 @@ class Fisher:
         reeling_time = time.time()
         reel_count = 0
         reel_timer_was_set = False
+
 
         while self.fishing_window.is_fishing_window():
             # while self.fishing_window.get_object('clock', True):
@@ -307,6 +310,8 @@ class Fisher:
         # result = sum(self.time_between_rod_casts_avg) / len(self.time_between_rod_casts_avg)
         # self.send_message(f'Среднее время между забросами удочки {result}')
         # self.send_message(f'Средняя скорость ловли: {3600 // result} попыток в час')
+        # self.attack()
+        self.attack()
 
         if self.attempt_counter[0] >= self.send_counter:
             if not self.overweight_baits_soski_correction():
@@ -437,13 +442,6 @@ class Fisher:
         # self.send_message(f'PAUSED for {delay} seconds')
         time.sleep(delay)
 
-    def fishing(self):
-        # self.q.new_task([(100, 100)], self.fishing_window.hwnd)
-        # self.send_message('fishing')
-        self.q.new_task('mouse',
-                        [self.fishing_window.get_object('fishing', False), True, 'LEFT', False, False, False],
-                        self.fishing_window)
-
     def button_name(self, i):
         switcher = {
             'ok': 'ok_button',
@@ -486,9 +484,21 @@ class Fisher:
                         self.fishing_window)
         return True
 
+    def attack(self):
+        self.q.new_task('mouse',
+                        [self.fishing_window.get_object('attack', False), True, 'LEFT', False, False, False],
+                        self.fishing_window)
+
     def send_trade_to_supplier(self):
         self.q.new_task('mouse',
                         [self.fishing_window.get_object('trade_supplier', False), True, 'LEFT', False, False, False],
+                        self.fishing_window)
+
+    def fishing(self):
+        # self.q.new_task([(100, 100)], self.fishing_window.hwnd)
+        # self.send_message('fishing')
+        self.q.new_task('mouse',
+                        [self.fishing_window.get_object('fishing', False), True, 'LEFT', False, False, False],
                         self.fishing_window)
 
     def pumping(self):

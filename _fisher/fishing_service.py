@@ -467,9 +467,9 @@ class FishingService(Client):
         flag = False
         self.send_message(f'TEST FishingService run_loop() calling')
         # self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
-        self.server_update_start()
+        # self.server_update_start()
         while True:
-            self.process_server_data()
+            # self.process_server_data()
 
             # for fisher in self.fishers:
             # print('fisher.current_state[0]', fisher.current_state[0])
@@ -478,17 +478,17 @@ class FishingService(Client):
             # self.listen_to_server()
             time.sleep(1)
 
-    def stop(cls):
-        cls.stop_fishers()
-        cls.send_message('thread stops')
+    def stop(self):
+        self.stop_fishers()
+        self.send_message('thread stops')
         closing_time = 5
         timer = time.time()
         while time.time() - timer < closing_time:
-            cls.send_message(f'timer before close ..... {time.time() - timer}')
+            self.send_message(f'timer before close ..... {time.time() - timer}')
             time.sleep(1)
 
-        del cls.fishers
-        del cls.fishing_windows
+        del self.fishers
+        del self.fishing_windows
 
     # def update_fishers_attempt(self, id, attempt):
     #     temp = f'fisher_{id}'
@@ -507,7 +507,9 @@ class FishingService(Client):
             self.process_server_data()
 
     def server_update_start(self):
-        t1 = Thread(target=self.server_update, args=())
+        # t1 = Thread(target=self.server_update, args=())
+        # t1.start()
+        proc_server = Process(target=self.server_update)
         # t2 = Thread(target=self.process_server_data_start, args=())
-        t1.start()
-        # t2.start()
+
+        proc_server.start()
