@@ -25,6 +25,10 @@ class FishingService(Client):
     buffers = []
     windows = []
     fishing_windows = []
+    supplier_windows = []
+    buffer_windows = []
+    teleporter_windows = []
+
     process_fishers = []
     process_buffer = []
     process_supplier = []
@@ -63,6 +67,7 @@ class FishingService(Client):
         self.teleporters = []
         self.process_fishers = list(range(number_of_fishers))
         self.process_suppliers = list(range(number_of_suppliers))
+        self.process_buffers = list(range(number_of_buffers))
 
         self.fishers_request = {}
         self.suppliers_request = {}
@@ -119,6 +124,18 @@ class FishingService(Client):
         # self.process_buffer.append(temp_buffer_process)
         # self.buffers.append(temp_buffer)
 
+        for buffer_id in range(number_of_buffers):
+            win_capture = window_buffers[buffer_id].wincap
+            window_name = window_buffers[buffer_id].window_name
+            hwnd = window_buffers[buffer_id].hwnd
+            screenshot = window_buffers[buffer_id].screenshot
+            temp_buffer_window = FishingBufferWindow(buffer_id, win_capture, window_name, hwnd, screenshot)
+            temp_buffer_window.window_id = window_buffers[buffer_id].window_id
+            self.buffer_windows.append(temp_buffer_window)
+
+            temp_buffer = Buffer(temp_buffer_window, buffer_id, number_of_buffers, q)
+            self.buffers.append(temp_buffer)
+
         for supplier_id in range(number_of_suppliers):
             win_capture = window_suppliers[supplier_id].wincap
             window_name = window_suppliers[supplier_id].window_name
@@ -126,7 +143,7 @@ class FishingService(Client):
             screenshot = window_suppliers[supplier_id].screenshot
             temp_supplier_window = FishingSupplierWindow(supplier_id, win_capture, window_name, hwnd, screenshot)
             temp_supplier_window.window_id = window_suppliers[supplier_id].window_id
-            self.fishing_windows.append(temp_supplier_window)
+            self.supplier_windows.append(temp_supplier_window)
 
             temp_supplier = Supplier(temp_supplier_window, supplier_id, number_of_suppliers, q)
             self.suppliers.append(temp_supplier)
@@ -141,6 +158,7 @@ class FishingService(Client):
         self.offset_y = 0
 
         self.start_fishers()
+        self.start_buffers()
         self.start_suppliers()
 
     def __del__(self):
@@ -193,6 +211,8 @@ class FishingService(Client):
 
     def start_suppliers(self, supplier_id=None):
         time.sleep(1)
+        if len(self.suppliers) == 0:
+            return
         self.send_message(f'start_suppliers')
         if supplier_id is None:
             for supplier in self.suppliers:
@@ -204,6 +224,22 @@ class FishingService(Client):
                 temp_supplier_process = Process(target=self.suppliers[supplier_id].run)
                 self.process_suppliers[supplier_id] = temp_supplier_process
                 self.process_suppliers[supplier_id].start()
+
+    def start_buffers(self, buffer_id=None):
+        time.sleep(1)
+        if len(self.buffers) == 0:
+            return
+        self.send_message(f'start_buffers')
+        if buffer_id is None:
+            for buffer in self.buffers:
+                temp_buffer_process = Process(target=buffer.run)
+                self.process_buffers[buffer.buffer_id] = temp_buffer_process
+                temp_buffer_process.start()
+        else:
+            if buffer_id < len(self.process_buffers):
+                temp_buffer_process = Process(target=self.buffers[buffer_id].run)
+                self.process_buffers[buffer_id] = temp_buffer_process
+                self.process_buffers[buffer_id].start()
 
     # def stop_suppliers(self, supplier_id=None):
     #     self.send_message(f'stop_suppliers)
