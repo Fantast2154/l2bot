@@ -11,9 +11,10 @@ import win32gui
 import sys
 import time
 import threading
-from system.botnet import Server, Client
+from system.botnet import Client
 import keyboard
 import PySimpleGUI as sg
+
 
 def gui_window1(windows_f, windows_b, windows_s, windows_t):
     global L2_total_height
@@ -42,7 +43,7 @@ def gui_window1(windows_f, windows_b, windows_s, windows_t):
         if window.height + window.left_top_y > L2_total_height:
             L2_total_height = window.height + window.left_top_y
 
-    workers = [0]*len(windows)
+    workers = [0] * len(windows)
     l2window_rectangles_temp = []
     l2window_workers_temp = []
     for i in range(len(windows)):
@@ -62,10 +63,10 @@ def gui_window1(windows_f, windows_b, windows_s, windows_t):
 
     global sg_gui_temp
     sg_gui_temp = sg.FlexForm(title=")", layout=layout1, size=(app_height, app_width),
-                         location=(L2_min_x, L2_total_height))
+                              location=(L2_min_x, L2_total_height))
 
-
-    window_input_msg_box = ['choose fisher windows', 'choose buffer windows', 'choose supplier windows', 'choose teleporter windows']
+    window_input_msg_box = ['choose fisher windows', 'choose buffer windows', 'choose supplier windows',
+                            'choose teleporter windows']
 
     windows_left = len(windows)
 
@@ -73,8 +74,8 @@ def gui_window1(windows_f, windows_b, windows_s, windows_t):
 
     index_list = []
     counter = 0
-    l2window_workers = [0]*len(windows)
-    l2attempt_counter = [0]*len(windows)
+    l2window_workers = [0] * len(windows)
+    l2attempt_counter = [0] * len(windows)
 
     for out_msg in window_input_msg_box:
         sg_gui_temp['msg'].Update(out_msg)
@@ -93,8 +94,10 @@ def gui_window1(windows_f, windows_b, windows_s, windows_t):
                         l2window_workers_temp[i].Update('fisher')
                         workers[i] = 'fisher'
                         windows_left -= 1
-                        l2window_workers[i] = sg.Text(f'{workers[i]}_{counter}', size=(l2button_width, 1), justification='center')
-                        l2attempt_counter[i] = sg.Text(f'', size=(l2button_width, 1), justification='center', key=f'fisher_{counter}')
+                        l2window_workers[i] = sg.Text(f'{workers[i]}_{counter}', size=(l2button_width, 1),
+                                                      justification='center')
+                        l2attempt_counter[i] = sg.Text(f'', size=(l2button_width, 1), justification='center',
+                                                       key=f'fisher_{counter}')
                         # l2window_workers.append(sg.Text(f'{workers[i]}_{counter}', size=(l2button_width, 1), justification='center'))
                         counter += 1
                     if out_msg == 'choose buffer windows':
@@ -118,7 +121,6 @@ def gui_window1(windows_f, windows_b, windows_s, windows_t):
                         l2window_workers[i] = sg.Text(f'{workers[i]}', size=(l2button_width, 1), justification='center')
                         l2attempt_counter[i] = sg.Text(f'', size=(l2button_width, 1), justification='center')
 
-
                     sg_gui_temp['unresolved'].Update(f'number of unresolved windows: {windows_left}')
                     index_list.append(i)
                     sg_gui_temp[temp].Update(disabled=True)
@@ -136,12 +138,13 @@ def gui_window1(windows_f, windows_b, windows_s, windows_t):
     sg_gui_temp['msg'].Update('')
     sg_gui_temp.Read(timeout=1)
     return True
-        # if workers[i] == 'fisher':
-        #     pass
-        #     l2window_workers.append(sg.Text(f'{workers[i]}_{index_list[i]}', size=(l2button_width, 1), justification='center'))
-        #     counter += 1
-        # else:
-        #     l2window_workers.append(sg.Text(f'{workers[i]}', size=(l2button_width, 1), justification='center'))
+    # if workers[i] == 'fisher':
+    #     pass
+    #     l2window_workers.append(sg.Text(f'{workers[i]}_{index_list[i]}', size=(l2button_width, 1), justification='center'))
+    #     counter += 1
+    # else:
+    #     l2window_workers.append(sg.Text(f'{workers[i]}', size=(l2button_width, 1), justification='center'))
+
 
 def gui_window2():
     # global app_height
@@ -162,6 +165,7 @@ def gui_window2():
                          location=(L2_min_x, L2_total_height))
     sg_gui.Read(timeout=0)
     return sg_gui
+
 
 def send_message(message):
     temp = 'MAIN' + ': ' + message
@@ -229,6 +233,7 @@ def client_server(bots_id_list):
         pass
         # return None
 
+
 def collapse(layout, key, visible):
     """
     Helper function that creates a Column that can be later made hidden, thus appearing "collapsed"
@@ -242,6 +247,7 @@ def collapse(layout, key, visible):
 
 
 if __name__ == '__main__':
+
 
     print('PROGRAM start--------------------------------------\n')
 
@@ -298,8 +304,6 @@ if __name__ == '__main__':
         print(f'The window capturing will start in ........ {delay - i} sec')
         time.sleep(1)
 
-
-
     # t = Telegram()
 
     if not gui_window1(windows_f, windows_b, windows_s, windows_t):
@@ -312,10 +316,13 @@ if __name__ == '__main__':
     # start fishing
     F = FishingService(windows_f, windows_b, windows_s, windows_t, queue)
 
-    # Process_fishingservice = Process(target=F.run)
-    # Process_fishingservice.start()
+
+
+    # F.run_thread()
+
     t = threading.Thread(target=F.run)
     t.start()
+
     # F.run()
     # F.start_fishing()
 

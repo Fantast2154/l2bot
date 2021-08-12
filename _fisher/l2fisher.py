@@ -87,8 +87,11 @@ class Fisher:
         self.send_message(f"destroyed")
 
     def send_message(self, message):
-        temp = '\t' * 10 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
-        print(temp)
+        try:
+            temp = '\t' * 10 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
+            print(temp)
+        except:
+            pass
 
     def test_action(self, count):
         self.q.new_task(count, self.fishing_window)

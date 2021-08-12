@@ -76,8 +76,11 @@ class Supplier:
         self.send_message(f"destroyed")
 
     def send_message(self, message):
-        temp = '\t' * 10 * self.supplier_id + 'Supplier ' + f'{self.supplier_id}: {message}'
-        print(temp)
+        try:
+            temp = '\t' * 10 * self.supplier_id + 'Supplier ' + f'{self.supplier_id}: {message}'
+            print(temp)
+        except:
+            pass
 
     def pause_supplier(self, delay):
         if delay is None:
