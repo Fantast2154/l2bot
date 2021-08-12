@@ -74,6 +74,8 @@ class Buffer:
         self.current_state[0] = 'available'
         while not self.exit_is_set:
             pass
+            self.buff()
+            self.pause_thread(15)
             # self.wait_for_supply_request()
             #
             # if not self.wait_for_trade():
@@ -128,9 +130,9 @@ class Buffer:
                         [coordinates, True, 'LEFT', False, False, False],
                         self.buffer_window)
 
-    def trade_item(self, coordinates):
+    def buff(self):
         self.q.new_task('mouse',
-                        [coordinates, True, 'LEFT', False, False, 'double'],
+                        [self.buffer_window.get_object('buff_song', False), True, 'LEFT', False, False, False],
                         self.buffer_window)
 
     def get_status(self):

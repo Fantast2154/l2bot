@@ -47,6 +47,7 @@ class FishingBufferWindow(L2window):
         ]
 
         self.init_images()
+        self.init_search()
 
     def update_screenshot(self):
         temp = self.screenshot[-1][self.hwnd][0]
