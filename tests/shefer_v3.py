@@ -9,7 +9,7 @@ class Server:
     def __init__(self, machine_id):
         self.id = machine_id
         self.HOST = ''
-        self.PORT = 27015
+        self.PORT = 8888
         self.ADDRESS = (self.HOST, self.PORT)
         self.BUFFERSIZE_TEMPORARY = 10000
 
@@ -42,6 +42,7 @@ class Server:
                     bot.close()
                     self.bots_list.remove(bot)
                     self.server_message(f'Клиент удалён.')
+
                 print('self.bots_data_collection', self.bots_data_collection)
                 for item in self.bots_data_collection:
                     for key, value in item.items():
@@ -49,6 +50,8 @@ class Server:
                             data_storage_dict[key].append(value)
                         else:
                             data_storage_dict[key] = [value]
+
+                self.bots_data_collection.clear()
 
                 # {уникальный ID машины-отправителя: [сообщение1, сообщение2, ...]} - вид отправляемого сообщения
                 #data_to_send = self.bots_data_collection
@@ -60,7 +63,6 @@ class Server:
 
                 for bot_ in self.bots_list:
                     try:
-
                         bot_.send(encoded_data_to_send)
                     except ConnectionResetError:
                         self.server_message('Ошибка передачи данных')
@@ -87,10 +89,8 @@ class Server:
 class Client:
     def __init__(self, machine_id, ip=None):
         self.id = machine_id
-        # self.HOST = '84.237.53.150'
-        self.HOST = 'localhost'
-        # self.PORT = 27015
-        self.PORT = 8888
+        self.HOST = '84.237.53.150'
+        self.PORT = 27015
         self.ADDRESS = (self.HOST, self.PORT)
         self.BUFFERSIZE_TEMPORARY = 1000
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -106,7 +106,6 @@ class Client:
                 self.client.connect(self.ADDRESS)
                 self.connected = True
                 self.client_message('Соединение установлено')
-                self.connect_to_server()
             except:
                 self.client_message(
                     'Сервер не отвечает. Для технической поддержки, свяжитесь с Баганцем. Скорее всего, вы просто дилетант. АЙПИ ИЗМЕНИЛ? САМ СЕРВЕР ЗАПУЩЕН??? Ну вот и всё.')
@@ -124,7 +123,7 @@ class Client:
         print(datetime.datetime.now().time(), f'Бот {self.id}', text)
 
     def client_send(self, data):
-        #print('client_send', data)
+        print('client_send', data)
         data_to_encode = {self.id: data}
         #data_to_encode = data
         encoded_data_to_send = pickle.dumps(data_to_encode)
@@ -140,7 +139,7 @@ class Client:
                 if data:
                     decoded_data = pickle.loads(data)
                     self.bots_data_collection = decoded_data
-                    #print(decoded_data)
+                    print('CLIENT', decoded_data)
             except ConnectionResetError:
                 self.client.close()
 
@@ -153,7 +152,7 @@ if __name__ == '__main__':
     s = Server(123)
     s.server_start()
 
-    # time.sleep(2)
+    #time.sleep(2)
 
-    # c = Client()
-    # c.connect_to_server()
+    #c = Client(123)
+    #c.connect_to_server()

@@ -33,7 +33,7 @@ class FishingWindow(L2window):
             ['blue_bar', 'images/fishing/blue_bar2.jpg', 0.75],
             ['colored', 'images/fishing/colored_2.jpg', 0.94],
             ['luminous', 'images/fishing/luminous_2.jpg', 0.94],
-            ['clock', 'images/fishing/clock2.jpg', 0.7],
+            ['clock', 'images/fishing/clock2.jpg', 0.87],
             ['map_button', 'images/map.jpg', 0.9],
             ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
             ['menu', 'images/menu.jpg', 0.6],
@@ -169,6 +169,7 @@ class FishingWindow(L2window):
             return []
 
     def is_fishing_window(self):
+
         temp = self.find('fishing_window', accurate=True)
         if temp:
             return True

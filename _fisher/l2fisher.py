@@ -128,7 +128,7 @@ class Fisher:
         # soski activation
         # trial rod case
 
-        delay = 1.5
+        delay = 1
         delay_correction = delay + 9 * self.fisher_id
         self.send_message(f'will start fishing in ........ {delay_correction} sec')
         self.pause_thread(delay_correction)
@@ -167,7 +167,7 @@ class Fisher:
         # activation of accurate search in wincap
 
         self.fishing()
-        self.pause_thread(0.7)
+        self.pause_thread(1)
         if not self.search_object_with_click(self.fishing_window.get_object, self.fishing, 18, 'fishing_window', True):
             return False
         self.fishing_window.record_fishing_window()
@@ -185,11 +185,22 @@ class Fisher:
             return False
 
         # searching for clock
-        if not self.search_object_without_click(self.fishing_window.is_clock, 20):
-            return False
+        counter = 1
+        time_between_actions = 7
+        temp_t = time.time()
+        searching_time = 12
+        while time.time() - temp_t < searching_time:
+            if not self.fishing_window.is_fishing_window():
+                return False
+            if time.time() - temp_t > time_between_actions * counter:
+                counter += 1
+                self.attack()
+            if self.fishing_window.is_clock():
+                break
+            time.sleep(0.5)
 
-        self.attack()
 
+        # fishing params
         blue_bar_pos = 0
         coords_saved = False
         x_border = None
@@ -204,9 +215,8 @@ class Fisher:
         reel_count = 0
         reel_timer_was_set = False
 
-
+        # fishing main loop
         while self.fishing_window.is_fishing_window():
-            # while self.fishing_window.get_object('clock', True):
 
             if self.is_day_time():
                 temp = self.fishing_window.is_blue_bar()
@@ -335,18 +345,21 @@ class Fisher:
             if time.time() - temp_timer > time_between_actions * counter:
                 counter += 1
                 task_proc()
+                self.pause_thread(0.5)
 
             if time.time() - temp_timer > searching_time or counter > repeat_times:
                 return False
-
+            self.pause_thread(0.1)
         return True
 
     def search_object_without_click(self, condition, searching_time, *args):
         temp_timer = time.time()
 
         while not condition(*args):
+
             if time.time() - temp_timer > searching_time:
                 return False
+            self.pause_thread(0.1)
         return True
 
     # def get_status(self):
@@ -358,6 +371,7 @@ class Fisher:
         while condition(*args):
             if time.time() - temp_timer > searching_time:
                 return True
+            self.pause_thread(0.1)
         return False
 
     def smart_button_click(self):
@@ -452,8 +466,8 @@ class Fisher:
 
     def smart_press_button(self, button_input, control_window, searching_time, *args):
         # function:
-        # pushing button 'button input' every 6 seconds for 'searching time' until  window 'control_window' appears
-
+        # pushing button 'button input' every 5 seconds for 'searching time' until  window 'control_window' appears
+        pause_between_clicks = 5
         temp_timer = time.time()
         button = self.button_name(button_input)
         if button != 'error':
@@ -461,10 +475,11 @@ class Fisher:
                 response = self.fishing_window.get_object(button, True)
                 if response:
                     self.press_button(button_input)
-                self.pause_thread(1)
+                self.pause_thread(pause_between_clicks)
 
                 if time.time() - temp_timer > searching_time:
                     return False
+                time.sleep(0.5)
             return True
         else:
             return False

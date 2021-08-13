@@ -36,38 +36,29 @@ class FishingService(Client):
     fishing_service_client = {}
     sg_gui = None
 
-    def __init__(self, window_fishers, window_buffers, window_suppliers, window_teleporters, q):
-        manager = Manager()
-        # self.fishers = manager.list()
-        for f in window_fishers:
-            self.windows.append(f)
-        for b in window_buffers:
-            self.windows.append(b)
-        for s in window_suppliers:
-            self.windows.append(s)
-        for t in window_teleporters:
-            self.windows.append(t)
+    def __init__(self, windows, user_input, q):
         self.machine_id = random.randint(0, 10000000)
         super().__init__(self.machine_id)  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС Client И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
-        #     # warning
-        #     return None
-        number_of_fishers = len(window_fishers)
-        number_of_buffers = len(window_buffers)
-        number_of_suppliers = len(window_suppliers)
-        number_of_teleporters = len(window_teleporters)
+        manager = Manager()
 
-        self.number_of_fishers_ = len(window_fishers)
-        self.number_of_buffers_ = len(window_buffers)
-        self.number_of_suppliers_ = len(window_suppliers)
-        self.number_of_teleporters_ = len(window_teleporters)
+        self.windows = windows
+        self.window_fishers = user_input[0]
+        self.window_buffers = user_input[1]
+        self.window_suppliers = user_input[2]
+        self.window_teleporters = user_input[3]
+
+        self.number_of_fishers = len(user_input[0])
+        self.number_of_buffers = len(user_input[1])
+        self.number_of_suppliers = len(user_input[2])
+        self.number_of_teleporters = len(user_input[3])
 
         self.fishers = []
         self.buffers = []
         self.suppliers = []
         self.teleporters = []
-        self.process_fishers = list(range(number_of_fishers))
-        self.process_suppliers = list(range(number_of_suppliers))
-        self.process_buffers = list(range(number_of_buffers))
+        self.process_fishers = list(range(self.number_of_fishers))
+        self.process_suppliers = list(range(self.number_of_suppliers))
+        self.process_buffers = list(range(self.number_of_buffers))
 
         self.fishers_request = {}
         self.suppliers_request = {}
@@ -76,10 +67,10 @@ class FishingService(Client):
 
         self.message = {}
 
-        if number_of_fishers < 1 or number_of_fishers > 3:
+        if self.number_of_fishers < 1 or self.number_of_fishers > 3:
             print('FISHING SERVICE ERROR')
         # return super(FishingService, cls).__new__(cls)
-        if number_of_suppliers != 0:
+        if self.number_of_suppliers != 0:
             self.has_supplier = True
             self.queue_list = []
         else:
@@ -90,23 +81,22 @@ class FishingService(Client):
 
         q.activate_l2windows(self.windows)
 
-        for fisher_id in range(number_of_fishers):
+        for fisher_id in range(self.number_of_fishers):
             # print('fisher_id', fisher_id)
             # window_fishers
-            win_capture = window_fishers[fisher_id].wincap
-            window_name = window_fishers[fisher_id].window_name
-            hwnd = window_fishers[fisher_id].hwnd
-            screenshot = window_fishers[fisher_id].screenshot
+            win_capture = self.window_fishers[fisher_id].wincap
+            window_name = self.window_fishers[fisher_id].window_name
+            hwnd = self.window_fishers[fisher_id].hwnd
+            screenshot = self.window_fishers[fisher_id].screenshot
             temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd, screenshot)
-            temp_fishing_window.window_id = window_fishers[fisher_id].window_id
+            temp_fishing_window.window_id = self.window_fishers[fisher_id].window_id
             self.fishing_windows.append(temp_fishing_window)
 
             # fishers
-            temp_fisher = Fisher(temp_fishing_window, fisher_id, number_of_fishers, q)
+            temp_fisher = Fisher(temp_fishing_window, fisher_id, self.number_of_fishers, q)
             self.fishers.append(temp_fisher)
 
-
-        # for buffer_id in range(number_of_buffers):
+        # for buffer_id in range(self.number_of_buffers):
         #     pass
         # windows
         # win_capture = windows[buffer_id].wincap
@@ -117,41 +107,40 @@ class FishingService(Client):
         # self.fishing_windows.append(temp_buffer_window)
 
         # buffers
-        # temp_buffer = Buffer(temp_buffer_window, buffer_id, number_of_buffers, q)
+        # temp_buffer = Buffer(temp_buffer_window, buffer_id, self.number_of_buffers, q)
         # temp_buffer_process = Process(target=temp_buffer.run)
         # temp_buffer_process.start()
         # temp_buffer.start()
         # self.process_buffer.append(temp_buffer_process)
         # self.buffers.append(temp_buffer)
 
-        for buffer_id in range(number_of_buffers):
-            win_capture = window_buffers[buffer_id].wincap
-            window_name = window_buffers[buffer_id].window_name
-            hwnd = window_buffers[buffer_id].hwnd
-            screenshot = window_buffers[buffer_id].screenshot
+        for buffer_id in range(self.number_of_buffers):
+            win_capture = self.window_buffers[buffer_id].wincap
+            window_name = self.window_buffers[buffer_id].window_name
+            hwnd = self.window_buffers[buffer_id].hwnd
+            screenshot = self.window_buffers[buffer_id].screenshot
             temp_buffer_window = FishingBufferWindow(buffer_id, win_capture, window_name, hwnd, screenshot)
-            temp_buffer_window.window_id = window_buffers[buffer_id].window_id
+            temp_buffer_window.window_id = self.window_buffers[buffer_id].window_id
             self.buffer_windows.append(temp_buffer_window)
 
-            temp_buffer = Buffer(temp_buffer_window, buffer_id, number_of_buffers, q)
+            temp_buffer = Buffer(temp_buffer_window, buffer_id, self.number_of_buffers, q)
             self.buffers.append(temp_buffer)
 
-        for supplier_id in range(number_of_suppliers):
-            win_capture = window_suppliers[supplier_id].wincap
-            window_name = window_suppliers[supplier_id].window_name
-            hwnd = window_suppliers[supplier_id].hwnd
-            screenshot = window_suppliers[supplier_id].screenshot
+        for supplier_id in range(self.number_of_suppliers):
+            win_capture = self.window_suppliers[supplier_id].wincap
+            window_name = self.window_suppliers[supplier_id].window_name
+            hwnd = self.window_suppliers[supplier_id].hwnd
+            screenshot = self.window_suppliers[supplier_id].screenshot
             temp_supplier_window = FishingSupplierWindow(supplier_id, win_capture, window_name, hwnd, screenshot)
-            temp_supplier_window.window_id = window_suppliers[supplier_id].window_id
+            temp_supplier_window.window_id = self.window_suppliers[supplier_id].window_id
             self.supplier_windows.append(temp_supplier_window)
 
-            temp_supplier = Supplier(temp_supplier_window, supplier_id, number_of_suppliers, q)
+            temp_supplier = Supplier(temp_supplier_window, supplier_id, self.number_of_suppliers, q)
             self.suppliers.append(temp_supplier)
 
         # wincap
         self.win_capture = self.windows[0].wincap
 
-        self.number_of_fishers = number_of_fishers
         self.q = q
 
         self.offset_x = 0
@@ -360,10 +349,10 @@ class FishingService(Client):
 
     def listen_to_server(self):
         amount = {'amount': {
-            'fishers': self.number_of_fishers_,
-            'suppliers': self.number_of_suppliers_,
-            'teleporters': self.number_of_teleporters_,
-            'buffers': self.number_of_buffers_
+            'fishers': self.number_of_fishers,
+            'suppliers': self.number_of_suppliers,
+            'teleporters': self.number_of_teleporters,
+            'buffers': self.number_of_buffers
         }}
 
         status = {'status': {
@@ -410,11 +399,11 @@ class FishingService(Client):
                         for fisher_status in datum['status']['fishers']:
                             for fisher_id, status in fisher_status.items():
                                 if status == 'requests supplying':
-                                    #print('self.message', self.message)
+                                    # print('self.message', self.message)
                                     temp_fishers_ids.append(fisher_id)
 
                         if datum['request']['fishers'].items():
-                            #print('ITEMS request fishers', datum['request']['fishers'].items())
+                            # print('ITEMS request fishers', datum['request']['fishers'].items())
                             # dic_resource = {'d_baits': a, 'n_baits': b, 'soski': c}
                             for fisher_id, dic_resource in datum['request']['fishers'].items():
                                 supplies[sender_id] = {fisher_id: dic_resource}
@@ -468,7 +457,6 @@ class FishingService(Client):
                         if supplies[sender_id][fisher_index].values():
                             # print('000000000000000000need_to_supply!!!!')
                             need_to_supply = True
-
 
                 if need_to_supply:
                     # print('start_supply', supplies)
