@@ -1,5 +1,6 @@
 from multiprocessing import Manager, Process
 import PySimpleGUI as sg
+import win32gui
 import threading
 
 

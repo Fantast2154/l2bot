@@ -32,8 +32,6 @@ def list_window_names():
 def get_l2windows_param():
     hash_list = []
     name_list = []
-    list_window_names()  # СПИСОК ВСЕХ ДОСТУПНЫХ ОКОН
-    # list_all_windows = get_window_param()
 
     for window in list_window_names():
         if window[1] == l2window_name:
@@ -99,13 +97,13 @@ if __name__ == '__main__':
     # start capturing screenshots
     Process_wincap = Process(target=win_capture.start_capturing, args=(screen_manager,))
     Process_wincap.start()
-    Process_wincap = None
 
+    # creating fishing manager
     F = FishingService(windows, user_input, queue)
 
+    # gui window loop
     t = threading.Thread(target=F.run)
     t.start()
-
     while True:  # Event Loop
         event, values = gui_window.sg_gui.Read(timeout=4)
 
