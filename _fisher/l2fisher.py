@@ -83,6 +83,11 @@ class Fisher:
         self.time_since_last_rod_cast = time.time()
         self.time_between_rod_casts_avg = []
 
+        # smart fishing params
+        self.bar_limit_left = 0
+        self.bar_limit_right = 0
+        self.bar_length = 0
+
     def __del__(self):
         self.send_message(f"destroyed")
 
@@ -174,6 +179,7 @@ class Fisher:
         self.fishing_window.start_accurate_search()
         self.fishing()
         self.pause_thread(2)
+        self.bar_limits()
         return True
 
     def actions_while_fishing(self):
@@ -188,7 +194,8 @@ class Fisher:
         counter = 1
         time_between_actions = 7
         temp_t = time.time()
-        searching_time = 12
+        searching_time = 12.2
+        fishing_fight_time = None
         while time.time() - temp_t < searching_time:
             if not self.fishing_window.is_fishing_window():
                 return False
@@ -198,7 +205,7 @@ class Fisher:
             if self.fishing_window.is_clock():
                 break
             time.sleep(0.5)
-
+        fishing_fight_time = time.time()
 
         # fishing params
         blue_bar_pos = 0
@@ -231,6 +238,13 @@ class Fisher:
                 (x_temp, y_temp) = temp[-1]
                 # self.send_message(f'temp {temp[-1]}')
                 x_border = x_temp
+
+                # SMART loop breaker depending on conditions
+                if not self.smart_fishing_breaker(x_border, fishing_fight_time):
+                    self.fishing()
+                    self.pause_thread(0.2)
+                    return True
+
             elif self.fishing_window.is_clock():
                 delta_pump_skill = time.time() - pump_skill_cast_time
                 if delta_pump_skill >= self.pumping_skill_CD:
@@ -304,6 +318,7 @@ class Fisher:
                 # if math.fabs(x_border - previous_position) >= 36:
                 previous_position = x_border
 
+
         return True
 
     def actions_between_fishing_rod_casts(self):
@@ -376,6 +391,10 @@ class Fisher:
 
     def smart_button_click(self):
         pass
+
+    def bar_limits(self):
+        [self.bar_limit_left, self.bar_limit_right] = self.fishing_window.wincap.bar_limits[self.fishing_window.hwnd]
+        self.bar_length = self.bar_limit_right - self.bar_limit_left
 
     def overweight_baits_soski_correction(self):
 
@@ -464,6 +483,15 @@ class Fisher:
         }
         return switcher.get(i, 'error')
 
+    def smart_fishing_breaker(self, x, timer):
+        if timer is not None:
+            time_max = 24
+            t = time_max - (time.time() - timer)
+            if 7 > t > 0 and (x - self.bar_limit_left)/self.bar_length > 0.3:
+                self.send_message('Achtung! RUSSISCHE SCHWEINE GREIFEN !!!! KAPITULIEREN!!')
+                return False
+        return True
+
     def smart_press_button(self, button_input, control_window, searching_time, *args):
         # function:
         # pushing button 'button input' every 5 seconds for 'searching time' until  window 'control_window' appears
@@ -498,6 +526,11 @@ class Fisher:
                         [self.fishing_window.get_object(param, True), True, 'LEFT', False, False, False],
                         self.fishing_window)
         return True
+
+    def click(self, coordinates):
+        self.q.new_task('mouse',
+                        [coordinates, True, 'LEFT', False, False, False],
+                        self.fishing_window)
 
     def attack(self):
         self.q.new_task('mouse',

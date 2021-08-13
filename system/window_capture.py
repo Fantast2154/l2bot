@@ -97,6 +97,7 @@ class WindowCapture:
         self.game_windows = manager.list()
         self.accurate = manager.dict()
         self.object_position_and_size = manager.dict()
+        self.bar_limits = manager.dict()
 
     def set_windows(self, windows_list):
         if windows_list:
@@ -115,6 +116,7 @@ class WindowCapture:
                                                [(x_fishwin + 107, y_fishwin + 217), (30, 30), 'clock'],
                                                [(x_fishwin + 17, y_fishwin + 249), (231, 14), 'blue_bar'],
                                                [(x_fishwin + 17, y_fishwin + 249), (231, 14), 'red_bar']]
+        self.bar_limits[hwnd] = [x_fishwin + 17, 231]
 
     # def __del__(self):
     #     self.send_message(f'destroyed')
