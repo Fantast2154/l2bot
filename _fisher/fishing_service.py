@@ -272,7 +272,7 @@ class FishingService(Client):
                 difference = 12
                 if temp < difference:
                     if self.fishers[i-1].paused[0] == 0:
-                        self.pause_fishers(i-1, round(difference - temp))
+                        self.pause_fishers(i, round(difference - temp))
                     # if timing_val > timing_list[i-1]:
                     #     if self.fishers[i-1].paused[0] == 0:
                     #         self.pause_fishers(i-1, round(difference - temp))
