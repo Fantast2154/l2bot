@@ -532,8 +532,9 @@ class FishingService(Client):
         # self.server_update_start()
         timer_fishing_service_start = time.time()
         while True:
-            if time.time() - timer_fishing_service_start > self.number_of_fishers * 9:
-                self.antiphase_fishing('on')
+            # if time.time() - timer_fishing_service_start > self.number_of_fishers * 9:
+            #     self.antiphase_fishing('on')
+
             # self.process_server_data()
 
             # self.listen_to_server()

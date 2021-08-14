@@ -96,7 +96,7 @@ class Fisher:
         self.send_message(f"destroyed")
 
     def send_message(self, message):
-        temp = '\t' * 10 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
+        temp = '\t' * 11 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
         print(temp)
 
     def test_action(self, count):
@@ -186,9 +186,8 @@ class Fisher:
         # initial fishing window search
         # recording fishing window position
         # activation of accurate search in wincap
-
         self.fishing()
-        self.pause_thread(1)
+        self.pause_thread(1.5)
         if not self.search_object_with_click(self.fishing_window.get_object, self.fishing, 18, 'fishing_window', True):
             return False
         self.fishing_window.record_fishing_window()
@@ -496,7 +495,7 @@ class Fisher:
 
     def ai_fishing_breaker(self, x, timer):
         if timer is not None:
-            time_max = 21
+            time_max = 22.8
             t = time_max - (time.time() - timer)
             if time_max > t > 0.7:
                 y = (x - self.bar_limit_left)/self.bar_length
@@ -507,6 +506,7 @@ class Fisher:
                 # self.send_message(f'y {y}, y_theory {y_theory}, y-y_theory {y - y_theory}')
                 if y > y_theory:
                     self.send_message(f'Achtung! Я СДЕЛАЛ ЧТО МОГ. КАПИТУЛИРУЮ.')
+                    self.send_message(f'{t} sec has been SAVED')
                     return False
         return True
 
@@ -615,7 +615,7 @@ class Fisher:
 
     def update_current_attempt(self):
         self.attempt_counter[0] += 1
-        temp = '\t' * 10 * self.fisher_id
+        temp = '\t' * 11 * self.fisher_id
         print(f'{temp}Fisher {self.fisher_id}: Attempt # {self.attempt_counter[0]}')
 
     def send_mail(self):

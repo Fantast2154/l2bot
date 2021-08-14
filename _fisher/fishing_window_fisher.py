@@ -125,7 +125,7 @@ class FishingWindow(L2window):
             return []
 
     def send_message(self, message):
-        temp = 'FishingWindow' + f' {self.window_id}' + ': ' + message
+        temp = '\t' * 11 * self.window_id +'FishingWindow ' + f'{self.window_id}: {message}'
         print(temp)
 
     def find(self, object, accurate=False):  # returns list of positions
@@ -249,3 +249,7 @@ class FishingWindow(L2window):
         except:
             self.send_message('Error init search')
             return False
+
+    def activate_window(self):
+        coords = [(self.left_top_x + 200, self.left_top_y - 10)]
+        return coords
