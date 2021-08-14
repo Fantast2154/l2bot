@@ -30,7 +30,9 @@ class Fisher:
         # 'paused'
         # 'error'
 
-        self.paused = None  # force pause the fisher
+        # pause fisher
+        self.paused = manager.list()
+        self.paused.append(0)
 
         # trading
         # self.supplying_request = False # fisher wants supplying. options: True, False
@@ -46,7 +48,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 100
+        self.send_counter = 1000
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -99,10 +101,14 @@ class Fisher:
         self.q.new_task(count, self.fishing_window)
 
     def pause_fisher(self, delay):
-        if delay is None:
+        self.send_message(f'paused for {delay} sec')
+        if delay is None or delay == 0:
             pass
         else:
-            self.pause_thread(delay)
+            for i in range(delay):
+                self.send_message(f'{delay - i} sec')
+                time.sleep(1)
+            self.paused[0] = 0
 
     def run(self):
         # function:
@@ -111,6 +117,9 @@ class Fisher:
         while True:  # or keyboard was pressed and not disconnected
 
             self.update_current_attempt()
+
+            if self.paused[0] != 0:
+                self.pause_fisher(self.paused[0])
 
             if not self.actions_while_fishing():
                 pass
@@ -346,7 +355,6 @@ class Fisher:
     def stop_fishing(self):
         # global current_state
         self.send_message(f'has finished fishing\n')
-        self.paused = True
         self.current_state[0] = 'not working'
 
     def search_object_with_click(self, search_object, task_proc, searching_time, *args):

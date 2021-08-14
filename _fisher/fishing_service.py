@@ -186,17 +186,22 @@ class FishingService(Client):
                 self.fishers[fisher_id].stop_fishing()
                 self.process_fishers[fisher_id].terminate()
 
-    # def pause_fishers(self, fisher_id=None, delay=None):
-    #     self.send_message(f'pause_fishing() calling')
-    #     if fisher_id is None:
-    #         for fisher in self.fishers:
-    #             fisher.stop_fishing()
-    #             # self.process_fishers[fisher.fisher_id].terminate()
-    #
-    #     else:
-    #         if fisher_id < len(self.process_fishers):
-    #             self.fishers[fisher_id].stop_fishing()
-    #             # self.process_fishers[fisher_id].terminate()
+    def pause_fishers(self, fisher_id=None, delay=0, except_param=False):
+
+        if fisher_id is None:
+            self.send_message(f'pause {delay} sec for all fishers has been registered')
+            for fisher in self.fishers:
+                fisher.paused[0] = delay
+        else:
+            if except_param:
+                self.send_message(f'pause {delay} sec for all fishers, EXCEPT fisher_{fisher_id} has been registered')
+                for fisher in self.fishers:
+                    if fisher.fisher_id == fisher_id:
+                        pass
+                    fisher.paused[0] = delay
+            if fisher_id < self.number_of_fishers:
+                self.send_message(f'pause {delay} sec for fisher_{fisher_id} has been registered')
+                self.fishers[fisher_id].paused[0] = delay
 
     def start_suppliers(self, supplier_id=None):
         time.sleep(1)
@@ -493,11 +498,12 @@ class FishingService(Client):
         # self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
         # self.server_update_start()
         while True:
+
             # self.process_server_data()
 
-            # for fisher in self.fishers:
-            # print('fisher.current_state[0]', fisher.current_state[0])
-            # self.fisher_response(fisher.fisher_id, fisher.current_state[0])
+            for fisher in self.fishers:
+                if fisher.fisher_id == 0 and fisher.attempt_counter[0] == 2 and fisher.paused[0] == 0:
+                    self.pause_fishers(fisher.fisher_id, 20)
 
             # self.listen_to_server()
             time.sleep(1)
