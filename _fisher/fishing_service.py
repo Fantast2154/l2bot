@@ -271,12 +271,14 @@ class FishingService(Client):
                 temp = abs(timing_val - timing_list[i-1])
                 difference = 12
                 if temp < difference:
-                    if timing_val > timing_list[i-1]:
-                        if self.fishers[i-1].paused[0] == 0:
-                            self.pause_fishers(i-1, round(difference - temp))
-                    else:
-                        if self.fishers[i].paused[0] == 0:
-                            self.pause_fishers(i, round(difference - temp))
+                    if self.fishers[i-1].paused[0] == 0:
+                        self.pause_fishers(i-1, round(difference - temp))
+                    # if timing_val > timing_list[i-1]:
+                    #     if self.fishers[i-1].paused[0] == 0:
+                    #         self.pause_fishers(i-1, round(difference - temp))
+                    # else:
+                    #     if self.fishers[i].paused[0] == 0:
+                    #         self.pause_fishers(i, round(difference - temp))
 
 
     def send_to_server(self, status):
