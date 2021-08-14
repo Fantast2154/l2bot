@@ -199,9 +199,9 @@ class Fisher:
         while time.time() - temp_t < searching_time:
             if not self.fishing_window.is_fishing_window():
                 return False
-            if time.time() - temp_t > time_between_actions * counter:
-                counter += 1
-                self.attack()
+            # if time.time() - temp_t > time_between_actions * counter:
+            #     counter += 1
+            #     self.attack()
             if self.fishing_window.is_clock():
                 break
             time.sleep(0.5)
@@ -242,7 +242,7 @@ class Fisher:
                 # SMART loop breaker depending on conditions
                 if not self.smart_fishing_breaker(x_border, fishing_fight_time):
                     self.fishing()
-                    self.pause_thread(0.2)
+                    self.pause_thread(0.7)
                     return True
 
             elif self.fishing_window.is_clock():
@@ -485,10 +485,11 @@ class Fisher:
 
     def smart_fishing_breaker(self, x, timer):
         if timer is not None:
-            time_max = 24
+            time_max = 25
             t = time_max - (time.time() - timer)
             if 7 > t > 0 and (x - self.bar_limit_left)/self.bar_length > 0.3:
                 self.send_message('Achtung! RUSSISCHE SCHWEINE GREIFEN !!!! KAPITULIEREN!!')
+                timer = None
                 return False
         return True
 

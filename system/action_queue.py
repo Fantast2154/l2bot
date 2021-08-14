@@ -1,3 +1,5 @@
+import random
+
 import keyboard
 
 from system.action_service import ActionService
@@ -7,7 +9,7 @@ import win32gui
 import win32com.client
 import win32api
 import win32con
-
+import math
 import win32gui as wgui
 import win32process as wproc
 import win32api as wapi
@@ -83,7 +85,7 @@ class ActionQueue():
 
     def click(self, x, y, param=False, params=False):
         # print('params', params)
-        self.mouse.position = (x, y)
+        self.mouse.position = (x - random.randint(0, 3), y - random.randint(0, 3))
         time.sleep(0.03)
         if 'double' in params:
             print('double click')
@@ -98,12 +100,13 @@ class ActionQueue():
             return
 
         if param:
+            time.sleep(0.02)
             self.mouse.press(Button.left)
             time.sleep(0.02)
             self.mouse.release(Button.left)
             time.sleep(0.03)
             self.mouse.move(4, 4)
-            time.sleep(0.01)
+            time.sleep(0.03)
 
         self.mouse.press(Button.left)
         time.sleep(0.07)
