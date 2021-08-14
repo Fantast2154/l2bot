@@ -256,7 +256,7 @@ class Fisher:
                 x_border = x_temp
 
                 # SMART loop breaker depending on conditions
-                if not self.smart_fishing_breaker(x_border, fishing_fight_time):
+                if not self.ai_fishing_breaker(x_border, fishing_fight_time):
                     self.fishing()
                     self.pause_thread(0.7)
                     return True
@@ -406,6 +406,7 @@ class Fisher:
 
     def bar_limits(self):
         [self.bar_limit_left, self.bar_limit_right] = self.fishing_window.wincap.bar_limits[self.fishing_window.hwnd]
+        self.bar_limit_left -= 0.053
         self.bar_length = self.bar_limit_right - self.bar_limit_left
 
     def overweight_baits_soski_correction(self):
@@ -495,14 +496,19 @@ class Fisher:
         }
         return switcher.get(i, 'error')
 
-    def smart_fishing_breaker(self, x, timer):
+    def ai_fishing_breaker(self, x, timer):
+        if self.fisher_id != 0:
+            return True
+
         if timer is not None:
-            time_max = 25
+            time_max = 21
             t = time_max - (time.time() - timer)
-            y = (x - self.bar_limit_left)/self.bar_length
-            if 15 > t > 0:
+            if time_max > t > 0.7:
+                y = (x - self.bar_limit_left)/self.bar_length
+
                 # y_theory = (9.8467 * math.exp(0.1545 * t))/100
-                y_theory = (14.832 * math.log(t) + 54.153)/100
+                # y_theory = (14.832 * math.log(t) + 54.153)/100
+                y_theory = (3.653 * t + 19.635)/100
                 # self.send_message(f'y {y}, y_theory {y_theory}, y-y_theory {y - y_theory}')
                 if y > y_theory:
                     self.send_message(f'Achtung! Я СДЕЛАЛ ЧТО МОГ. КАПИТУЛИРУЮ.')
