@@ -84,8 +84,8 @@ class Gui_interface:
                     if event == temp:
                         if out_msg == 'choose fisher windows':
                             self.windows_f.append(self.windows[i])
-                            self.l2window_workers[i].Update('fisher')
-                            self.workers[i] = 'fisher'
+                            self.l2window_workers[i].Update(f'fisher_{counter}')
+                            self.workers[i] = f'fisher'
                             self.index.append(i)
                             windows_left -= 1
 

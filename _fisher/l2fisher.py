@@ -54,6 +54,8 @@ class Fisher:
         self.attempt_counter.append(0)
 
         # fishing timers
+        self.press_fishing_timer = manager.list()
+        self.press_fishing_timer.append(time.time())
         self.total_fishing_time = 0
         self.last_rod_cast_time = 0
         self.avg_rod_cast_time = 0
@@ -100,16 +102,6 @@ class Fisher:
     def test_action(self, count):
         self.q.new_task(count, self.fishing_window)
 
-    def pause_fisher(self, delay):
-        self.send_message(f'paused for {delay} sec')
-        if delay is None or delay == 0:
-            pass
-        else:
-            for i in range(delay):
-                self.send_message(f'{delay - i} sec')
-                time.sleep(1)
-            self.paused[0] = 0
-
     def run(self):
         # function:
         # main fishing loop
@@ -118,15 +110,15 @@ class Fisher:
 
             self.update_current_attempt()
 
-            if self.paused[0] != 0:
-                self.pause_fisher(self.paused[0])
-
             if not self.actions_while_fishing():
                 pass
                 # print('self.actions_while_fishing()')
 
             if not self.actions_between_fishing_rod_casts():
                 self.send_message('actions_between_fishing_rod_casts FAILED')
+
+            if self.paused[0] != 0:
+                self.pause_fisher(self.paused[0])
 
         if not self.stop_fishing():
             self.send_message('ERROR stop_fishing()')
@@ -144,7 +136,7 @@ class Fisher:
 
         delay = 1
         delay_correction = delay + 9 * self.fisher_id
-        self.send_message(f'will start fishing in ........ {delay_correction} sec')
+        self.send_message(f'will start fishing in .... {delay_correction} sec')
         self.pause_thread(delay_correction)
 
         if not self.fishing_window.init_search():
@@ -174,6 +166,21 @@ class Fisher:
         self.current_state[0] = 'Fishing'
         self.run()
 
+    def pause_fisher(self, delay):
+        self.send_message(f'paused for {delay} sec')
+        if delay is None or delay == 0:
+            pass
+        else:
+            for i in range(delay):
+                self.send_message(f'{delay - i} sec')
+                time.sleep(1)
+            self.paused[0] = 0
+
+    def stop_fishing(self):
+        # global current_state
+        self.send_message(f'has finished fishing\n')
+        self.current_state[0] = 'not working'
+
     def trial_rod_cast(self):
         # function:
         # initial fishing window search
@@ -198,7 +205,7 @@ class Fisher:
         # searching for fishing window
         if not self.search_object_with_click(self.fishing_window.is_fishing_window, self.fishing, 12):
             return False
-
+        self.press_fishing_timer[0] = time.time()
         # searching for clock
         counter = 1
         time_between_actions = 7
@@ -352,10 +359,7 @@ class Fisher:
                 self.send_message('overweight_baits_soski_correction FAILURE')
         return True
 
-    def stop_fishing(self):
-        # global current_state
-        self.send_message(f'has finished fishing\n')
-        self.current_state[0] = 'not working'
+
 
     def search_object_with_click(self, search_object, task_proc, searching_time, *args):
         counter = 0

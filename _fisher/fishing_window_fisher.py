@@ -157,7 +157,7 @@ class FishingWindow(L2window):
             [(x_fishwin, y_fishwin, w_fishwin, h_fishwin)] = self.library['fishing_window'][0].find(
                 self.update_screenshot(), coordinates_and_sizes=True)
             self.wincap.set_fishing_window(self.hwnd, x_fishwin, y_fishwin, w_fishwin, h_fishwin)
-            self.send_message('fishing window has been recorded')
+            # self.send_message('fishing window has been recorded')
         except:
             self.send_message('Error recording fishing window')
 

@@ -14,6 +14,7 @@ from multiprocessing import Process, Value, Manager
 from system.action_queue import ActionQueue
 from system.botnet import Client
 import random
+import math
 from threading import Lock
 
 
@@ -162,7 +163,6 @@ class FishingService(Client):
 
     def start_fishers(self, fisher_id=None):
         time.sleep(1)
-        self.send_message(f'start_fishing')
         if fisher_id is None:
             for fisher in self.fishers:
                 temp_fisher_process = Process(target=fisher.start_fishing)
@@ -197,7 +197,7 @@ class FishingService(Client):
                 self.send_message(f'pause {delay} sec for all fishers, EXCEPT fisher_{fisher_id} has been registered')
                 for fisher in self.fishers:
                     if fisher.fisher_id == fisher_id:
-                        pass
+                        continue
                     fisher.paused[0] = delay
             if fisher_id < self.number_of_fishers:
                 self.send_message(f'pause {delay} sec for fisher_{fisher_id} has been registered')
@@ -246,6 +246,29 @@ class FishingService(Client):
     #         if supplier_id < len(self.process_suppliers):
     #             self.suppliers[supplier_id].stop_fishing()
     #             self.process_suppliers[supplier_id].terminate()
+
+    def antiphase_fishing(self, param='off'):
+        if param == 'off':
+            return
+        elif param == 'on':
+            timing_list = []
+            for fisher in self.fishers:
+                timer = time.time() - fisher.press_fishing_timer[0]
+
+                if 40 > timer >= 0:
+                    timing_list.append(timer)
+
+            if not timing_list or len(timing_list) < 2:
+                return
+
+            for i, timing_val in enumerate(timing_list):
+                if i == 0:
+                    continue
+
+                temp = abs(timing_val - timing_list[i-1])
+                if temp < 8 and self.fishers[i].paused[0] == 0:
+                    self.pause_fishers(i, round(15 - temp))
+
 
     def send_to_server(self, status):
         # print('super().is_connected()', super().is_connected())
@@ -494,16 +517,13 @@ class FishingService(Client):
 
     def run(self):
         flag = False
-        self.send_message(f'TEST FishingService run_loop() calling')
         # self.connect()  # МОЖНО ПОСТАВИТЬ В НУЖНОЕ МЕСТО МЕТОД ПОДКЛЮЧЕНИЯ К СЕРВЕРУ
         # self.server_update_start()
+        timer_fishing_service_start = time.time()
         while True:
-
+            if time.time() - timer_fishing_service_start > self.number_of_fishers * 9:
+                self.antiphase_fishing('on')
             # self.process_server_data()
-
-            for fisher in self.fishers:
-                if fisher.fisher_id == 0 and fisher.attempt_counter[0] == 2 and fisher.paused[0] == 0:
-                    self.pause_fishers(fisher.fisher_id, 20)
 
             # self.listen_to_server()
             time.sleep(1)
