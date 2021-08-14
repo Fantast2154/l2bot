@@ -499,10 +499,14 @@ class Fisher:
         if timer is not None:
             time_max = 25
             t = time_max - (time.time() - timer)
-            if 7 > t > 0 and (x - self.bar_limit_left)/self.bar_length > 0.3:
-                self.send_message('Achtung! RUSSISCHE SCHWEINE GREIFEN !!!! KAPITULIEREN!!')
-                timer = None
-                return False
+            y = (x - self.bar_limit_left)/self.bar_length
+            if 15 > t > 0:
+                # y_theory = (9.8467 * math.exp(0.1545 * t))/100
+                y_theory = (14.832 * math.log(t) + 54.153)/100
+                # self.send_message(f'y {y}, y_theory {y_theory}, y-y_theory {y - y_theory}')
+                if y > y_theory:
+                    self.send_message(f'Achtung! Я СДЕЛАЛ ЧТО МОГ. КАПИТУЛИРУЮ.')
+                    return False
         return True
 
     def smart_press_button(self, button_input, control_window, searching_time, *args):
