@@ -353,6 +353,7 @@ class Fisher:
         # self.send_message(f'Средняя скорость ловли: {3600 // result} попыток в час')
         # self.attack()
         self.attack()
+        self.press_fishing_timer[0] = 0
 
         if self.attempt_counter[0] >= self.send_counter:
             if not self.overweight_baits_soski_correction():
@@ -388,9 +389,6 @@ class Fisher:
                 return False
             self.pause_thread(0.1)
         return True
-
-    # def get_status(self):
-    #     return current_state
 
     def hold_the_object_in_vision(self, condition, searching_time, *args):
         temp_timer = time.time()
@@ -497,9 +495,6 @@ class Fisher:
         return switcher.get(i, 'error')
 
     def ai_fishing_breaker(self, x, timer):
-        if self.fisher_id != 0:
-            return True
-
         if timer is not None:
             time_max = 21
             t = time_max - (time.time() - timer)

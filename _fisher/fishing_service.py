@@ -253,7 +253,10 @@ class FishingService(Client):
         elif param == 'on':
             timing_list = []
             for fisher in self.fishers:
-                timer = time.time() - fisher.press_fishing_timer[0]
+                if fisher.press_fishing_timer[0] == 0:
+                    timer = 0
+                else:
+                    timer = time.time() - fisher.press_fishing_timer[0]
 
                 if 40 > timer >= 0:
                     timing_list.append(timer)
@@ -266,8 +269,14 @@ class FishingService(Client):
                     continue
 
                 temp = abs(timing_val - timing_list[i-1])
-                if temp < 8 and self.fishers[i].paused[0] == 0:
-                    self.pause_fishers(i, round(15 - temp))
+                difference = 12
+                if temp < difference:
+                    if timing_val > timing_list[i-1]:
+                        if self.fishers[i-1].paused[0] == 0:
+                            self.pause_fishers(i-1, round(difference - temp))
+                    else:
+                        if self.fishers[i].paused[0] == 0:
+                            self.pause_fishers(i, round(difference - temp))
 
 
     def send_to_server(self, status):
