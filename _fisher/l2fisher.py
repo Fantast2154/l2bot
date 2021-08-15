@@ -17,6 +17,7 @@ class Fisher:
         self.fisher_id = fisher_id
         self.number_of_fishers = number_of_fishers
         self.q = q
+        self.fishing_service = fishing_service
         self.send_message(f'created')
 
         # communication with fisher service
@@ -72,12 +73,12 @@ class Fisher:
         self.buff_hawkeye_rebufftime = 1200 - 40
 
         # fishing params
-        if fisher_id == 0:
-            self.reeling_skill_CD = 1.9
-            self.pumping_skill_CD = 1.9
-        else:
-            self.reeling_skill_CD = 2.3
-            self.pumping_skill_CD = 2.3
+        # if fisher_id == 0:
+        #     self.reeling_skill_CD = 1.9
+        #     self.pumping_skill_CD = 1.9
+        # else:
+        #     self.reeling_skill_CD = 2.3
+        #     self.pumping_skill_CD = 2.3
         self.reeling_skill_CD = 2.3
         self.pumping_skill_CD = 2.3
         self.pumping_CD = 1.05
@@ -385,7 +386,6 @@ class Fisher:
         if self.attempt_counter[0] >= self.send_counter:
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
-
         return True
 
     def search_object_with_click(self, search_object, task_proc, searching_time, *args):
@@ -444,6 +444,20 @@ class Fisher:
             self.requested_items_to_supply.append(required_dbaits)  # dbaits
             self.requested_items_to_supply.append(required_nbaits)  # nbaits
             self.requested_items_to_supply.append(required_soski)  # soski
+
+            self.requested_items_to_supply_d['dbaits'] = required_dbaits
+            self.requested_items_to_supply_d['nbaits'] = required_nbaits
+            self.requested_items_to_supply_d['soski'] = required_soski
+
+            self.fishing_service.fishers_items.update({self.fisher_id: self.requested_items_to_supply_d})
+            self.fishing_service.fishers_request = 'requests supplying'
+            self.fishers_requested_supps[0] = self.requested_items_to_supply_d
+            self.fishers_request[0] = 'requests supplying'
+            print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
+            self.supply_request_proceed[0] = True
+            self.current_state[0] = 'busy'
+            self.trading_is_allowed[0] = True
+
             self.trading()
 
         return True
@@ -475,12 +489,12 @@ class Fisher:
         if not self.search_object_without_click(self.fishing_window.is_exchange_menu, 120):
             return False
 
-        # waiting_time = 15
-        # temp = time.time()
-        # while self.fishing_window.is_exchange_menu and time.time() - temp < waiting_time:
-        #     time.sleep(0.5)
+        waiting_time = 15
+        temp = time.time()
+        while self.fishing_window.is_exchange_menu and time.time() - temp < waiting_time:
+            time.sleep(0.5)
 
-        self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 15)
+        #self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 15)
 
         self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 15)
 
@@ -493,7 +507,14 @@ class Fisher:
         self.requested_items_to_supply.pop()
         self.requested_items_to_supply.pop()
         self.requested_items_to_supply.pop()
+
+        self.requested_items_to_supply_d['dbaits'] = 0
+        self.requested_items_to_supply_d['nbaits'] = 0
+        self.requested_items_to_supply_d['soski'] = 0
+
         self.current_state[0] = 'fishing'
+        self.fishers_request[0] = ''
+        #self.send_counter += 3
 
         self.fishing_window.start_accurate_search()
 
@@ -544,7 +565,7 @@ class Fisher:
         temp_timer = time.time()
         button = self.button_name(button_input)
         if button != 'error':
-            while not control_window(*args):
+            while control_window(*args):
                 response = self.fishing_window.get_object(button, True)
                 if response:
                     self.press_button(button_input)
