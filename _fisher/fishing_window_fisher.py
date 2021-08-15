@@ -20,16 +20,18 @@ class FishingWindow(L2window):
         self.accurate_search = False
         self.screenshot_accurate = None
         self.init_image_database = [
-            ['fishing', 'images/fishing/fishing.jpg', 0.87],
-            ['pumping', 'images/fishing/pumping.jpg', 0.87],
-            ['reeling', 'images/fishing/reeling.jpg', 0.87],
+            ['fishing', 'images/fishing/fishing.jpg', 0.77],
+            ['pumping', 'images/fishing/pumping.jpg', 0.77],
+            ['reeling', 'images/fishing/reeling.jpg', 0.77],
             ['attack', 'images/fishing/attack.jpg', 0.87],
-            ['trade_supplier', 'images/trade/trade_icon.jpg', 0.83]]
+            ['trade_supplier', 'images/trade/trade_icon.jpg', 0.77]]
 
         self.extended_image_database = [
             ['bait', 'images/fishing/bait.jpg', 0.90],
             ['soski', 'images/soski.jpg', 0.7],
-            ['hp_window', 'images/farming/hp_window.jpg', 0.87],
+            ['hp_window', 'images/farming/hp_window.jpg', 0.77],
+            ['hawk_buff', 'images/fishing/hawk_buff.jpg', 0.77],
+            ['move_to_supplier', 'images/fishing/move_to_supplier.jpg', 0.77],
             ['blue_bar', 'images/fishing/blue_bar2.jpg', 0.75],
             ['colored', 'images/fishing/colored_2.jpg', 0.94],
             ['luminous', 'images/fishing/luminous_2.jpg', 0.94],
@@ -40,6 +42,11 @@ class FishingWindow(L2window):
             ['fishing_window', 'images/fishing/fishing_window.jpg', 0.7],
             ['red_bar', 'images/fishing/red_bar3.jpg', 0.8],
             ['buff', 'images/fishing/cdbuff.jpg', 0.87],
+            ['fishing_potion_white', 'images/fishing/fishing_potion_white.jpg', 0.7],
+            ['alacrity_potion_small', 'images/fishing/alacrity_potion_small.jpg', 0.7],
+            ['alacrity_dex_warlock', 'images/fishing/alacrity_dex_warlock.jpg', 0.7],
+            ['pet_atk1', 'images/fishing/pet_atk_1.jpg', 0.7],
+            ['pet_atk2', 'images/fishing/pet_atk_2.jpg', 0.7],
             ['soski_activated', 'images/soski_activated.jpg', 0.78],
             ['sun', 'images/sun2.jpg', 0.7],
             ['moon', 'images/moon2.jpg', 0.7],
@@ -67,7 +74,6 @@ class FishingWindow(L2window):
     # def __del__(self):
     #     self.send_message(f"destroyed")
     # [{hwnd1: [], hwnd2: []}]
-
 
     def update_screenshot(self):
         temp = self.screenshot[-1][self.hwnd][0]
@@ -119,13 +125,13 @@ class FishingWindow(L2window):
                 # cv2.waitKey(1)
             else:
                 return []
-            #self.send_message(f'{self.screenshot_accurate}')
+            # self.send_message(f'{self.screenshot_accurate}')
             return self.screenshot_accurate
         else:
             return []
 
     def send_message(self, message):
-        temp = '\t' * 11 * self.window_id +'FishingWindow ' + f'{self.window_id}: {message}'
+        temp = '\t' * 11 * self.window_id + 'FishingWindow ' + f'{self.window_id}: {message}'
         print(temp)
 
     def find(self, object, accurate=False):  # returns list of positions
@@ -168,6 +174,52 @@ class FishingWindow(L2window):
         else:
             return []
 
+    def is_fishing_potion_white(self):
+        if self.library['fishing_potion_white'][1]:
+            return self.library['fishing_potion_white'][1]
+        else:
+            return self.get_object('fishing_potion_white', search=True)
+
+    def is_hawk_buff(self):
+        if self.library['hawk_buff'][1]:
+            return self.library['hawk_buff'][1]
+        else:
+            return self.get_object('hawk_buff', search=True)
+
+    def is_pet_attack(self):
+        if self.library['pet_atk1'][1]:
+            return self.library['pet_atk1'][1]
+        temp1 = self.get_object('pet_atk1', search=True)
+        if temp1:
+            return temp1
+        if self.library['pet_atk2'][1]:
+            return self.library['pet_atk2'][1]
+        temp2 = self.get_object('pet_atk2', search=True)
+        if temp2:
+            return temp2
+        return []
+
+    def is_attack(self):
+        if self.library['attack'][1]:
+            return self.library['attack'][1]
+        else:
+            return self.get_object('attack', search=True)
+
+
+    def is_alacrity_potion_small(self):
+        print('ALACRITY')
+        if self.library['alacrity_potion_small'][1]:
+            return self.library['alacrity_potion_small'][1]
+        else:
+
+            return self.get_object('alacrity_potion_small', search=True)
+
+    def is_alacrity_dex_warlock(self):
+        if self.library['alacrity_dex_warlock'][1]:
+            return self.library['alacrity_dex_warlock'][1]
+        else:
+            return self.get_object('alacrity_dex_warlock', search=True)
+
     def is_fishing_window(self):
 
         temp = self.find('fishing_window', accurate=True)
@@ -198,6 +250,12 @@ class FishingWindow(L2window):
         else:
             return False
 
+    def is_move_to_supplier(self):
+        if self.library['move_to_supplier'][1]:
+            return self.library['move_to_supplier'][1]
+        else:
+            return self.get_object('move_to_supplier', search=True)
+
     def init_images(self):
         for obj in self.init_image_database:
             try:
@@ -215,20 +273,16 @@ class FishingWindow(L2window):
                 # self.send_message('Error finding images2')
 
     def get_object(self, object, search=False):
-        print('GET O, EBANIY', object, search)
         if self.library[object][0]:
-            print('GET O passsssssssss ')
             pass
         else:
             temp = 'ERROR referring to the unknown object: ' + object
             self.send_message(temp)
-            print('Gsend_message asdasdasd13123123sss ')
             return False
 
         if search:
             # pos = self.library[object][0].find(self.update_screenshot())
             pos = self.find(object)
-            print('__________________get_object', pos)
 
             if pos:
                 self.library[object][1] = pos

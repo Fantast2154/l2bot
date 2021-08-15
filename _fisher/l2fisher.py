@@ -9,7 +9,7 @@ import cv2
 
 class Fisher:
 
-    def __init__(self, fishing_window, fisher_id, number_of_fishers, q, fishing_service=None):
+    def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
         # global current_state, supply_request, request_proceed, trading_is_allowed, requested_items_to_supply
         manager = Manager()
 
@@ -17,16 +17,11 @@ class Fisher:
         self.fisher_id = fisher_id
         self.number_of_fishers = number_of_fishers
         self.q = q
-        self.fishing_service = fishing_service
         self.send_message(f'created')
 
         # communication with fisher service
         self.current_state = manager.list()
         self.current_state.append('not fishing')
-        self.fishers_request = manager.list()
-        self.fishers_request.append('')
-        self.fishers_requested_supps = manager.list()
-        self.fishers_requested_supps.append(0)
         # current_state params
         # 'not fishing'
         # 'fishing'
@@ -48,13 +43,12 @@ class Fisher:
         self.trading_is_allowed = manager.list()
         self.trading_is_allowed.append(False)
         self.requested_items_to_supply = manager.list()
-        self.requested_items_to_supply_d = {}
         # self.requested_items_to_supply.append(10)
         # self.requested_items_to_supply.append(1)
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 2
+        self.send_counter = 1000
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -65,11 +59,22 @@ class Fisher:
         self.total_fishing_time = 0
         self.last_rod_cast_time = 0
         self.avg_rod_cast_time = 0
-        self.buff_time = time.time()
+        self.fishing_potion_timer = -4000
+        self.alacrity_potion_timer = -4000
+        self.buff_hawkeye_timer = -4000
+        self.fishing_potion_rebufftime = 3600 - 40
+        self.alacrity_potion_rebufftime = 1200 - 40
+        self.buff_hawkeye_rebufftime = 1200 - 40
 
         # fishing params
-        self.reeling_skill_CD = 2.2
-        self.pumping_skill_CD = 2.2
+        # if fisher_id == 0:
+        #     self.reeling_skill_CD = 1.9
+        #     self.pumping_skill_CD = 1.9
+        # else:
+        #     self.reeling_skill_CD = 2.3
+        #     self.pumping_skill_CD = 2.3
+        self.reeling_skill_CD = 2.3
+        self.pumping_skill_CD = 2.3
         self.pumping_CD = 1.05
 
         # overweight, soski, baits
@@ -154,11 +159,16 @@ class Fisher:
             self.send_message(f'trial rod cast FAILURE')
             self.stop_fishing()
 
+        if not self.init_setup():
+            pass
+
+        self.fishing_window.start_accurate_search()
+        self.pause_thread(1)
+
         # if not self.record_game_time():
         #     self.send_message(f'record_game_time FAILURE')
         #     self.stop_fishing()
 
-        # self.rebuff(search=True)
         # self.send_message('rebuff')
         # self.choose_day_bait(search=True)
         # self.send_message('day baits has chosen FAILURE')
@@ -197,7 +207,6 @@ class Fisher:
         if not self.search_object_with_click(self.fishing_window.get_object, self.fishing, 18, 'fishing_window', True):
             return False
         self.fishing_window.record_fishing_window()
-        self.fishing_window.start_accurate_search()
         self.fishing()
         self.pause_thread(2)
         self.bar_limits()
@@ -209,11 +218,13 @@ class Fisher:
 
         # searching for fishing window
         if not self.search_object_with_click(self.fishing_window.is_fishing_window, self.fishing, 12):
+            self.move_to_supplier()
+            self.pause_thread(2)
             return False
         self.press_fishing_timer[0] = time.time()
         # searching for clock
         counter = 1
-        time_between_actions = 7
+        time_between_actions = 5
         temp_t = time.time()
         searching_time = 12.2
         fishing_fight_time = None
@@ -223,6 +234,10 @@ class Fisher:
             # if time.time() - temp_t > time_between_actions * counter:
             #     counter += 1
             #     self.attack()
+            if time.time() - temp_t > time_between_actions:
+                counter += 1
+                time_between_actions = 13
+                self.attack()
             if self.fishing_window.is_clock():
                 break
             time.sleep(0.5)
@@ -261,10 +276,11 @@ class Fisher:
                 x_border = x_temp
 
                 # SMART loop breaker depending on conditions
-                if not self.ai_fishing_breaker(x_border, fishing_fight_time):
-                    self.fishing()
-                    self.pause_thread(0.7)
-                    return True
+
+                # if not self.ai_fishing_breaker(x_border, fishing_fight_time):
+                #     self.fishing()
+                #     self.pause_thread(0.7)
+                #     return True
 
             elif self.fishing_window.is_clock():
                 delta_pump_skill = time.time() - pump_skill_cast_time
@@ -272,13 +288,13 @@ class Fisher:
                     self.pumping()
                     pump_skill_cast_time = time.time()
 
-            if not coords_saved and (x_border is not None):
+            if not coords_saved and (x_border != None):
                 pumping_time = time.time()
                 coords_saved = True
                 previous_position = x_border
                 # self.send_message('COORDS SAVED!!!!')
             # self.send_message(previous_position - x_border)
-            if previous_position is not None and x_border is not None:
+            if previous_position != None and x_border != None:
                 delta_pump_skill = time.time() - pump_skill_cast_time
                 delta_reel_skill = time.time() - reeling_skill_cast_time
 
@@ -359,9 +375,12 @@ class Fisher:
         self.attack()
         self.press_fishing_timer[0] = 0
 
+        self.if_rebuff_time()
+
         if self.attempt_counter[0] >= self.send_counter:
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
+
         return True
 
     def search_object_with_click(self, search_object, task_proc, searching_time, *args):
@@ -420,20 +439,6 @@ class Fisher:
             self.requested_items_to_supply.append(required_dbaits)  # dbaits
             self.requested_items_to_supply.append(required_nbaits)  # nbaits
             self.requested_items_to_supply.append(required_soski)  # soski
-
-            self.requested_items_to_supply_d['dbaits'] = required_dbaits
-            self.requested_items_to_supply_d['nbaits'] = required_nbaits
-            self.requested_items_to_supply_d['soski'] = required_soski
-
-            self.fishing_service.fishers_items.update({self.fisher_id: self.requested_items_to_supply_d})
-            self.fishing_service.fishers_request = 'requests supplying'
-            self.fishers_requested_supps[0] = self.requested_items_to_supply_d
-            self.fishers_request[0] = 'requests supplying'
-            print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
-            self.supply_request_proceed[0] = True
-            self.current_state[0] = 'busy'
-            self.trading_is_allowed[0] = True
-
             self.trading()
 
         return True
@@ -465,15 +470,14 @@ class Fisher:
         if not self.search_object_without_click(self.fishing_window.is_exchange_menu, 120):
             return False
 
-        waiting_time = 15
-        temp = time.time()
-        while self.fishing_window.is_exchange_menu and time.time() - temp < waiting_time:
-            time.sleep(0.5)
+        # waiting_time = 15
+        # temp = time.time()
+        # while self.fishing_window.is_exchange_menu and time.time() - temp < waiting_time:
+        #     time.sleep(0.5)
+
+        self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 15)
 
         self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 15)
-        #self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 15)
-
-        #self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 15)
 
         # if self.fishing_window.is_exchange_menu:
         #     self.press_button('ok')
@@ -484,14 +488,7 @@ class Fisher:
         self.requested_items_to_supply.pop()
         self.requested_items_to_supply.pop()
         self.requested_items_to_supply.pop()
-
-        self.requested_items_to_supply_d['dbaits'] = 0
-        self.requested_items_to_supply_d['nbaits'] = 0
-        self.requested_items_to_supply_d['soski'] = 0
-
         self.current_state[0] = 'fishing'
-        self.fishers_request[0] = ''
-        self.send_counter += 3
 
         self.fishing_window.start_accurate_search()
 
@@ -538,16 +535,13 @@ class Fisher:
     def smart_press_button(self, button_input, control_window, searching_time, *args):
         # function:
         # pushing button 'button input' every 5 seconds for 'searching time' until  window 'control_window' appears
-        print('control_window(*args)', control_window(*args))
         pause_between_clicks = 5
         temp_timer = time.time()
         button = self.button_name(button_input)
         if button != 'error':
-            while control_window(*args):
-                print('WHILE NOT SUKA')
-                response = self.fishing_window.get_object(button, search=True)
+            while not control_window(*args):
+                response = self.fishing_window.get_object(button, True)
                 if response:
-                    print('CLICLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCK')
                     self.press_button(button_input)
                 self.pause_thread(pause_between_clicks)
 
@@ -582,6 +576,14 @@ class Fisher:
         self.q.new_task('mouse',
                         [self.fishing_window.get_object('attack', False), True, 'LEFT', False, False, False],
                         self.fishing_window)
+        self.pause_thread(0.7)
+        # temp = self.fishing_window.is_pet_attack()
+        # if temp:
+        #     self.pause_thread(0.4)
+        #     self.q.new_task('mouse',
+        #                     [temp, True, 'LEFT', False, False, False],
+        #                     self.fishing_window)
+        #     self.pause_thread(0.1)
 
     def send_trade_to_supplier(self):
         self.q.new_task('mouse',
@@ -668,4 +670,62 @@ class Fisher:
 
     def is_day_time(self):
         # if self.game_time is not None:
+        return True
+
+    def if_rebuff_time(self):
+
+        if time.time() - self.buff_hawkeye_timer > self.buff_hawkeye_rebufftime:
+            self.rebuff_hawkeye()
+            self.pause_thread(2.5)
+        if time.time() - self.fishing_potion_timer > self.fishing_potion_rebufftime:
+            self.rebuff_fishing_potion()
+            self.pause_thread(1)
+        if time.time() - self.alacrity_potion_timer > self.alacrity_potion_rebufftime:
+            self.rebuff_alacrity()
+            self.pause_thread(0.7)
+
+    def rebuff_hawkeye(self):
+        self.send_message('rebuff hawkeye')
+        self.buff_hawkeye_timer = time.time()
+        temp = self.fishing_window.is_hawk_buff()
+        if temp:
+            self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
+        else:
+            self.buff_hawkeye_rebufftime = 10000000
+
+    def rebuff_alacrity(self):
+        self.send_message('rebuff alacrity')
+        self.alacrity_potion_timer = time.time()
+        temp = self.fishing_window.is_alacrity_potion_small()
+        if temp:
+            self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
+            self.pause_thread(2)
+        else:
+            self.alacrity_potion_rebufftime = 10000000
+
+        # temp2 = self.fishing_window.is_alacrity_dex_warlock()
+        # if temp2:
+        #     self.q.new_task('mouse', [temp2, True, 'LEFT', False, False, False], self.fishing_window)
+        #     self.pause_thread(6)
+
+    def rebuff_fishing_potion(self):
+        self.send_message('rebuff fishing potion')
+        self.fishing_potion_timer = time.time()
+        temp = self.fishing_window.is_fishing_potion_white()
+        if temp:
+
+            self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
+        else:
+            self.fishing_potion_rebufftime = 10000000
+
+    def move_to_supplier(self):
+        temp = self.fishing_window.is_move_to_supplier()
+        if temp:
+            self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
+
+    def init_setup(self):
+        self.if_rebuff_time()
+        self.pause_thread(2)
+        self.move_to_supplier()
+        self.pause_thread(2)
         return True
