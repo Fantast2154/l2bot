@@ -22,6 +22,10 @@ class Fisher:
         # communication with fisher service
         self.current_state = manager.list()
         self.current_state.append('not fishing')
+        self.fishers_request = manager.list()
+        self.fishers_request.append('')
+        self.fishers_requested_supps = manager.list()
+        self.fishers_requested_supps.append(0)
         # current_state params
         # 'not fishing'
         # 'fishing'
@@ -34,7 +38,7 @@ class Fisher:
         self.paused = manager.list()
         self.paused.append(0)
 
-        # trading
+       # trading
         # self.supplying_request = False # fisher wants supplying. options: True, False
         self.supplying_request = manager.list()
         self.supplying_request.append(False)
@@ -43,12 +47,13 @@ class Fisher:
         self.trading_is_allowed = manager.list()
         self.trading_is_allowed.append(False)
         self.requested_items_to_supply = manager.list()
+        self.requested_items_to_supply_d = {}
         # self.requested_items_to_supply.append(10)
         # self.requested_items_to_supply.append(1)
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 1000
+        self.send_counter = 2
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -73,8 +78,8 @@ class Fisher:
         else:
             self.reeling_skill_CD = 2.3
             self.pumping_skill_CD = 2.3
-        # self.reeling_skill_CD = 2.3
-        # self.pumping_skill_CD = 2.3
+        self.reeling_skill_CD = 2.3
+        self.pumping_skill_CD = 2.3
         self.pumping_CD = 1.05
 
         # overweight, soski, baits
