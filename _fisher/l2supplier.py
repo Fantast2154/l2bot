@@ -41,7 +41,6 @@ class Supplier:
         self.trading_is_allowed.append(False)
         self.requested_items_to_supply = manager.list()
 
-
         # self.supply_request[0] = manager.list()
         # self.supply_request[0].append(False)
         # self.trade_request = manager.list()
@@ -119,7 +118,6 @@ class Supplier:
             if temp:
                 print('TRADE WAS FOUND')
 
-
                 waiting_time2 = 15
                 temp_timer2 = time.time()
                 while time.time() - temp_timer2 < waiting_time2 and not self.supplier_window.is_exchange_menu():
@@ -136,8 +134,6 @@ class Supplier:
         self.send_message('chlen BAGANCA')
         if not self.search_loop_without_click(self.supplier_window.is_exchange_menu, 15):
             return False
-
-
 
         self.pause_thread(0.7)
         request_soski = self.requested_items_to_supply.pop(2)

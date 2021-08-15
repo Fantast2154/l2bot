@@ -22,7 +22,7 @@ class FishingSupplierWindow(L2window):
 
         self.extended_image_database = [
             ['map_button', 'images/map.jpg', 0.9],
-            ['baits', 'images/trade/bait.jpg', 0.80],
+            ['baits', 'images/trade/bait.jpg', 0.93],
             ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
             ['soski', 'images/items/soski_test.jpg', 0.8],
             ['menu', 'images/menu.jpg', 0.6],
@@ -152,10 +152,14 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x-260//2, y-35//2)]
-            coordinates = self.find('ok_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
+            #temp_coordinates2 = [(x-260//2, y-35//2)]
+            temp_coordinates2 = [(x-300//2, y-40//2)]
+            #coordinates = self.find('ok_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
+            #coordinates = self.find('ok_button', coordinates=temp_coordinates2, w=300, d=550, accurate=True)
+            coordinates = self.find('ok_button')
             [(out_x, out_y)] = coordinates
-            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+            #return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+            return coordinates
         else:
             return []
 

@@ -9,7 +9,7 @@ import cv2
 
 class Fisher:
 
-    def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
+    def __init__(self, fishing_window, fisher_id, number_of_fishers, q, fishing_service=None):
         # global current_state, supply_request, request_proceed, trading_is_allowed, requested_items_to_supply
         manager = Manager()
 
@@ -17,11 +17,16 @@ class Fisher:
         self.fisher_id = fisher_id
         self.number_of_fishers = number_of_fishers
         self.q = q
+        self.fishing_service = fishing_service
         self.send_message(f'created')
 
         # communication with fisher service
         self.current_state = manager.list()
         self.current_state.append('not fishing')
+        self.fishers_request = manager.list()
+        self.fishers_request.append('')
+        self.fishers_requested_supps = manager.list()
+        self.fishers_requested_supps.append(0)
         # current_state params
         # 'not fishing'
         # 'fishing'
@@ -43,12 +48,13 @@ class Fisher:
         self.trading_is_allowed = manager.list()
         self.trading_is_allowed.append(False)
         self.requested_items_to_supply = manager.list()
+        self.requested_items_to_supply_d = {}
         # self.requested_items_to_supply.append(10)
         # self.requested_items_to_supply.append(1)
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 1000
+        self.send_counter = 2
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -266,13 +272,13 @@ class Fisher:
                     self.pumping()
                     pump_skill_cast_time = time.time()
 
-            if not coords_saved and (x_border != None):
+            if not coords_saved and (x_border is not None):
                 pumping_time = time.time()
                 coords_saved = True
                 previous_position = x_border
                 # self.send_message('COORDS SAVED!!!!')
             # self.send_message(previous_position - x_border)
-            if previous_position != None and x_border != None:
+            if previous_position is not None and x_border is not None:
                 delta_pump_skill = time.time() - pump_skill_cast_time
                 delta_reel_skill = time.time() - reeling_skill_cast_time
 
@@ -333,7 +339,6 @@ class Fisher:
                 # if math.fabs(x_border - previous_position) >= 36:
                 previous_position = x_border
 
-
         return True
 
     def actions_between_fishing_rod_casts(self):
@@ -358,8 +363,6 @@ class Fisher:
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
         return True
-
-
 
     def search_object_with_click(self, search_object, task_proc, searching_time, *args):
         counter = 0
@@ -417,6 +420,20 @@ class Fisher:
             self.requested_items_to_supply.append(required_dbaits)  # dbaits
             self.requested_items_to_supply.append(required_nbaits)  # nbaits
             self.requested_items_to_supply.append(required_soski)  # soski
+
+            self.requested_items_to_supply_d['dbaits'] = required_dbaits
+            self.requested_items_to_supply_d['nbaits'] = required_nbaits
+            self.requested_items_to_supply_d['soski'] = required_soski
+
+            self.fishing_service.fishers_items.update({self.fisher_id: self.requested_items_to_supply_d})
+            self.fishing_service.fishers_request = 'requests supplying'
+            self.fishers_requested_supps[0] = self.requested_items_to_supply_d
+            self.fishers_request[0] = 'requests supplying'
+            print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
+            self.supply_request_proceed[0] = True
+            self.current_state[0] = 'busy'
+            self.trading_is_allowed[0] = True
+
             self.trading()
 
         return True
@@ -448,14 +465,15 @@ class Fisher:
         if not self.search_object_without_click(self.fishing_window.is_exchange_menu, 120):
             return False
 
-        # waiting_time = 15
-        # temp = time.time()
-        # while self.fishing_window.is_exchange_menu and time.time() - temp < waiting_time:
-        #     time.sleep(0.5)
-
-        self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 15)
+        waiting_time = 15
+        temp = time.time()
+        while self.fishing_window.is_exchange_menu and time.time() - temp < waiting_time:
+            time.sleep(0.5)
 
         self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 15)
+        #self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 15)
+
+        #self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 15)
 
         # if self.fishing_window.is_exchange_menu:
         #     self.press_button('ok')
@@ -466,7 +484,14 @@ class Fisher:
         self.requested_items_to_supply.pop()
         self.requested_items_to_supply.pop()
         self.requested_items_to_supply.pop()
+
+        self.requested_items_to_supply_d['dbaits'] = 0
+        self.requested_items_to_supply_d['nbaits'] = 0
+        self.requested_items_to_supply_d['soski'] = 0
+
         self.current_state[0] = 'fishing'
+        self.fishers_request[0] = ''
+        self.send_counter += 3
 
         self.fishing_window.start_accurate_search()
 
@@ -498,11 +523,11 @@ class Fisher:
             time_max = 22.8
             t = time_max - (time.time() - timer)
             if time_max > t > 0.7:
-                y = (x - self.bar_limit_left)/self.bar_length
+                y = (x - self.bar_limit_left) / self.bar_length
 
                 # y_theory = (9.8467 * math.exp(0.1545 * t))/100
                 # y_theory = (14.832 * math.log(t) + 54.153)/100
-                y_theory = (3.653 * t + 19.635)/100
+                y_theory = (3.653 * t + 19.635) / 100
                 # self.send_message(f'y {y}, y_theory {y_theory}, y-y_theory {y - y_theory}')
                 if y > y_theory:
                     self.send_message(f'Achtung! Я СДЕЛАЛ ЧТО МОГ. КАПИТУЛИРУЮ.')
@@ -513,13 +538,16 @@ class Fisher:
     def smart_press_button(self, button_input, control_window, searching_time, *args):
         # function:
         # pushing button 'button input' every 5 seconds for 'searching time' until  window 'control_window' appears
+        print('control_window(*args)', control_window(*args))
         pause_between_clicks = 5
         temp_timer = time.time()
         button = self.button_name(button_input)
         if button != 'error':
-            while not control_window(*args):
-                response = self.fishing_window.get_object(button, True)
+            while control_window(*args):
+                print('WHILE NOT SUKA')
+                response = self.fishing_window.get_object(button, search=True)
                 if response:
+                    print('CLICLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCLICKCK')
                     self.press_button(button_input)
                 self.pause_thread(pause_between_clicks)
 
