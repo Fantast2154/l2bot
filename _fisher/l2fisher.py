@@ -9,7 +9,7 @@ import cv2
 
 class Fisher:
 
-    def __init__(self, fishing_window, fisher_id, number_of_fishers, q, fishing_service):
+    def __init__(self, fishing_window, fisher_id, number_of_fishers, q, fishing_service=None):
         # global current_state, supply_request, request_proceed, trading_is_allowed, requested_items_to_supply
         manager = Manager()
 
@@ -381,7 +381,7 @@ class Fisher:
         self.attack()
         self.press_fishing_timer[0] = 0
 
-        self.if_rebuff_time()
+        #self.if_rebuff_time()
 
         if self.attempt_counter[0] >= self.send_counter:
             if not self.overweight_baits_soski_correction():
@@ -750,7 +750,7 @@ class Fisher:
             self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
 
     def init_setup(self):
-        self.if_rebuff_time()
+        #self.if_rebuff_time()
         self.pause_thread(2)
         self.move_to_supplier()
         self.pause_thread(2)

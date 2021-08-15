@@ -464,7 +464,7 @@ class FishingService:
     def run(self):
         flag = False
         timer_fishing_service_start = time.time()
-        # self.server_update_start()
+        self.server_update_start()
         while True:
             # if time.time() - timer_fishing_service_start > self.number_of_fishers * 9:
             #     self.antiphase_fishing('on')

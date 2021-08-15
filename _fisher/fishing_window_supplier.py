@@ -116,7 +116,7 @@ class FishingSupplierWindow(L2window):
             coordinates = self.find('baits', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             #print(coordinates)
             if coordinates:
-                [(out_x, out_y)] = coordinates
+                (out_x, out_y) = coordinates[0]
                 return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
