@@ -9,7 +9,7 @@ import cv2
 
 class Fisher:
 
-    def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
+    def __init__(self, fishing_window, fisher_id, number_of_fishers, q, fishing_service):
         # global current_state, supply_request, request_proceed, trading_is_allowed, requested_items_to_supply
         manager = Manager()
 
@@ -67,14 +67,14 @@ class Fisher:
         self.buff_hawkeye_rebufftime = 1200 - 40
 
         # fishing params
-        # if fisher_id == 0:
-        #     self.reeling_skill_CD = 1.9
-        #     self.pumping_skill_CD = 1.9
-        # else:
-        #     self.reeling_skill_CD = 2.3
-        #     self.pumping_skill_CD = 2.3
-        self.reeling_skill_CD = 2.3
-        self.pumping_skill_CD = 2.3
+        if fisher_id == 0:
+            self.reeling_skill_CD = 1.9
+            self.pumping_skill_CD = 1.9
+        else:
+            self.reeling_skill_CD = 2.3
+            self.pumping_skill_CD = 2.3
+        # self.reeling_skill_CD = 2.3
+        # self.pumping_skill_CD = 2.3
         self.pumping_CD = 1.05
 
         # overweight, soski, baits
