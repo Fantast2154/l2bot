@@ -463,11 +463,9 @@ class Fisher:
             self.requested_items_to_supply_d['nbaits'] = required_nbaits
             self.requested_items_to_supply_d['soski'] = required_soski
 
-            # self.fishing_service.fishers_items.update({self.fisher_id: self.requested_items_to_supply_d})
-            # self.fishing_service.fishers_request = 'requests supplying'
-            # self.fishers_requested_supps[0] = self.requested_items_to_supply_d
-            # self.fishers_request[0] = 'requests supplying'
-            # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
+            self.fishers_requested_supps[0] = self.requested_items_to_supply_d
+            self.fishers_request[0] = 'requests supplying'
+            print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
             self.supply_request_proceed[0] = True
             self.current_state[0] = 'busy'
             self.trading_is_allowed[0] = True
