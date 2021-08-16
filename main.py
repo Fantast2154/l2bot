@@ -1,7 +1,9 @@
+import time
+
 from _fisher.fishing_service import FishingService
 from system.telegram import Telegram
 from system.l2window import L2window
-
+import keyboard
 from system.action_queue import ActionQueue
 
 from system.window_capture import WindowCapture
@@ -57,6 +59,7 @@ def input_number(message):
 def client_server(bots_id_list):
     pass
 
+
 if __name__ == '__main__':
     print('PROGRAM start--------------------------------------\n')
     l2window_name = 'Asterios'
@@ -104,6 +107,8 @@ if __name__ == '__main__':
     # gui window loop
     t = threading.Thread(target=F.run)
     t.start()
+
+    pause_switch = True
     while True:  # Event Loop
         event, values = gui_window.sg_gui.Read(timeout=4)
 
@@ -112,15 +117,33 @@ if __name__ == '__main__':
             gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
         if event == sg.WIN_CLOSED or event == 'Exit':
-            print('PROGRAM ENDS...')
+            print('main: PROGRAM ENDS...')
             break
+
+        try:  # used try so that if user pressed other than the given key error will not be shown
+            if keyboard.is_pressed('q'):  # if key 'q' is pressed
+                print('main: EXIT EVENT DETECTED')
+                time.sleep(2)
+                break  # finishing the loop
+            if keyboard.is_pressed('w'):  # if key 'q' is pressed
+
+                if pause_switch:
+                    print('main: PAUSE EVENT DETECTED')
+                    F.pause_fishers()
+                    pause_switch = False
+                else:
+                    print('main: RESUME EVENT DETECTED')
+                    F.resume_fishers()
+                    pause_switch = True
+                time.sleep(2)
+        except:
+            continue
+    F.stop()
+    queue.stop()
+    t.join()
+    win_capture.stop()
+    Process_wincap.join()
+
     gui_window.sg_gui.close()
 
-    t.join()
-    Process_wincap.terminate()
-
-    # stop everything
-    F.stop()
-
-    del windows
     sys.exit('PROGRAM ends ......... BYE BYE BYE BYE BYE BYE')

@@ -80,6 +80,7 @@ class WindowCapture:
         # self.send_message(f'TEST ScreenshotMaster created\n')
         # entire window accurate = False
         # accurate = True
+        self.exit_is_set = False
         self.fishing_window_pos_screenshots = []
         self.clock_pos_screenshots = []
         self.blue_bar_pos_screenshots = []
@@ -216,15 +217,15 @@ class WindowCapture:
     def start_capturing(self, screenshot_):
         global screenshot
         screenshot = screenshot_
-        self.thread_run()
+        self.run()
 
     def set_accurate_param(self, accurate, hwnd):
         self.accurate[hwnd] = accurate
 
-    def thread_run(self):
-
-        while True:
+    def run(self):
+        while not self.exit_is_set:
             self.capture_screen()
 
     def stop(self):
+        self.exit_is_set = True
         self.send_message(f'destroyed')

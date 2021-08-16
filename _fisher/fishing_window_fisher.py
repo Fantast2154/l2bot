@@ -24,7 +24,7 @@ class FishingWindow(L2window):
             ['pumping', 'images/fishing/pumping.jpg', 0.77],
             ['reeling', 'images/fishing/reeling.jpg', 0.77],
             ['attack', 'images/fishing/attack.jpg', 0.87],
-            ['trade_supplier', 'images/trade/trade_icon.jpg', 0.77]]
+            ['trade_supplier', 'images/trade/trade_icon.jpg', 0.7]]
 
         self.extended_image_database = [
             ['bait', 'images/fishing/bait.jpg', 0.90],

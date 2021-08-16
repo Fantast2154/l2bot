@@ -42,7 +42,7 @@ class FishingService:
         # super().__init__(self.machine_id)  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС Client И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
         manager = Manager()
         # self.fishing_service_client = Client(self.machine_id)
-
+        self.exit_is_set = False
         self.windows = windows
         self.window_fishers = user_input[0]
         self.window_buffers = user_input[1]
@@ -58,7 +58,7 @@ class FishingService:
         self.buffers = []
         self.suppliers = []
         self.teleporters = []
-        self.process_fishers = list(range(self.number_of_fishers))
+        # self.process_fishers = list(range(self.number_of_fishers))
         self.process_suppliers = list(range(self.number_of_suppliers))
         self.process_buffers = list(range(self.number_of_buffers))
 
@@ -113,7 +113,7 @@ class FishingService:
             self.fishing_windows.append(temp_fishing_window)
 
             # fishers
-            temp_fisher = Fisher(temp_fishing_window, fisher_id, self.number_of_fishers, q, fishing_service=self)
+            temp_fisher = Fisher(temp_fishing_window, fisher_id, self.number_of_fishers, q)
             self.fishers.append(temp_fisher)
 
         # for buffer_id in range(self.number_of_buffers):
@@ -185,45 +185,62 @@ class FishingService:
         if fisher_id is None:
             for fisher in self.fishers:
                 temp_fisher_process = Process(target=fisher.start_fishing)
-                self.process_fishers[fisher.fisher_id] = temp_fisher_process
-                self.process_fishers[fisher.fisher_id].start()
-                self.process_fishers[fisher.fisher_id] = None
-                # temp_fisher_process.start()
-        else:
-            if fisher_id < len(self.process_fishers):
-                temp_fisher_process = Process(target=self.fishers[fisher_id].start_fishing)
-                self.process_fishers[fisher_id] = temp_fisher_process
-                self.process_fishers[fisher_id].start()
-                self.process_fishers[fisher_id] = None
+                self.process_fishers.append(temp_fisher_process)
+                # self.process_fishers[fisher.fisher_id].start()
+                # self.process_fishers[fisher.fisher_id] = None
+                temp_fisher_process.start()
+        # else:
+        #     if fisher_id < len(self.process_fishers):
+        #         temp_fisher_process = Process(target=self.fishers[fisher_id].start_fishing)
+        #         self.process_fishers[fisher_id] = temp_fisher_process
+        #         # self.process_fishers[fisher_id].start()
+        #         # self.process_fishers[fisher_id] = None
+        #         temp_fisher_process.start()
 
     def stop_fishers(self, fisher_id=None):
-        self.send_message(f'stop_fishing')
+        self.send_message(f'STOP FISHING EVENT')
         if fisher_id is None:
             for fisher in self.fishers:
-                fisher.stop_fishing()
-                self.process_fishers[fisher.fisher_id].terminate()
+                fisher.stop_fisher()
+                self.process_fishers[fisher.fisher_id].join()
+        #
+        # else:
+        #     if fisher_id < len(self.process_fishers):
+        #         self.fishers[fisher_id].stop_fishing()
+                # self.process_fishers[fisher_id].terminate()
 
-        else:
-            if fisher_id < len(self.process_fishers):
-                self.fishers[fisher_id].stop_fishing()
-                self.process_fishers[fisher_id].terminate()
-
-    def pause_fishers(self, fisher_id=None, delay=0, except_param=False):
-
+    def pause_fishers(self, fisher_id=None, delay=None, except_param=False):
         if fisher_id is None:
-            self.send_message(f'pause {delay} sec for all fishers has been registered')
+            if delay is None:
+                self.send_message(f'pause permanently for all fishers has been registered')
+            else:
+                self.send_message(f'pause {delay} sec for all fishers has been registered')
             for fisher in self.fishers:
                 fisher.paused[0] = delay
         else:
             if except_param:
-                self.send_message(f'pause {delay} sec for all fishers, EXCEPT fisher_{fisher_id} has been registered')
+                if delay is None:
+                    self.send_message(f'pause permanently for all fishers, EXCEPT fisher_{fisher_id} has been registered')
+                else:
+                    self.send_message(f'pause {delay} sec for all fishers, EXCEPT fisher_{fisher_id} has been registered')
+
                 for fisher in self.fishers:
                     if fisher.fisher_id == fisher_id:
                         continue
                     fisher.paused[0] = delay
             if fisher_id < self.number_of_fishers:
-                self.send_message(f'pause {delay} sec for fisher_{fisher_id} has been registered')
+                if delay is None:
+                    self.send_message(f'pause permanently for all fishers, EXCEPT fisher_{fisher_id} has been registered')
+                else:
+                    self.send_message(f'pause {delay} sec for all fishers, EXCEPT fisher_{fisher_id} has been registered')
                 self.fishers[fisher_id].paused[0] = delay
+
+    def resume_fishers(self):
+        self.send_message(f'resume fishers has been registered')
+        for fisher in self.fishers:
+            fisher.paused[0] = 0
+
+
 
     def start_suppliers(self, supplier_id=None):
         time.sleep(1)
@@ -465,22 +482,27 @@ class FishingService:
         flag = False
         timer_fishing_service_start = time.time()
         self.server_update_start()
-        while True:
+        while not self.exit_is_set:
             # if time.time() - timer_fishing_service_start > self.number_of_fishers * 9:
             #     self.antiphase_fishing('on')
             time.sleep(1)
 
     def stop(self):
+        self.exit_is_set = True
         self.stop_fishers()
-        self.send_message('thread stops')
-        closing_time = 5
+
+        closing_time = 6
         timer = time.time()
+        counter = 0
         while time.time() - timer < closing_time:
-            self.send_message(f'timer before close ..... {time.time() - timer}')
+            counter += 1
+            self.send_message(f'thread stops in ..... {closing_time- counter}')
             time.sleep(1)
 
-        del self.fishers
-        del self.fishing_windows
+        self.send_message(f'destroyed')
+
+        # del self.fishers
+        # del self.fishing_windows
 
     # def update_fishers_attempt(self, id, attempt):
     #     temp = f'fisher_{id}'

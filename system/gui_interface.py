@@ -22,8 +22,8 @@ class Gui_interface:
         self.L2_min_x = 10000
         self.l2button_width = 12
         self.l2button_height = 6
-        self.app_height = 400
-        self.app_width = 300
+        self.app_height = 285
+        self.app_base_width = 550
 
         self.l2attempt_counter = manager.list()
 
@@ -42,21 +42,20 @@ class Gui_interface:
 
         for i in range(len(self.windows)):
             self.l2attempt_counter.append(sg.Text(f'', size=(self.l2button_width, 1),
-                                                                justification='center', key=f'attempt_counter_{i}'))
+                                                  justification='center', key=f'attempt_counter_{i}'))
 
         layout = [
-            [sg.Text(f'', key='2nd_txt_field', size=(22, 1), font=("Helvetica", 15))],
-            [*self.l2window_rectangles],
+            [sg.Text(f'', key='1_txt_field', size=(22, 1), font=("Helvetica", 13))],
+            [*self.l2window_rectangles, sg.Button(f'OK', size=(4, 1)), sg.Button('Exit')],
             [*self.l2window_workers],
             [*self.l2attempt_counter],
-            [sg.Text(f'', size=(15, 1), key='out')],
-            [sg.Text(f'number of unresolved windows: {len(self.windows)}', key='1st_txt_field',
-                     font=("Helvetica", 15))],
-
-            [sg.Button(f'OK', size=(4, 1)), sg.Button('Exit')]
+            [sg.Text(f'number of unresolved windows: {len(self.windows)}', size=(200, 1), font=("Helvetica", 13),
+                     key='2_txt_field')],
+            [sg.Text(f' ', key='3_txt_field', size=(200, 1), font=("Helvetica", 12))],
         ]
 
-        self.sg_gui = sg.FlexForm(title="PIDAR RADAR", layout=layout, size=(self.app_height, self.app_width),
+        self.sg_gui = sg.FlexForm(title="PIDAR RADAR", layout=layout, size=(
+        self.app_base_width, self.app_height),
                                   location=(self.L2_min_x, self.L2_total_height))
 
     def gui_window(self):
@@ -71,7 +70,7 @@ class Gui_interface:
         counter = 0
 
         for out_msg in window_input_msg_box:
-            self.sg_gui['2nd_txt_field'].Update(out_msg)
+            self.sg_gui['1_txt_field'].Update(out_msg)
             while True:
                 if windows_left <= 0:
                     break
@@ -116,7 +115,7 @@ class Gui_interface:
                             self.l2attempt_counter[i] = sg.Text(f'', size=(self.l2button_width, 1),
                                                                 justification='center')
 
-                        self.sg_gui['1st_txt_field'].Update(f'number of unresolved windows: {windows_left}')
+                        self.sg_gui['2_txt_field'].Update(f'number of unresolved windows: {windows_left}')
                         self.sg_gui[temp].Update(disabled=True)
 
                         self.sg_gui.Read(timeout=10)
@@ -124,8 +123,9 @@ class Gui_interface:
                             break
                 if event == 'OK':
                     break
-        self.sg_gui['1st_txt_field'].Update(f'', visible=False)
-        self.sg_gui['2nd_txt_field'].Update(f'', visible=False)
+
+        self.sg_gui['2_txt_field'].Update(f'To stop the programm press "q"', font=("Helvetica", 13), visible=True)
+        self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "w"', font=("Helvetica", 13), visible=True)
         self.sg_gui.Read(timeout=2)
 
         user_input = []

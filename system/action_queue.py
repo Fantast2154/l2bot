@@ -50,7 +50,7 @@ class ActionQueue():
         self.action_rate_list = manager.list()
         self.queue_list = manager.list()
 
-        self.stop_event = False
+        self.exit_is_set = False
 
     def activate_l2windows(self, windows):
         try:
@@ -163,13 +163,13 @@ class ActionQueue():
         t.start()
 
     def stop(self):
-        self.stop_event = True
+        self.exit_is_set = True
         self.send_message(f'destroyed\n')
         # self.exit.set()
 
     def run(self):
 
-        while not self.stop_event:
+        while not self.exit_is_set:
             # while not self.queue_list.empty():
             while self.queue_list:
                 try:

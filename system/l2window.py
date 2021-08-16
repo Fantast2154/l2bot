@@ -20,7 +20,7 @@ class L2window:
         x = 0
         y = 0
         width = 630
-        height = 630
+        height = 710
         self.left_top_x = width * window_id + 0
         self.left_top_y = y
         self.width = width

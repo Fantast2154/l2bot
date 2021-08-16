@@ -9,15 +9,17 @@ import cv2
 
 class Fisher:
 
-    def __init__(self, fishing_window, fisher_id, number_of_fishers, q, fishing_service=None):
+    def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
         # global current_state, supply_request, request_proceed, trading_is_allowed, requested_items_to_supply
         manager = Manager()
-
+        self.exit_is_set = manager.list()
+        self.exit_is_set.append(False)
+        
         self.fishing_window = fishing_window
         self.fisher_id = fisher_id
         self.number_of_fishers = number_of_fishers
         self.q = q
-        self.fishing_service = fishing_service
+        # self.fishing_service = fishing_service
         self.send_message(f'created')
 
         # communication with fisher service
@@ -54,7 +56,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 2
+        self.send_counter = 10000000000000
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -122,8 +124,10 @@ class Fisher:
     def run(self):
         # function:
         # main fishing loop
-
-        while True:  # or keyboard was pressed and not disconnected
+        timer = time.time()
+        while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
+            if time.time() - timer > 3600*4:
+                break
 
             self.update_current_attempt()
 
@@ -137,9 +141,8 @@ class Fisher:
             if self.paused[0] != 0:
                 self.pause_fisher(self.paused[0])
 
-        if not self.stop_fishing():
-            self.send_message('ERROR stop_fishing()')
-            return
+        self.send_message(f'has finished fishing\n')
+        self.current_state[0] = 'not working'
 
     def start_fishing(self):
         # function:
@@ -157,13 +160,13 @@ class Fisher:
         self.pause_thread(delay_correction)
 
         if not self.fishing_window.init_search():
-            self.stop_fishing()
+            self.stop_fisher()
 
         self.send_message(f'starts fishing')
 
         if not self.trial_rod_cast():
             self.send_message(f'trial rod cast FAILURE')
-            self.stop_fishing()
+            self.stop_fisher()
 
         if not self.init_setup():
             pass
@@ -173,7 +176,7 @@ class Fisher:
 
         # if not self.record_game_time():
         #     self.send_message(f'record_game_time FAILURE')
-        #     self.stop_fishing()
+        #     self.stop_fisher()
 
         # self.send_message('rebuff')
         # self.choose_day_bait(search=True)
@@ -183,25 +186,35 @@ class Fisher:
 
         # if not self.overweight_baits_soski_correction():
         #     self.send_message('overweight_baits_soski_correction FAILURE')
-        #     self.stop_fishing()
+        #     self.stop_fisher()
 
         self.current_state[0] = 'Fishing'
         self.run()
 
-    def pause_fisher(self, delay):
-        self.send_message(f'paused for {delay} sec')
-        if delay is None or delay == 0:
-            pass
+    def pause_fisher(self, delay=None):
+        if delay is None:
+            self.send_message(f'paused permanently. press "w" to resume')
+            inf_timer = 100000
+            self.paused[0] = inf_timer
+            while not self.exit_is_set[0]:
+                if self.paused[0] == 0:
+                    break
+                self.pause_thread(1)
         else:
-            for i in range(delay):
-                self.send_message(f'{delay - i} sec')
-                time.sleep(1)
-            self.paused[0] = 0
+            self.send_message(f'paused for {delay} sec')
+            if delay is None or delay == 0:
+                pass
+            else:
+                self.paused[0] = delay
+                for i in range(delay):
+                    self.send_message(f'{delay - i} sec')
+                    self.pause_thread(1)
+                self.paused[0] = 0
 
-    def stop_fishing(self):
+    def stop_fisher(self):
         # global current_state
-        self.send_message(f'has finished fishing\n')
-        self.current_state[0] = 'not working'
+        self.send_message('self.exit_is_set[0]=True')
+        self.exit_is_set[0] = True
 
     def trial_rod_cast(self):
         # function:
@@ -234,7 +247,7 @@ class Fisher:
         temp_t = time.time()
         searching_time = 12.2
         fishing_fight_time = None
-        while time.time() - temp_t < searching_time:
+        while time.time() - temp_t < searching_time and not self.exit_is_set[0]:
             if not self.fishing_window.is_fishing_window():
                 return False
             # if time.time() - temp_t > time_between_actions * counter:
@@ -265,7 +278,7 @@ class Fisher:
         reel_timer_was_set = False
 
         # fishing main loop
-        while self.fishing_window.is_fishing_window():
+        while self.fishing_window.is_fishing_window() and not self.exit_is_set[0]:
 
             if self.is_day_time():
                 temp = self.fishing_window.is_blue_bar()
@@ -381,16 +394,16 @@ class Fisher:
         self.attack()
         self.press_fishing_timer[0] = 0
 
-        #self.if_rebuff_time()
+        self.if_rebuff_time()
 
-        if self.attempt_counter[0] >= self.send_counter:
+        if self.attempt_counter[0] == self.send_counter:
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
         return True
 
     def search_object_with_click(self, search_object, task_proc, searching_time, *args):
         counter = 0
-        time_between_actions = 5
+        time_between_actions = 6
         repeat_times = searching_time // time_between_actions
         temp_timer = time.time()
 
@@ -449,11 +462,11 @@ class Fisher:
             self.requested_items_to_supply_d['nbaits'] = required_nbaits
             self.requested_items_to_supply_d['soski'] = required_soski
 
-            self.fishing_service.fishers_items.update({self.fisher_id: self.requested_items_to_supply_d})
-            self.fishing_service.fishers_request = 'requests supplying'
-            self.fishers_requested_supps[0] = self.requested_items_to_supply_d
-            self.fishers_request[0] = 'requests supplying'
-            print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
+            # self.fishing_service.fishers_items.update({self.fisher_id: self.requested_items_to_supply_d})
+            # self.fishing_service.fishers_request = 'requests supplying'
+            # self.fishers_requested_supps[0] = self.requested_items_to_supply_d
+            # self.fishers_request[0] = 'requests supplying'
+            # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
             self.supply_request_proceed[0] = True
             self.current_state[0] = 'busy'
             self.trading_is_allowed[0] = True
@@ -715,6 +728,8 @@ class Fisher:
         self.buff_hawkeye_timer = time.time()
         temp = self.fishing_window.is_hawk_buff()
         if temp:
+            self.reeling_skill_CD = 1.9
+            self.pumping_skill_CD = 1.9
             self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
         else:
             self.buff_hawkeye_rebufftime = 10000000
@@ -750,7 +765,7 @@ class Fisher:
             self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
 
     def init_setup(self):
-        #self.if_rebuff_time()
+        self.if_rebuff_time()
         self.pause_thread(2)
         self.move_to_supplier()
         self.pause_thread(2)
