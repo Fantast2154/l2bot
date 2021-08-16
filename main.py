@@ -121,11 +121,11 @@ if __name__ == '__main__':
             break
 
         try:  # used try so that if user pressed other than the given key error will not be shown
-            if keyboard.is_pressed('q'):  # if key 'q' is pressed
+            if keyboard.is_pressed('alt+q'):  # if key 'q' is pressed
                 print('main: EXIT EVENT DETECTED')
                 time.sleep(2)
                 break  # finishing the loop
-            if keyboard.is_pressed('w'):  # if key 'q' is pressed
+            if keyboard.is_pressed('alt+w'):  # if key 'q' is pressed
 
                 if pause_switch:
                     print('main: PAUSE EVENT DETECTED')

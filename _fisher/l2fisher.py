@@ -125,8 +125,9 @@ class Fisher:
         # function:
         # main fishing loop
         timer = time.time()
+        run_hours = 5
         while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
-            if time.time() - timer > 3600*4:
+            if time.time() - timer > 3600*run_hours:
                 break
 
             self.update_current_attempt()
@@ -193,7 +194,7 @@ class Fisher:
 
     def pause_fisher(self, delay=None):
         if delay is None:
-            self.send_message(f'paused permanently. press "w" to resume')
+            self.send_message(f'paused permanently')
             inf_timer = 100000
             self.paused[0] = inf_timer
             while not self.exit_is_set[0]:

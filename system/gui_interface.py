@@ -124,8 +124,8 @@ class Gui_interface:
                 if event == 'OK':
                     break
 
-        self.sg_gui['2_txt_field'].Update(f'To stop the programm press "q"', font=("Helvetica", 13), visible=True)
-        self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "w"', font=("Helvetica", 13), visible=True)
+        self.sg_gui['2_txt_field'].Update(f'To stop the programm press "alt+q"', font=("Helvetica", 13), visible=True)
+        self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "alt+w"', font=("Helvetica", 13), visible=True)
         self.sg_gui.Read(timeout=2)
 
         user_input = []
