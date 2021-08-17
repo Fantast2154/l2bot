@@ -74,6 +74,7 @@ class Fisher:
         self.alacrity_potion_rebufftime = 1200 - 40
         self.buff_hawkeye_rebufftime = 1200 - 40
         self.position_correction_timer = time.time()
+        self.absence_of_fishing_window_timer = 0
 
         # fishing params
         # if fisher_id == 0:
@@ -126,7 +127,7 @@ class Fisher:
         # function:
         # main fishing loop
         timer = time.time()
-        run_hours = 5
+        run_hours = 7
         while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
             if time.time() - timer > 3600*run_hours:
                 self.pause_fisher()
@@ -240,8 +241,12 @@ class Fisher:
         # searching for fishing window
         if not self.search_object_with_click(self.fishing_window.is_fishing_window, self.fishing, 12):
             self.move_to_supplier()
-            self.pause_thread(2)
+            if time.time() - self.absence_of_fishing_window_timer > 180:
+                self.pause_fisher()
+                return False
+            self.absence_of_fishing_window_timer = time.time()
             return False
+        self.absence_of_fishing_window_timer = 0
         self.press_fishing_timer[0] = time.time()
         # searching for clock
         counter = 1
@@ -479,7 +484,7 @@ class Fisher:
 
             self.fishers_requested_supps[0] = self.requested_items_to_supply_d
             self.fishers_request[0] = 'requests supplying'
-            print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
+            # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
             self.supply_request_proceed[0] = True
             self.current_state[0] = 'busy'
             self.trading_is_allowed[0] = True
@@ -617,6 +622,7 @@ class Fisher:
         self.q.new_task('mouse',
                         [self.fishing_window.get_object(param, True), True, 'LEFT', False, False, False],
                         self.fishing_window)
+        # coordinates, ,mouse_button, ...
         return True
 
     def click(self, coordinates):
@@ -728,13 +734,10 @@ class Fisher:
 
         if time.time() - self.buff_hawkeye_timer > self.buff_hawkeye_rebufftime:
             self.rebuff_hawkeye()
-            self.pause_thread(2.5)
         if time.time() - self.fishing_potion_timer > self.fishing_potion_rebufftime:
             self.rebuff_fishing_potion()
-            self.pause_thread(1)
         if time.time() - self.alacrity_potion_timer > self.alacrity_potion_rebufftime:
             self.rebuff_alacrity()
-            self.pause_thread(0.7)
 
     def rebuff_hawkeye(self):
         self.send_message('rebuff hawkeye')
@@ -744,6 +747,7 @@ class Fisher:
             self.reeling_skill_CD = 1.9
             self.pumping_skill_CD = 1.9
             self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
+            self.pause_thread(2.5)
         else:
             self.buff_hawkeye_rebufftime = 10000000
 
@@ -753,7 +757,7 @@ class Fisher:
         temp = self.fishing_window.is_alacrity_potion_small()
         if temp:
             self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
-            self.pause_thread(2)
+            self.pause_thread(0.7)
         else:
             self.alacrity_potion_rebufftime = 10000000
 
@@ -767,8 +771,8 @@ class Fisher:
         self.fishing_potion_timer = time.time()
         temp = self.fishing_window.is_fishing_potion_white()
         if temp:
-
             self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
+            self.pause_thread(0.7)
         else:
             self.fishing_potion_rebufftime = 10000000
 
@@ -776,10 +780,9 @@ class Fisher:
         temp = self.fishing_window.is_move_to_supplier()
         if temp:
             self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
+            self.pause_thread(2)
 
     def init_setup(self):
         self.if_rebuff_time()
-        self.pause_thread(2)
         self.move_to_supplier()
-        self.pause_thread(2)
         return True
