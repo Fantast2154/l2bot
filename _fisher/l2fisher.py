@@ -73,6 +73,7 @@ class Fisher:
         self.fishing_potion_rebufftime = 3600 - 40
         self.alacrity_potion_rebufftime = 1200 - 40
         self.buff_hawkeye_rebufftime = 1200 - 40
+        self.position_correction_timer = time.time()
 
         # fishing params
         # if fisher_id == 0:
@@ -128,7 +129,7 @@ class Fisher:
         run_hours = 5
         while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
             if time.time() - timer > 3600*run_hours:
-                break
+                self.pause_fisher()
 
             self.update_current_attempt()
 
@@ -277,8 +278,10 @@ class Fisher:
         reeling_time = time.time()
         reel_count = 0
         reel_timer_was_set = False
-
+        extra_attack_check = False
+        self.attack()
         # fishing main loop
+
         while self.fishing_window.is_fishing_window() and not self.exit_is_set[0]:
 
             if self.is_day_time():
@@ -400,7 +403,18 @@ class Fisher:
         if self.attempt_counter[0] == self.send_counter:
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
+
+        self.fihser_position_correction()
+
         return True
+
+    def fihser_position_correction(self):
+        t = 900
+        if time.time() - self.position_correction_timer > t:
+            self.move_to_supplier()
+            self.pause_thread(3)
+            self.position_correction_timer = time.time()
+
 
     def search_object_with_click(self, search_object, task_proc, searching_time, *args):
         counter = 0
