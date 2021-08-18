@@ -21,12 +21,13 @@ class Server:
         self.bots_list = []
         self.bots_processing_list = []
         self.bots_data_collection = []
+        self.exit_is_set = False
 
     def server_message(self, text):
         print(datetime.datetime.now().time(), 'Сервер:', text)
 
     def data_accepting(self):
-        while True:
+        while not self.exit_is_set:
             if not self.bots_list:
                 self.bots_data_collection.clear()
             else:
@@ -67,7 +68,7 @@ class Server:
 
     def bots_accepting(self):
         self.server_message('Сервер запущен.')
-        while True:
+        while not self.exit_is_set:
             clientsocket, address = self.server.accept()
             self.bots_list.append(clientsocket)
             self.server_message('Бот установил связь.')
@@ -94,8 +95,9 @@ class Client:
         self.connected = False
         self.has_received = False
         self.tries = 0
+        self.exit_is_set = False
 
-        while not self.connected:
+        while not self.connected and not self.exit_is_set:
             if self.tries >= 2:
                 self.connected = False
                 self.client_message('Сервер не отвечает. Работаем в оффлайн режиме')
@@ -142,7 +144,7 @@ class Client:
         #return self.dtr[0]
 
     def data_accepting(self):
-        while self.connected:
+        while self.connected and not self.exit_is_set:
             try:
                 if self.has_received:
                     self.bots_data_collection.clear()

@@ -421,7 +421,7 @@ class FishingService:
             self.start_supply(self.machine_id, self.fishers_items)
 
     def offline_requests(self):
-        while True:
+        while self.exit_is_set:
             time.sleep(0.1)
             if self.has_supplier:
                 self.offline_supply()
@@ -435,7 +435,7 @@ class FishingService:
 
         who_requests_supplying = {}
         anyone_is_requesting = False
-        while True:
+        while self.exit_is_set:
             self.fishing_service_client.client_receive_message()
             self.message = self.data_to_receive[0]
             # print('fishing service', self.message)
@@ -512,7 +512,7 @@ class FishingService:
 
     def up_to_serv(self):
         print('up')
-        while True:
+        while self.exit_is_set:
             self.update_to_server()
             time.sleep(0.5)
 

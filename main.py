@@ -70,6 +70,7 @@ if __name__ == '__main__':
     name_list, hash_list = get_l2windows_param()
     n = len(name_list)
     print('number of l2 windows:', n)
+    print('hash_list of l2 windows:', hash_list)
     print('-----')
     if n < 1:
         sys.exit('NO L2 WINDOWS DETECTED. PROGRAM ENDS.......')
