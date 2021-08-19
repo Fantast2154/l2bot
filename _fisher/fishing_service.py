@@ -354,7 +354,7 @@ class FishingService:
         for fisher in self.fishers:
             fisher_dict.update({fisher.fisher_id: fisher.current_state[0]})
             if fisher.fishers_request[0] == 'requests supplying':
-                #print("fisher.fishers_request[0] == 'requests supplying'!!!!!!")
+                # print("fisher.fishers_request[0] == 'requests supplying'!!!!!!")
                 self.fishers_request = 'requests supplying'
                 self.fishers_items.update({fisher.fisher_id: fisher.fishers_requested_supps[0]})
             else:
@@ -408,16 +408,16 @@ class FishingService:
 
         self.data_to_transmit[0] = data
         self.fishing_service_client.client_send()
-        #if self.command_was_sent:
-        #self.command[0] = self.none_command[0]
-           # self.command_was_sent = False
+        # if self.command_was_sent:
+        # self.command[0] = self.none_command[0]
+        # self.command_was_sent = False
         # self.data_to_receive.append(0)
 
         # x = fishing_service_client
         # print('x', x)
         # x.client_send(data)
-        #if self.fishers_request:
-            #print('////////////////////////////////////FISHING SERVICE', self.fishers_request)
+        # if self.fishers_request:
+        # print('////////////////////////////////////FISHING SERVICE', self.fishers_request)
 
     def start_supply(self, machine_id, fishers_and_items):
         exit_ = False
@@ -438,7 +438,7 @@ class FishingService:
     def offline_supply(self):
         for fisher in self.fishers:
             if fisher.fishers_request[0] == 'requests supplying':
-                #print("fisher.fishers_request[0] == 'requests supplying'!!!!!!")
+                # print("fisher.fishers_request[0] == 'requests supplying'!!!!!!")
                 self.fishers_request = 'requests supplying'
                 self.fishers_items.update({fisher.fisher_id: fisher.fishers_requested_supps[0]})
             else:
@@ -455,7 +455,7 @@ class FishingService:
     def command_process(self, sender, data: dict):
         command_sentence = data['command']
         if command_sentence:
-           # print('AFTER command_sentence', command_sentence)
+            # print('AFTER command_sentence', command_sentence)
             recipient = command_sentence[0]
             current_command_id = command_sentence[1]
             if recipient == self.machine_id and current_command_id != self.previous_command_id:
@@ -468,7 +468,7 @@ class FishingService:
                     s = 'self.' + bot + 's' + f'[{bot_id}]' + f'.{what_to_do}()'
                     print('S', s)
                     eval(s)
-                    #self.fishers[0].allow_to_trade()
+                    # self.fishers[0].allow_to_trade()
                     print('EVALUATED!!!!!')
                     self.previous_command_id = current_command_id
                 else:
@@ -493,12 +493,12 @@ class FishingService:
             #print('BEFORE', self.message)
             if self.message:
                 for sender_id, data_ in self.message.items():
-                    #print('BEFORE', sender_id, data_['command'])
+                    if sender_id == 1:
+                        print('SPAM ', self.message)
                     self.command_process(sender_id, data_)
 
     def process_server_data(self):
         print('process_server_data')
-
 
         # {уникальный ID машины-отправителя: [сообщение1, сообщение2, ...]} - вид отправляемого сообщения сообщение1
         # имеет вид {fisher_id: dict} -> {fisher_id: {'d_baits': a, 'n_baits': b, 'soski': c}}, где a,
@@ -511,18 +511,18 @@ class FishingService:
         while not self.exit_is_set:
             time.sleep(1)
             self.message = self.data_to_receive[0]
-            #print('ANOTHER PROCESS', self.message)
+            # print('ANOTHER PROCESS', self.message)
             # print('fishing service', self.message)
             if self.message:
                 for sender_id, data_ in self.message.items():
 
-                    #self.command_process(sender_id, data_)
+                    # self.command_process(sender_id, data_)
                     # print('sender_id - is me?', sender_id == self.machine_id)
                     if sender_id != self.machine_id and self.has_supplier:
                         if data_['request']['fishers'] == 'requests supplying':
                             who_requests_supplying[sender_id] = data_['supplies']['fishers']
                             anyone_is_requesting = True
-                            #print('anyone_is_requesting? not me - YES!!!')
+                            # print('anyone_is_requesting? not me - YES!!!')
                         else:
                             pass
                     elif sender_id == self.machine_id and self.has_supplier:
@@ -530,7 +530,7 @@ class FishingService:
                         if data_['request']['fishers'] == 'requests supplying':
                             who_requests_supplying[sender_id] = data_['supplies']['fishers']
                             anyone_is_requesting = True
-                            #print('anyone_is_requesting? me - YES!!!')
+                            # print('anyone_is_requesting? me - YES!!!')
                     else:
                         pass
 
@@ -541,18 +541,18 @@ class FishingService:
 
             # print('self.has_supplier and anyone_is_requesting', self.has_supplier, anyone_is_requesting)
             if self.has_supplier and anyone_is_requesting:
-                #print('who', who_requests_supplying)
+                # print('who', who_requests_supplying)
                 for sender_id, fishers_data in who_requests_supplying.items():
                     if supplied_fishers.get(sender_id, None) is not None:
                         if time.time() - supplied_fishers[sender_id] >= supply_cooldown:
                             self.start_supply(sender_id, fishers_data)
-                            #print('supplied_fishers[sender_id] is not None')
-                            #print('sender_id fishers_data')
-                            #print(sender_id)
-                            #print(fishers_data)
+                            # print('supplied_fishers[sender_id] is not None')
+                            # print('sender_id fishers_data')
+                            # print(sender_id)
+                            # print(fishers_data)
                             supplied_fishers[sender_id] = time.time()
                     else:
-                        #print('supplied_fishers[sender_id] NONE')
+                        # print('supplied_fishers[sender_id] NONE')
                         self.start_supply(sender_id, fishers_data)
                         supplied_fishers[sender_id] = time.time()
 
@@ -594,13 +594,13 @@ class FishingService:
     #     sg_gui[temp].update(f'{attempt}')
 
     def up_to_serv(self):
-        print('up')
+        print('Обновление сервера запущено')
         while not self.exit_is_set:
             self.update_to_server()
             time.sleep(0.5)
 
     def proc_serv_dat(self):
-        print('proc')
+        print('Обработка данных, поступающих с сервера, запущена')
         self.process_server_data()
 
     def server_update(self):
