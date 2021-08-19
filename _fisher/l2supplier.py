@@ -146,14 +146,17 @@ class Supplier:
         self.send_message('dbaits')
         self.send_message(f'{request_dbaits}')
         soski_pos = self.supplier_window.is_soski()
+        print('soski_pos', soski_pos)
         if not soski_pos:
             return False
 
         dbaits_pos = self.supplier_window.is_baits()
+        print('dbaits_pos', dbaits_pos)
         if not dbaits_pos:
             return False
 
         ok_button_pos = self.supplier_window.is_ok_button()
+        print('ok_button_pos', ok_button_pos)
         if not ok_button_pos:
             return False
 
@@ -196,6 +199,7 @@ class Supplier:
         self.supply_request[0] = False
         self.update_current_attempt()
         self.current_state[0] = 'available'
+        print('SUPPORT IS AVAILABLE')
         return True
 
     def start_supplier(self):

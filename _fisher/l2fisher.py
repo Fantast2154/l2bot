@@ -56,7 +56,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 10000000000000
+        self.send_counter = 1 # 10000000000000
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -485,7 +485,7 @@ class Fisher:
             self.fishers_requested_supps[0] = self.requested_items_to_supply_d
             self.fishers_request[0] = 'requests supplying'
             # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
-            #self.supply_request_proceed[0] = True
+            self.supply_request_proceed[0] = True
             #self.current_state[0] = 'busy'
 
 
@@ -495,6 +495,7 @@ class Fisher:
 
     def allow_to_trade(self):
         self.trading_is_allowed[0] = True
+        self.send_message('TRADING IS ALLOWED BOY BOY BOY')
 
     def trading(self):
         self.current_state[0] = 'requests supplying'
@@ -530,7 +531,7 @@ class Fisher:
 
         #self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 15)
 
-        self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 15)
+        self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 5)
 
         # if self.fishing_window.is_exchange_menu:
         #     self.press_button('ok')
