@@ -242,7 +242,7 @@ class Fisher:
         if not self.search_object_with_click(self.fishing_window.is_fishing_window, self.fishing, 12):
             self.move_to_supplier()
             if time.time() - self.absence_of_fishing_window_timer > 180:
-                self.pause_fisher()
+                #self.pause_fisher()
                 return False
             self.absence_of_fishing_window_timer = time.time()
             return False
@@ -485,13 +485,16 @@ class Fisher:
             self.fishers_requested_supps[0] = self.requested_items_to_supply_d
             self.fishers_request[0] = 'requests supplying'
             # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
-            self.supply_request_proceed[0] = True
-            self.current_state[0] = 'busy'
-            self.trading_is_allowed[0] = True
+            #self.supply_request_proceed[0] = True
+            #self.current_state[0] = 'busy'
+
 
             self.trading()
 
         return True
+
+    def allow_to_trade(self):
+        self.trading_is_allowed[0] = True
 
     def trading(self):
         self.current_state[0] = 'requests supplying'

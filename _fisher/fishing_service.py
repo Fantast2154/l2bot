@@ -75,6 +75,9 @@ class FishingService:
         self.any_supp_is_available = False
 
         self.message = {}
+        self.none_command = [-1, -2, '', -3, '', 0, '']
+        self.command = [-1, -2, '', -3, '', 0, '']
+        self.previous_command_id = -1
 
         self.data_to_transmit = manager.list()
         self.data_to_receive = manager.list()
@@ -207,7 +210,7 @@ class FishingService:
         # else:
         #     if fisher_id < len(self.process_fishers):
         #         self.fishers[fisher_id].stop_fishing()
-                # self.process_fishers[fisher_id].terminate()
+        # self.process_fishers[fisher_id].terminate()
 
     def pause_fishers(self, fisher_id=None, delay=None, except_param=False):
         if fisher_id is None:
@@ -220,9 +223,11 @@ class FishingService:
         else:
             if except_param:
                 if delay is None:
-                    self.send_message(f'pause permanently for all fishers, EXCEPT fisher_{fisher_id} has been registered')
+                    self.send_message(
+                        f'pause permanently for all fishers, EXCEPT fisher_{fisher_id} has been registered')
                 else:
-                    self.send_message(f'pause {delay} sec for all fishers, EXCEPT fisher_{fisher_id} has been registered')
+                    self.send_message(
+                        f'pause {delay} sec for all fishers, EXCEPT fisher_{fisher_id} has been registered')
 
                 for fisher in self.fishers:
                     if fisher.fisher_id == fisher_id:
@@ -230,17 +235,17 @@ class FishingService:
                     fisher.paused[0] = delay
             if fisher_id < self.number_of_fishers:
                 if delay is None:
-                    self.send_message(f'pause permanently for all fishers, EXCEPT fisher_{fisher_id} has been registered')
+                    self.send_message(
+                        f'pause permanently for all fishers, EXCEPT fisher_{fisher_id} has been registered')
                 else:
-                    self.send_message(f'pause {delay} sec for all fishers, EXCEPT fisher_{fisher_id} has been registered')
+                    self.send_message(
+                        f'pause {delay} sec for all fishers, EXCEPT fisher_{fisher_id} has been registered')
                 self.fishers[fisher_id].paused[0] = delay
 
     def resume_fishers(self):
         self.send_message(f'resume fishers has been registered')
         for fisher in self.fishers:
             fisher.paused[0] = 0
-
-
 
     def start_suppliers(self, supplier_id=None):
         time.sleep(1)
@@ -379,15 +384,24 @@ class FishingService:
             'buffers': self.buffers_items
         }}
 
+        command = {'command': self.command}
+        # [получатель - целое число,
+        # уникальный номер команды - целое число,
+        # 'тип бота' - строка,
+        # номер бота - целое число,
+        # 'команда' - строка]
+
         data = {}
 
         data.update(number)
         data.update(status)
         data.update(request)
         data.update(supplies)
+        data.update(command)
 
         self.data_to_transmit[0] = data
         self.fishing_service_client.client_send()
+        self.command = self.none_command
         # self.data_to_receive.append(0)
 
         # x = fishing_service_client
@@ -426,6 +440,31 @@ class FishingService:
             if self.has_supplier:
                 self.offline_supply()
 
+    def command_process(self, sender, data: dict):
+        command_sentence = data['command']
+        if command_sentence:
+            recipient = command_sentence[0]
+            current_command_id = command_sentence[1]
+            if recipient == self.machine_id and current_command_id != self.previous_command_id:
+                if not command_sentence[5]:
+                    bot = command_sentence[2]
+                    bot_id = command_sentence[3]
+                    what_to_do = command_sentence[4]
+
+                    s = 'self.' + bot + 's' + f'[{bot_id}]' + f'.{what_to_do}'
+                    eval(s)
+                    self.previous_command_id = current_command_id
+                else:
+                    s_ = command_sentence[6]
+                    for _ in range(3):
+                        time.sleep(1)
+                        print('ВНИМАНИЕ! ПОЛУЧЕНА КОМАНДА ВЫСШЕГО ПРИОРИТЕТА', s_)
+                    eval(s_)
+
+    def send_command(self, recipient, bot, bot_id, what_to_do):
+        r = random.randint(0, 100000000)
+        self.command = [recipient, r, bot, bot_id, what_to_do]
+
     def process_server_data(self):
         print('process_server_data')
 
@@ -442,6 +481,7 @@ class FishingService:
 
             if self.message:
                 for sender_id, data_ in self.message.items():
+                    self.command_process(sender_id, data_)
                     # print('sender_id - is me?', sender_id == self.machine_id)
                     if sender_id != self.machine_id and self.has_supplier:
                         if data_['request']['fishers'] == 'requests supplying':
@@ -496,7 +536,7 @@ class FishingService:
         counter = 0
         while time.time() - timer < closing_time:
             counter += 1
-            self.send_message(f'thread stops in ..... {closing_time- counter}')
+            self.send_message(f'thread stops in ..... {closing_time - counter}')
             time.sleep(1)
 
         self.send_message(f'destroyed')
