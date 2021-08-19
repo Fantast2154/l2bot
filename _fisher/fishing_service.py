@@ -490,7 +490,7 @@ class FishingService:
             time.sleep(1)
             self.fishing_service_client.client_receive_message()
             self.message = self.data_to_receive[0]
-            #print('BEFORE', self.message)
+            # print('BEFORE', self.message)
             if self.message:
                 for sender_id, data_ in self.message.items():
                     if sender_id == 1:
