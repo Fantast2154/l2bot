@@ -22,9 +22,9 @@ class FishingSupplierWindow(L2window):
 
         self.extended_image_database = [
             ['map_button', 'images/map.jpg', 0.9],
-            ['baits', 'images/trade/bait.jpg', 0.93],
+            ['baits', 'images/trade/bait_2.jpg', 0.93],
             ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
-            ['soski', 'images/items/soski_test.jpg', 0.8],
+            ['soski', 'images/items/soski_2.jpg', 0.93],
             ['menu', 'images/menu.jpg', 0.6],
             ['disconnect_EN', 'images/disconnect_EN.jpg', 0.4],
             ['weight_icon', 'images/weight.jpg', 0.9],
@@ -185,7 +185,7 @@ class FishingSupplierWindow(L2window):
             try:
                 self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]
             except:
-                self.send_message('Error finding images2')
+                self.send_message(f'Error finding images2 {obj}')
 
     def get_object(self, object, search=False):
         if self.library[object][0]:

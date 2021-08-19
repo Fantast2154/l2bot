@@ -418,6 +418,8 @@ class FishingService:
                 if supp.current_state[0] == 'available':
                     for fisher_id, supps in fishers_and_items.copy().items():
                         # supps = {'d_baits': a, 'n_baits': b, 'soski': c}
+                        self.send_command(machine_id, 'fisher', fisher_id, 'allow_to_trade')
+                        print('COMMAND WAS SENT')
                         supp.supply(machine_id, fisher_id, supps)
                     exit_ = True
                 else:
@@ -451,7 +453,7 @@ class FishingService:
                     bot_id = command_sentence[3]
                     what_to_do = command_sentence[4]
 
-                    s = 'self.' + bot + 's' + f'[{bot_id}]' + f'.{what_to_do}'
+                    s = 'self.' + bot + 's' + f'[{bot_id}]' + f'.{what_to_do}()'
                     eval(s)
                     self.previous_command_id = current_command_id
                 else:
