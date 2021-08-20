@@ -56,7 +56,10 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 10000000000000
+        if self.fisher_id == 0:
+            self.send_counter = 7
+        else:
+            self.send_counter = 9
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -519,9 +522,13 @@ class Fisher:
         #     self.pause_thread(6)
 
         if not self.search_object_with_click(self.fishing_window.is_exchange_menu, self.send_trade_to_supplier, 15):
+            self.fishing_window.start_accurate_search()
+            self.pause_thread(1)
             return False
 
         if not self.search_object_without_click(self.fishing_window.is_exchange_menu, 120):
+            self.fishing_window.start_accurate_search()
+            self.pause_thread(1)
             return False
 
         waiting_time = 15
@@ -735,14 +742,14 @@ class Fisher:
         return True
 
     def if_rebuff_time(self):
-
-        if time.time() - self.buff_hawkeye_timer > self.buff_hawkeye_rebufftime:
-            self.attack()
-            self.rebuff_hawkeye()
-        if time.time() - self.fishing_potion_timer > self.fishing_potion_rebufftime:
-            self.rebuff_fishing_potion()
-        if time.time() - self.alacrity_potion_timer > self.alacrity_potion_rebufftime:
-            self.rebuff_alacrity()
+        pass
+        # if time.time() - self.buff_hawkeye_timer > self.buff_hawkeye_rebufftime:
+        #     self.attack()
+        #     self.rebuff_hawkeye()
+        # if time.time() - self.fishing_potion_timer > self.fishing_potion_rebufftime:
+        #     self.rebuff_fishing_potion()
+        # if time.time() - self.alacrity_potion_timer > self.alacrity_potion_rebufftime:
+        #     self.rebuff_alacrity()
 
     def rebuff_hawkeye(self):
         self.send_message('rebuff hawkeye')
