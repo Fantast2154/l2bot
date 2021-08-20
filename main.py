@@ -64,7 +64,7 @@ if __name__ == '__main__':
     print('PROGRAM start--------------------------------------\n')
     l2window_name = 'Asterios'
     win_capture = WindowCapture(l2window_name)
-    queue = ActionQueue()
+
 
     # searching running L2 windows
     name_list, hash_list = get_l2windows_param()
@@ -95,25 +95,29 @@ if __name__ == '__main__':
     # setting created windows to screenshot maker
     win_capture.set_windows(windows)
 
+    # setting created windows to queue
+    queue = ActionQueue(windows)
+
     # start queueing of tasks
-    queue.start()
+    process_queue = threading.Thread(target=queue.run)
+    process_queue.start()
 
     # start capturing screenshots
     Process_wincap = Process(target=win_capture.start_capturing, args=(screen_manager,))
     Process_wincap.start()
 
     # creating fishing manager
-    F = FishingService(windows, user_input, queue)
+    FishService = FishingService(windows, user_input, queue)
 
     # gui window loop
-    t = threading.Thread(target=F.run)
-    t.start()
+    process_fishingService = threading.Thread(target=FishService.run)
+    process_fishingService.start()
 
     pause_switch = True
     while True:  # Event Loop
         event, values = gui_window.sg_gui.Read(timeout=4)
 
-        for fisher in F.fishers:
+        for fisher in FishService.fishers:
             temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
             gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
@@ -130,19 +134,22 @@ if __name__ == '__main__':
 
                 if pause_switch:
                     print('main: PAUSE EVENT DETECTED')
-                    F.pause_fishers()
+                    FishService.pause_fishers()
                     pause_switch = False
                 else:
                     print('main: RESUME EVENT DETECTED')
-                    F.resume_fishers()
+                    FishService.resume_fishers()
                     pause_switch = True
                 time.sleep(2)
         except:
             continue
-    F.stop()
+    FishService.stop()
+    process_fishingService.join()
+
     queue.stop()
-    t.join()
-    win_capture.stop()
+    process_queue.join()
+
+    win_capture.exit_is_set[0] = True
     Process_wincap.join()
 
     gui_window.sg_gui.close()

@@ -127,7 +127,7 @@ class Fisher:
         # function:
         # main fishing loop
         timer = time.time()
-        run_hours = 7
+        run_hours = 6
         while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
             if time.time() - timer > 3600*run_hours:
                 self.pause_fisher()
@@ -195,6 +195,7 @@ class Fisher:
         self.run()
 
     def pause_fisher(self, delay=None):
+        self.attack()
         if delay is None:
             self.send_message(f'paused permanently')
             inf_timer = 100000
@@ -224,6 +225,8 @@ class Fisher:
         # initial fishing window search
         # recording fishing window position
         # activation of accurate search in wincap
+        self.move_to_supplier()
+        self.move_to_supplier()
         self.fishing()
         self.pause_thread(1.5)
         if not self.search_object_with_click(self.fishing_window.get_object, self.fishing, 18, 'fishing_window', True):
@@ -241,12 +244,12 @@ class Fisher:
         # searching for fishing window
         if not self.search_object_with_click(self.fishing_window.is_fishing_window, self.fishing, 12):
             self.move_to_supplier()
-            if time.time() - self.absence_of_fishing_window_timer > 180:
-                #self.pause_fisher()
-                return False
-            self.absence_of_fishing_window_timer = time.time()
+            # if time.time() - self.absence_of_fishing_window_timer > 180:
+            #     self.pause_fisher()
+            #     return False
+            # self.absence_of_fishing_window_timer = time.time()
             return False
-        self.absence_of_fishing_window_timer = 0
+        # self.absence_of_fishing_window_timer = 0
         self.press_fishing_timer[0] = time.time()
         # searching for clock
         counter = 1
@@ -260,10 +263,10 @@ class Fisher:
             # if time.time() - temp_t > time_between_actions * counter:
             #     counter += 1
             #     self.attack()
-            if time.time() - temp_t > time_between_actions:
-                counter += 1
-                time_between_actions = 13
-                self.attack()
+            # if time.time() - temp_t > time_between_actions:
+            #     counter += 1
+            #     time_between_actions = 13
+            #     self.attack()
             if self.fishing_window.is_clock():
                 break
             time.sleep(0.5)
@@ -284,7 +287,7 @@ class Fisher:
         reel_count = 0
         reel_timer_was_set = False
         extra_attack_check = False
-        self.attack()
+        # self.attack()
         # fishing main loop
 
         while self.fishing_window.is_fishing_window() and not self.exit_is_set[0]:
@@ -400,12 +403,13 @@ class Fisher:
         # self.send_message(f'Среднее время между забросами удочки {result}')
         # self.send_message(f'Средняя скорость ловли: {3600 // result} попыток в час')
         # self.attack()
-        self.attack()
+        # self.attack()
         self.press_fishing_timer[0] = 0
 
         self.if_rebuff_time()
 
         if self.attempt_counter[0] == self.send_counter:
+            self.attack()
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
 
@@ -414,10 +418,10 @@ class Fisher:
         return True
 
     def fihser_position_correction(self):
+        self.attack()
         t = 900
         if time.time() - self.position_correction_timer > t:
             self.move_to_supplier()
-            self.pause_thread(3)
             self.position_correction_timer = time.time()
 
 
@@ -486,16 +490,12 @@ class Fisher:
             self.fishers_request[0] = 'requests supplying'
             # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
             self.supply_request_proceed[0] = True
-            #self.current_state[0] = 'busy'
-
+            self.current_state[0] = 'busy'
+            self.trading_is_allowed[0] = True
 
             self.trading()
 
         return True
-
-    def allow_to_trade(self):
-        self.trading_is_allowed[0] = True
-        self.send_message('TRADING IS ALLOWED BOY BOY BOY')
 
     def trading(self):
         self.current_state[0] = 'requests supplying'
@@ -531,7 +531,7 @@ class Fisher:
 
         #self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 15)
 
-        self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 5)
+        self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 15)
 
         # if self.fishing_window.is_exchange_menu:
         #     self.press_button('ok')
@@ -636,9 +636,8 @@ class Fisher:
 
     def attack(self):
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('attack', False), True, 'LEFT', False, False, False],
+                        [self.fishing_window.get_object('attack', False), True, 'LEFT', False, False, 'F4'],
                         self.fishing_window)
-        self.pause_thread(0.7)
         # temp = self.fishing_window.is_pet_attack()
         # if temp:
         #     self.pause_thread(0.4)
@@ -656,18 +655,18 @@ class Fisher:
         # self.q.new_task([(100, 100)], self.fishing_window.hwnd)
         # self.send_message('fishing')
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('fishing', False), True, 'LEFT', False, False, False],
+                        [self.fishing_window.get_object('fishing', False), True, 'LEFT', False, False, 'F1'],
                         self.fishing_window)
 
     def pumping(self):
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('pumping', False), True, 'LEFT', False, False, False],
+                        [self.fishing_window.get_object('pumping', False), True, 'LEFT', False, False, 'F2'],
                         self.fishing_window)
         # self.q.new_task('mouse', [[(100, 100)], True, 'LEFT', False, False, False], self.fishing_window)
 
     def reeling(self):
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('reeling', False), True, 'LEFT', False, False, False],
+                        [self.fishing_window.get_object('reeling', False), True, 'LEFT', False, False, 'F3'],
                         self.fishing_window)
 
     def rebuff(self, search=False):
@@ -735,7 +734,7 @@ class Fisher:
         return True
 
     def if_rebuff_time(self):
-
+        self.attack()
         if time.time() - self.buff_hawkeye_timer > self.buff_hawkeye_rebufftime:
             self.rebuff_hawkeye()
         if time.time() - self.fishing_potion_timer > self.fishing_potion_rebufftime:
@@ -788,5 +787,4 @@ class Fisher:
 
     def init_setup(self):
         self.if_rebuff_time()
-        self.move_to_supplier()
         return True

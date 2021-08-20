@@ -20,10 +20,11 @@ class FishingWindow(L2window):
         self.accurate_search = False
         self.screenshot_accurate = None
         self.init_image_database = [
-            ['fishing', 'images/fishing/fishing.jpg', 0.77],
+            ['fishing', 'images/fishing/fishing_macro.jpg', 0.77],
             ['pumping', 'images/fishing/pumping.jpg', 0.77],
             ['reeling', 'images/fishing/reeling.jpg', 0.77],
             ['attack', 'images/fishing/attack.jpg', 0.87],
+            ['move_to_supplier', 'images/fishing/move_to_supplier.jpg', 0.77],
             ['trade_supplier', 'images/trade/trade_icon.jpg', 0.7]]
 
         self.extended_image_database = [
@@ -31,7 +32,6 @@ class FishingWindow(L2window):
             ['soski', 'images/soski.jpg', 0.7],
             ['hp_window', 'images/farming/hp_window.jpg', 0.77],
             ['hawk_buff', 'images/fishing/hawk_buff.jpg', 0.77],
-            ['move_to_supplier', 'images/fishing/move_to_supplier.jpg', 0.77],
             ['blue_bar', 'images/fishing/blue_bar2.jpg', 0.75],
             ['colored', 'images/fishing/colored_2.jpg', 0.94],
             ['luminous', 'images/fishing/luminous_2.jpg', 0.94],
@@ -42,7 +42,7 @@ class FishingWindow(L2window):
             ['fishing_window', 'images/fishing/fishing_window.jpg', 0.7],
             ['red_bar', 'images/fishing/red_bar3.jpg', 0.8],
             ['buff', 'images/fishing/cdbuff.jpg', 0.87],
-            ['fishing_potion_white', 'images/fishing/fishing_potion_white.jpg', 0.7],
+            ['fishing_potion_white', 'images/fishing/fishing_potion_white.jpg', 0.65],
             ['alacrity_potion_small', 'images/fishing/alacrity_potion_small.jpg', 0.7],
             ['alacrity_dex_warlock', 'images/fishing/alacrity_dex_warlock.jpg', 0.7],
             ['pet_atk1', 'images/fishing/pet_atk_1.jpg', 0.7],
