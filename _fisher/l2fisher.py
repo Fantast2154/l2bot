@@ -57,7 +57,7 @@ class Fisher:
 
         # send/receive counters
         if self.fisher_id == 0:
-            self.send_counter = 7
+            self.send_counter = 2
         else:
             self.send_counter = 9
         self.receive_counter = 0
@@ -493,12 +493,16 @@ class Fisher:
             self.fishers_request[0] = 'requests supplying'
             # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
             self.supply_request_proceed[0] = True
-            self.current_state[0] = 'busy'
-            self.trading_is_allowed[0] = True
+            #self.current_state[0] = 'busy'
+            #self.trading_is_allowed[0] = True
 
             self.trading()
 
         return True
+
+    def allow_to_trade(self):
+        self.trading_is_allowed[0] = True
+        self.send_message('TRADING IS ALLOWED BOY BOY BOY')
 
     def trading(self):
         self.current_state[0] = 'requests supplying'
@@ -538,7 +542,7 @@ class Fisher:
 
         #self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 15)
 
-        self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 15)
+        self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 5)
 
         # if self.fishing_window.is_exchange_menu:
         #     self.press_button('ok')
@@ -742,14 +746,14 @@ class Fisher:
         return True
 
     def if_rebuff_time(self):
-        pass
-        # if time.time() - self.buff_hawkeye_timer > self.buff_hawkeye_rebufftime:
-        #     self.attack()
-        #     self.rebuff_hawkeye()
-        # if time.time() - self.fishing_potion_timer > self.fishing_potion_rebufftime:
-        #     self.rebuff_fishing_potion()
-        # if time.time() - self.alacrity_potion_timer > self.alacrity_potion_rebufftime:
-        #     self.rebuff_alacrity()
+
+        if time.time() - self.buff_hawkeye_timer > self.buff_hawkeye_rebufftime:
+            self.attack()
+            self.rebuff_hawkeye()
+        if time.time() - self.fishing_potion_timer > self.fishing_potion_rebufftime:
+            self.rebuff_fishing_potion()
+        if time.time() - self.alacrity_potion_timer > self.alacrity_potion_rebufftime:
+            self.rebuff_alacrity()
 
     def rebuff_hawkeye(self):
         self.send_message('rebuff hawkeye')
