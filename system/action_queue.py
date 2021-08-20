@@ -324,8 +324,8 @@ class ActionQueue:
                 #     self.click(x, y, param=False, params=params)
                 self.click(x, y, param=False, params=params)
 
-            # if 'insert' in params:
-            #     keyboard.send('ctrl+v')
+            if 'insert' in params:
+                keyboard.send('ctrl+v')
 
     @classmethod
     def start_queueing(cls):

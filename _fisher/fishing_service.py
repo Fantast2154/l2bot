@@ -357,8 +357,6 @@ class FishingService:
                 # print("fisher.fishers_request[0] == 'requests supplying'!!!!!!")
                 self.fishers_request = 'requests supplying'
                 self.fishers_items.update({fisher.fisher_id: fisher.fishers_requested_supps[0]})
-            else:
-                self.fishers_request = ''
 
         for supplier in self.suppliers:
             supplier_dict.update({supplier.supplier_id: supplier.current_state[0]})
@@ -408,6 +406,8 @@ class FishingService:
 
         self.data_to_transmit[0] = data
         self.fishing_service_client.client_send()
+
+        self.fishers_request = ''
         # if self.command_was_sent:
         # self.command[0] = self.none_command[0]
         # self.command_was_sent = False
