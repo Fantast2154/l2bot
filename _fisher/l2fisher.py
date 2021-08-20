@@ -418,9 +418,9 @@ class Fisher:
         return True
 
     def fihser_position_correction(self):
-        self.attack()
         t = 900
         if time.time() - self.position_correction_timer > t:
+            self.attack()
             self.move_to_supplier()
             self.position_correction_timer = time.time()
 
@@ -638,6 +638,7 @@ class Fisher:
         self.q.new_task('mouse',
                         [self.fishing_window.get_object('attack', False), True, 'LEFT', False, False, 'F4'],
                         self.fishing_window)
+        self.pause_thread(0.1)
         # temp = self.fishing_window.is_pet_attack()
         # if temp:
         #     self.pause_thread(0.4)
@@ -734,8 +735,9 @@ class Fisher:
         return True
 
     def if_rebuff_time(self):
-        self.attack()
+
         if time.time() - self.buff_hawkeye_timer > self.buff_hawkeye_rebufftime:
+            self.attack()
             self.rebuff_hawkeye()
         if time.time() - self.fishing_potion_timer > self.fishing_potion_rebufftime:
             self.rebuff_fishing_potion()
