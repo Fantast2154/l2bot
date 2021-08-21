@@ -59,7 +59,7 @@ class Fisher:
         if self.fisher_id == 0:
             self.send_counter = 2
         else:
-            self.send_counter = 4
+            self.send_counter = 2
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -492,7 +492,7 @@ class Fisher:
             self.fishers_requested_supps[0] = self.requested_items_to_supply_d
             self.fishers_request[0] = 'requests supplying'
             # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
-            self.supply_request_proceed[0] = True
+            #self.supply_request_proceed[0] = True
             #self.current_state[0] = 'busy'
             #self.trading_is_allowed[0] = True
 
@@ -503,6 +503,10 @@ class Fisher:
     def allow_to_trade(self):
         self.trading_is_allowed[0] = True
         self.send_message('TRADING IS ALLOWED BOY BOY BOY')
+
+    def process_supply_request(self):
+        self.supply_request_proceed[0] = True
+        self.send_message('SUPPLY REQUEST IS PROCEED BOY BOY BOY')
 
     def trading(self):
         self.current_state[0] = 'requests supplying'

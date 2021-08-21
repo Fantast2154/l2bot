@@ -67,6 +67,15 @@ class FishingService:
         self.teleporters_request = ''
         self.buffers_request = ''
 
+        self.fishers_who_request = set()
+        self.suppliers_who_request = []
+        self.teleporters_who_request = []
+        self.buffers_who_request = []
+
+        # self.pinged_fishers = {}
+        self.pinged_fishers = manager.list()
+        self.pinged_fishers.append({})
+
         self.fishers_items = {}
         self.suppliers_items = {}
         self.teleporters_items = {}
@@ -354,8 +363,9 @@ class FishingService:
         for fisher in self.fishers:
             fisher_dict.update({fisher.fisher_id: fisher.current_state[0]})
             if fisher.fishers_request[0] == 'requests supplying':
-                # print("fisher.fishers_request[0] == 'requests supplying'!!!!!!")
+                print(f"fisher {fisher.fisher_id} requests supplying!!!!!!")
                 self.fishers_request = 'requests supplying'
+                self.fishers_who_request.add(fisher.fisher_id)
                 self.fishers_items.update({fisher.fisher_id: fisher.fishers_requested_supps[0]})
 
         for supplier in self.suppliers:
@@ -379,7 +389,12 @@ class FishingService:
             'suppliers': self.suppliers_request,
             'teleporters': self.teleporters_request,
             'buffers': self.buffers_request
-        }}
+        },
+            'who': {
+                'fishers': self.fishers_who_request,
+                'suppliers': self.suppliers_who_request,
+                'teleporters': self.teleporters_who_request,
+                'buffers': self.buffers_who_request}}
 
         supplies = {'supplies': {
             'fishers': self.fishers_items,
@@ -419,19 +434,47 @@ class FishingService:
         # if self.fishers_request:
         # print('////////////////////////////////////FISHING SERVICE', self.fishers_request)
 
-    def start_supply(self, machine_id, fishers_and_items):
+    def start_supply(self, sender_fishers_and_stuff):
         exit_ = False
         self.fishers_request = ''
+        who_has_been_supplied = {}
         while not exit_:
             for supp in self.suppliers:
                 if supp.current_state[0] == 'available':
-                    for fisher_id, supps in fishers_and_items.copy().items():
-                        # supps = {'d_baits': a, 'n_baits': b, 'soski': c}
-                        self.send_command(machine_id, 'fisher', fisher_id, 'allow_to_trade')
-                        print('COMMAND WAS SENT')
-                        supp.supply(machine_id, fisher_id, supps)
-                        print('^^^^^^^^^^^^^^^^^^^^^^^SUPPLYING IS DONE^^^^^^^^^^^^^^^^^^')
-                    exit_ = True
+                    for machine_id, fishers_and_stuff in sender_fishers_and_stuff.copy().items():
+                        for fisher_id, supplies in fishers_and_stuff.items():
+                            pinged = False
+                            self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
+                            time.sleep(2)
+                            self.send_command(machine_id, 'fisher', fisher_id, 'allow_to_trade')
+                            time.sleep(2)
+                            self.ping(machine_id, fisher_id)
+                            time.sleep(2)
+                            while not pinged:
+                                time.sleep(0.1)
+                                print('PING...')
+                                print('self.pinged_fishers[0]', self.pinged_fishers[0])
+                                if self.pinged_fishers[0].get(machine_id) is not None:
+                                    # print('self.pinged_fishers[0]', self.pinged_fishers[0])
+                                    print('machine_id', machine_id)
+                                    print('fisher_id', fisher_id)
+                                    if fisher_id in self.pinged_fishers[0][machine_id].keys():
+                                        pinged = self.pinged_fishers[0][machine_id][fisher_id]
+                                    else:
+                                        continue
+
+                            print('COMMANDS WAS SENT')
+
+                            print('Fisher has responded!!!!')
+
+                            supp.supply(machine_id, fisher_id, supplies)
+                            print('^^^^^^^^^^^^^^^^^^^^^^^SUPPLYING^^^^^^^^^^^^^^^^^^^^^^^')
+                            if who_has_been_supplied.get(machine_id, None) is not None:
+                                who_has_been_supplied[machine_id].update(fishers_and_stuff)
+                            else:
+                                who_has_been_supplied[machine_id] = fishers_and_stuff
+                    return who_has_been_supplied
+                    # exit_ = True
                 else:
                     continue
 
@@ -444,13 +487,28 @@ class FishingService:
             else:
                 self.fishers_request = ''
         if self.fishers_request:
-            self.start_supply(self.machine_id, self.fishers_items)
+            pass
+            # self.start_supply(self.machine_id, self.fishers_items)
 
     def offline_requests(self):
         while not self.exit_is_set:
             time.sleep(0.1)
             if self.has_supplier:
                 self.offline_supply()
+
+    def change(self, recipient, fisher_id):
+        print('Changing...')
+        self.pinged_fishers[0] = {recipient: {fisher_id: True}}
+        print(self.pinged_fishers[0])
+        print('@@@@@@@@ PINGED FISHERS HAVE BEEN CHANGED!!!!!! @@@@@@@@')
+
+    def response(self, recipient, fisher_id):
+        self.send_command(recipient, '', -2, '', highpriority=1,
+                          highpriority_command=f'self.change({self.machine_id}, {fisher_id})')
+
+    def ping(self, recipient, fisher_id):
+        self.send_command(recipient, '', -2, '', highpriority=1,
+                          highpriority_command=f'self.response({self.machine_id}, {fisher_id})')
 
     def command_process(self, sender, data: dict):
         command_sentence = data['command']
@@ -473,21 +531,22 @@ class FishingService:
                     self.previous_command_id = current_command_id
                 else:
                     s_ = command_sentence[6]
-                    for _ in range(3):
-                        time.sleep(1)
+                    for _ in range(2):
+                        time.sleep(0.2)
                         print('ВНИМАНИЕ! ПОЛУЧЕНА КОМАНДА ВЫСШЕГО ПРИОРИТЕТА', s_)
                     eval(s_)
+                    self.previous_command_id = current_command_id
 
-    def send_command(self, recipient, bot, bot_id, what_to_do):
+    def send_command(self, recipient, bot, bot_id, what_to_do, highpriority=0, highpriority_command=''):
         r = random.randint(0, 100000000)
-        self.command[0] = [recipient, r, bot, bot_id, what_to_do, 0, '']
+        self.command[0] = [recipient, r, bot, bot_id, what_to_do, highpriority, highpriority_command]
         print('+++++++++++++SELF COMMAND IS', self.command[0])
         self.command_was_sent = True
 
     def process_commands(self):
         print('PROCESSING COMMANDS THREAD')
         while not self.exit_is_set:
-            time.sleep(1)
+            time.sleep(0.1)
             self.fishing_service_client.client_receive_message()
             self.message = self.data_to_receive[0]
             # print('BEFORE', self.message)
@@ -504,33 +563,32 @@ class FishingService:
         # имеет вид {fisher_id: dict} -> {fisher_id: {'d_baits': a, 'n_baits': b, 'soski': c}}, где a,
         # b и c - количество дневных наживок, ночных наживок и сосок соответственно
 
+        who_requests_supplying_new = {}
+        who_has_been_supplied = {}
         who_requests_supplying = {}
         anyone_is_requesting = False
         supplied_fishers = {}
         supply_cooldown = 40
         while not self.exit_is_set:
-            time.sleep(1)
+            time.sleep(0.1)
             self.message = self.data_to_receive[0]
             # print('ANOTHER PROCESS', self.message)
             # print('fishing service', self.message)
             if self.message:
                 for sender_id, data_ in self.message.items():
-
                     # self.command_process(sender_id, data_)
                     # print('sender_id - is me?', sender_id == self.machine_id)
-                    if sender_id != self.machine_id and self.has_supplier:
+                    if self.has_supplier:
                         if data_['request']['fishers'] == 'requests supplying':
-                            who_requests_supplying[sender_id] = data_['supplies']['fishers']
-                            anyone_is_requesting = True
+                            who_requests_supplying_new.update({sender_id: {}})
+                            for fisher_id in data_['who']['fishers']:
+                                who_requests_supplying_new[sender_id].update(
+                                    {fisher_id: data_['supplies']['fishers'][fisher_id]})
+                            # who_requests_supplying[sender_id] = data_['supplies']['fishers']
+                            # anyone_is_requesting = True
                             # print('anyone_is_requesting? not me - YES!!!')
                         else:
                             pass
-                    elif sender_id == self.machine_id and self.has_supplier:
-                        # print(data_['request'])
-                        if data_['request']['fishers'] == 'requests supplying':
-                            who_requests_supplying[sender_id] = data_['supplies']['fishers']
-                            anyone_is_requesting = True
-                            # print('anyone_is_requesting? me - YES!!!')
                     else:
                         pass
 
@@ -540,26 +598,30 @@ class FishingService:
                                 self.any_supp_is_available = True
 
             # print('self.has_supplier and anyone_is_requesting', self.has_supplier, anyone_is_requesting)
-            if self.has_supplier and anyone_is_requesting:
-                # print('who', who_requests_supplying)
-                for sender_id, fishers_data in who_requests_supplying.items():
-                    if supplied_fishers.get(sender_id, None) is not None:
-                        if time.time() - supplied_fishers[sender_id] >= supply_cooldown:
-                            self.start_supply(sender_id, fishers_data)
-                            # print('supplied_fishers[sender_id] is not None')
-                            # print('sender_id fishers_data')
-                            # print(sender_id)
-                            # print(fishers_data)
-                            supplied_fishers[sender_id] = time.time()
-                    else:
-                        # print('supplied_fishers[sender_id] NONE')
-                        self.start_supply(sender_id, fishers_data)
-                        supplied_fishers[sender_id] = time.time()
+            if self.has_supplier and who_requests_supplying_new:
+                self.pinged_fishers[0].clear()
+                #print('/////////////who_requests_supplying_new', who_requests_supplying_new)
+                #print('////////who_has_been_supplied', who_has_been_supplied)
+                who_to_supply = self.is_in(who_has_been_supplied, who_requests_supplying_new)
+                #print('////who_to_supply', who_to_supply)
+                if who_to_supply:
+                    who_has_been_supplied = self.start_supply(who_to_supply)
+                # who_has_been_supplied = {machine_id: [fisher_id, ...]}
 
-                who_requests_supplying.clear()
-                anyone_is_requesting = False
-
-            self.any_supp_is_available = False
+    def is_in(self, supplied, to_supply):
+        who_to_supply_ = {}
+        for machine_id1, fishers_and_stuff1 in to_supply.items():
+            if machine_id1 in supplied.keys():
+                for fisher_id, stuff in fishers_and_stuff1.items():
+                    for sup_val in supplied.values():
+                        if fisher_id not in sup_val.keys():
+                            if who_to_supply_.get(machine_id1, None) is not None:
+                                who_to_supply_[machine_id1].update({fisher_id: stuff})
+                            else:
+                                who_to_supply_[machine_id1] = {fisher_id: stuff}
+            else:
+                who_to_supply_[machine_id1] = fishers_and_stuff1
+        return who_to_supply_
 
     def run(self):
         flag = False
