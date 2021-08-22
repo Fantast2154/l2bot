@@ -444,12 +444,9 @@ class FishingService:
                     for machine_id, fishers_and_stuff in sender_fishers_and_stuff.copy().items():
                         for fisher_id, supplies in fishers_and_stuff.items():
                             pinged = False
-                            self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
-                            time.sleep(2)
-                            self.send_command(machine_id, 'fisher', fisher_id, 'allow_to_trade')
-                            time.sleep(2)
+
                             self.ping(machine_id, fisher_id)
-                            time.sleep(2)
+
                             while not pinged:
                                 time.sleep(0.1)
                                 print('PING...')
@@ -462,7 +459,11 @@ class FishingService:
                                         pinged = self.pinged_fishers[0][machine_id][fisher_id]
                                     else:
                                         continue
-
+                            time.sleep(2)
+                            self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
+                            time.sleep(2)
+                            self.send_command(machine_id, 'fisher', fisher_id, 'allow_to_trade')
+                            time.sleep(2)
                             print('COMMANDS WAS SENT')
 
                             print('Fisher has responded!!!!')
@@ -588,7 +589,7 @@ class FishingService:
                             # anyone_is_requesting = True
                             # print('anyone_is_requesting? not me - YES!!!')
                         else:
-                            pass
+                            who_requests_supplying_new = {}
                     else:
                         pass
 

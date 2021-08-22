@@ -106,7 +106,7 @@ class Supplier:
     def wait_for_supply_request(self):
         while not self.supply_request[0]:
             self.pause_thread(0.1)
-        self.send_message('SUPPLY REQUEST RECEVIED')
+        self.send_message('SUPPLY REQUEST RECEIVED')
 
     def wait_for_trade(self):
         self.send_message('waiting for trade')

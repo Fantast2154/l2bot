@@ -57,9 +57,9 @@ class Fisher:
 
         # send/receive counters
         if self.fisher_id == 0:
-            self.send_counter = 2
+            self.send_counter = 3
         else:
-            self.send_counter = 2
+            self.send_counter = 4
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -411,7 +411,7 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.send_counter:
+        if self.attempt_counter[0] % self.send_counter == 0:
             self.attack()
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
@@ -476,11 +476,16 @@ class Fisher:
     def overweight_baits_soski_correction(self):
 
         self.send_message('overweight_baits_soski_correction')
-        required_dbaits = 12
-        required_nbaits = 1
-        required_soski = 15
+        if self.fisher_id == 0:
+            required_dbaits = 10
+            required_nbaits = 11
+            required_soski = 12
+        else:
+            required_dbaits = 20
+            required_nbaits = 21
+            required_soski = 22
 
-        if required_dbaits > 10 or required_nbaits > 10 or required_soski > 10:
+        if required_dbaits > 1 or required_nbaits > 1 or required_soski > 1:
             self.requested_items_to_supply.append(required_dbaits)  # dbaits
             self.requested_items_to_supply.append(required_nbaits)  # nbaits
             self.requested_items_to_supply.append(required_soski)  # soski
@@ -515,6 +520,7 @@ class Fisher:
             time.sleep(0.5)
 
         self.current_state[0] = 'busy'
+        self.fishers_request[0] = ''
 
         while not self.trading_is_allowed[0]:
             time.sleep(0.5)
@@ -563,7 +569,7 @@ class Fisher:
         self.requested_items_to_supply_d['soski'] = 0
 
         self.current_state[0] = 'fishing'
-        self.fishers_request[0] = ''
+
         #self.send_counter += 3
 
         self.fishing_window.start_accurate_search()
