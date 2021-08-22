@@ -435,11 +435,14 @@ class FishingService:
         # print('////////////////////////////////////FISHING SERVICE', self.fishers_request)
 
     def start_supply(self, sender_fishers_and_stuff):
+        print('<<<<<<<<<<<<<<<<<<<<<<START SUPPLY')
+        print('sender_fishers_and_stuff', sender_fishers_and_stuff)
         exit_ = False
         self.fishers_request = ''
         who_has_been_supplied = {}
         while not exit_:
             for supp in self.suppliers:
+                print('supp is trying start to supply')
                 if supp.current_state[0] == 'available':
                     for machine_id, fishers_and_stuff in sender_fishers_and_stuff.copy().items():
                         for fisher_id, supplies in fishers_and_stuff.items():
@@ -569,7 +572,9 @@ class FishingService:
         anyone_is_requesting = False
         supplied_fishers = {}
         supply_cooldown = 40
+        cooldown_start = 0
         while not self.exit_is_set:
+            who_requests_supplying_new = {}
             time.sleep(0.1)
             self.message = self.data_to_receive[0]
             # print('ANOTHER PROCESS', self.message)
@@ -600,13 +605,17 @@ class FishingService:
             # print('self.has_supplier and anyone_is_requesting', self.has_supplier, anyone_is_requesting)
             if self.has_supplier and who_requests_supplying_new:
                 self.pinged_fishers[0].clear()
-                #print('/////////////who_requests_supplying_new', who_requests_supplying_new)
-                #print('////////who_has_been_supplied', who_has_been_supplied)
+                print('/////////////who_requests_supplying_new', who_requests_supplying_new)
+                print('////////who_has_been_supplied', who_has_been_supplied)
                 who_to_supply = self.is_in(who_has_been_supplied, who_requests_supplying_new)
-                #print('////who_to_supply', who_to_supply)
+                print('////who_to_supply', who_to_supply)
                 if who_to_supply:
                     who_has_been_supplied = self.start_supply(who_to_supply)
+                    cooldown_start = time.time()
                 # who_has_been_supplied = {machine_id: [fisher_id, ...]}
+            if time.time() - cooldown_start >= 60:
+                who_has_been_supplied.clear()
+
 
     def is_in(self, supplied, to_supply):
         who_to_supply_ = {}

@@ -110,7 +110,7 @@ class Supplier:
 
     def wait_for_trade(self):
         self.send_message('waiting for trade')
-        waiting_time = 20
+        waiting_time = 60
         temp_timer = time.time()
         while time.time() - temp_timer < waiting_time:
             self.pause_thread(0.1)
@@ -127,7 +127,7 @@ class Supplier:
                 self.pause_thread(0.5)
                 self.supply_request[0] = False
                 return True
-        self.supply_request[0] = False
+
         return False
 
     def supply_goods(self):
