@@ -60,19 +60,25 @@ class FishingWindow(L2window):
             ['send_button', 'images/send_button.jpg', 0.8],
             ['confirm_button', 'images/confirm_button.jpg', 0.8],
             ['cancel_button', 'images/cancel_button.jpg', 0.8],
-            ['claim_items_button', 'images/claim_items_button.jpg', 0.8],
-            ['catched_item_0', 'images/items/catcheditem1.jpg', 0.7],
-            ['catched_item_1', 'images/items/catcheditem2.jpg', 0.7],
-            ['catched_item_2', 'images/items/catcheditem3.jpg', 0.7],
-            ['catched_item_3', 'images/items/catcheditem4.jpg', 0.7]]
+            ['claim_items_button', 'images/claim_items_button.jpg', 0.8]
+        ]
 
-        self.vision_catcheditem_pos = [None] * 4
+        self.catched_fish_database = [
+            ['catched_item_0', 'images/items/catcheditem0.jpg', 0.83],
+            ['catched_item_1', 'images/items/catcheditem1.jpg', 0.83],
+            ['catched_item_2', 'images/items/catcheditem2.jpg', 0.83],
+            ['catched_item_3', 'images/items/catcheditem3.jpg', 0.83],
+            ['catched_item_4', 'images/items/catcheditem4.jpg', 0.83],
+            ['catched_item_5', 'images/items/catcheditem5.jpg', 0.83],
+            ['catched_item_6', 'images/items/catcheditem6.jpg', 0.83],
+            ['catched_item_7', 'images/items/catcheditem7.jpg', 0.83]
+        ]
         # self.send_message(f'<-L2window created')
 
         self.init_images()
 
-    # def __del__(self):
-    #     self.send_message(f"destroyed")
+    def __del__(self):
+        self.send_message(f"destroyed")
     # [{hwnd1: [], hwnd2: []}]
 
     def update_screenshot(self):
@@ -265,6 +271,14 @@ class FishingWindow(L2window):
                 self.send_message('Error finding images1')
 
         for obj in self.extended_image_database:
+            try:
+                # {'key', [obj, [(x,y]/None]
+                self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]
+            except:
+                pass
+                # self.send_message('Error finding images2')
+
+        for obj in self.catched_fish_database:
             try:
                 # {'key', [obj, [(x,y]/None]
                 self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]

@@ -2,6 +2,7 @@ import math
 import random
 import time
 from multiprocessing import Manager
+import keyboard
 from system.botnet import Client
 import win32gui
 import cv2
@@ -56,11 +57,10 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        # if self.fisher_id == 0:
-        #     self.send_counter = 3
-        # else:
-        #     self.send_counter = 4
-        self.send_counter = 2
+        if self.fisher_id == 0:
+            self.send_counter = 2
+        else:
+            self.send_counter = 2
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -131,7 +131,9 @@ class Fisher:
         # function:
         # main fishing loop
         timer = time.time()
-        run_hours = 6
+        run_hours = 5
+        if self.fisher_id == 1:
+            run_hours = 5
         while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
             if time.time() - timer > 3600*run_hours:
                 self.pause_fisher()
@@ -162,7 +164,7 @@ class Fisher:
         # trial rod case
 
         delay = 1
-        delay_correction = delay + 9 * self.fisher_id
+        delay_correction = delay + 20 * self.fisher_id
         self.send_message(f'will start fishing in .... {delay_correction} sec')
         self.pause_thread(delay_correction)
 
@@ -231,6 +233,14 @@ class Fisher:
         # activation of accurate search in wincap
         self.move_to_supplier()
         self.move_to_supplier()
+
+        keyboard.send('Alt+J')
+        self.pause_thread(.6)
+        keyboard.send('Alt+Shift+s')
+        # self.pause_thread(.6)
+        # keyboard.send('Alt+Shift+r')
+
+        self.pause_thread(.2)
         self.fishing()
         self.pause_thread(1.5)
         if not self.search_object_with_click(self.fishing_window.get_object, self.fishing, 18, 'fishing_window', True):
@@ -463,7 +473,7 @@ class Fisher:
         while condition(*args):
             if time.time() - temp_timer > searching_time:
                 return True
-            self.pause_thread(0.1)
+            self.pause_thread(0.3)
         return False
 
     def smart_button_click(self):
@@ -478,13 +488,13 @@ class Fisher:
 
         self.send_message('overweight_baits_soski_correction')
         if self.fisher_id == 0:
-            required_dbaits = 10
-            required_nbaits = 11
-            required_soski = 12
+            required_dbaits = 1
+            required_nbaits = 2
+            required_soski = 3
         else:
-            required_dbaits = 20
-            required_nbaits = 21
-            required_soski = 22
+            required_dbaits = 4
+            required_nbaits = 5
+            required_soski = 6
 
         if required_dbaits > 1 or required_nbaits > 1 or required_soski > 1:
             self.requested_items_to_supply.append(required_dbaits)  # dbaits
@@ -515,20 +525,24 @@ class Fisher:
         self.send_message('SUPPLY REQUEST IS PROCEED BOY BOY BOY')
 
     def trading(self):
+        self.send_message('requests supplying')
         self.current_state[0] = 'requests supplying'
 
         while not self.supply_request_proceed[0]:
             time.sleep(0.5)
-
+        self.send_message('request has been proceed')
         self.current_state[0] = 'busy'
         self.fishers_request[0] = ''
 
         while not self.trading_is_allowed[0]:
+
             time.sleep(0.5)
 
-        self.send_message('trading_is_allowed')
+        self.send_message('trading is allowed')
+        self.move_to_supplier()
         self.fishing_window.stop_accurate_search()
         self.pause_thread(1)
+
 
         # waiting_time2 = 15
         # temp_timer2 = time.time()
@@ -536,27 +550,31 @@ class Fisher:
         #     self.send_trade_to_supplier()
         #     self.pause_thread(6)
 
-        if not self.search_object_with_click(self.fishing_window.is_exchange_menu, self.send_trade_to_supplier, 15):
+        if not self.search_object_with_click(self.fishing_window.is_exchange_menu, self.send_trade_to_supplier, 20):
             self.fishing_window.start_accurate_search()
             self.pause_thread(1)
             return False
 
-        if not self.search_object_without_click(self.fishing_window.is_exchange_menu, 120):
-            self.fishing_window.start_accurate_search()
-            self.pause_thread(1)
-            return False
+        self.send_message('exchange_menu found')
 
-        waiting_time = 15
-        temp = time.time()
-        while self.fishing_window.is_exchange_menu and time.time() - temp < waiting_time:
-            time.sleep(0.5)
+        self.send_fish_to_supplier(self.fishing_window.is_exchange_menu())
 
-        #self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 15)
+        self.smart_press_button('ok', self.fishing_window.is_exchange_menu, searching_time=5)
 
-        self.smart_press_button('ok', self.fishing_window.is_exchange_menu, 5)
+        # if not self.search_object_without_click(self.fishing_window.is_exchange_menu, 120):
+        #     self.fishing_window.start_accurate_search()
+        #     self.pause_thread(1)
+        #     return False
 
-        # if self.fishing_window.is_exchange_menu:
-        #     self.press_button('ok')
+        # waiting_time = 15
+        # temp = time.time()
+        # while self.fishing_window.is_exchange_menu and time.time() - temp < waiting_time:
+        #     time.sleep(0.5)
+
+        answer = self.hold_the_object_in_vision(self.fishing_window.is_exchange_menu, 120)
+
+        if answer:
+            self.press_button('cancel')
 
         self.supplying_request[0] = False
         self.supply_request_proceed[0] = False
@@ -576,6 +594,60 @@ class Fisher:
         self.fishing_window.start_accurate_search()
 
         self.pause_thread(1)
+
+
+    def send_fish_to_supplier(self, exchange_menu_pos):
+        self.send_message('send_fish_to_supplier')
+        list_pos = []
+        for x in self.fishing_window.catched_fish_database:
+            catched_fish_pos_list = self.fishing_window.find(x[0])
+            # print('catched_fish_pos_list', catched_fish_pos_list)
+            if catched_fish_pos_list:
+                # y1point = self.fishing_window.is_exchange_menu
+                for catched_fish_pos in catched_fish_pos_list:
+                    (x_temp, y_temp) = catched_fish_pos
+                    if not list_pos:
+                        list_pos.append(catched_fish_pos)
+                        continue
+                    else:
+                        apnd = True
+                        for elem in list_pos:
+                            (elem_x, elem_y) = elem
+                            if abs(x_temp - elem_x) < 10 and abs(y_temp - elem_y) < 10:
+                                apnd = False
+                                break
+                        if apnd:
+                            list_pos.append(catched_fish_pos)
+
+        # self.send_message(f'original {list_pos}')
+        decorated = [(tup[1], tup) for tup in list_pos]
+        decorated.sort(reverse=True)
+        sorted = [tup for second, tup in decorated]
+        # self.send_message(f'sorted y {sorted}')
+        (temp_x_0, temp_y_0) = sorted[0]
+        for i in range(len(sorted)):
+            (x, y) = sorted[i]
+            # print('temp_y_0', temp_y_0)
+            if abs(y - temp_y_0) < 10 and y != temp_y_0:
+                print('abs(y - temp_y_0)', abs(y - temp_y_0))
+                sorted[i] = (x, temp_y_0)
+            else:
+                temp_y_0 = y
+
+        # self.send_message(f'sorted y cleaned {sorted}')
+        decorated = [(tup[1], tup) for tup in sorted]
+        decorated.sort(reverse=True)
+        sorted2 = [tup for second, tup in decorated]
+        # self.send_message(f'sorted x {sorted2}')
+        # decorated = [(tup[1], tup) for tup in sorted1]
+        # decorated.sort(reverse=True)
+        # sorted2 = [tup for second, tup in decorated]
+        # self.send_message(f'sorted {sorted2}')
+
+
+        for elem in sorted2:
+            # print('elem', elem)
+            self.drag_and_drop_fish([elem], exchange_menu_pos)
 
     def buff_is_active(self):
         if time.time() - self.buff_time < 30:
@@ -699,6 +771,17 @@ class Fisher:
         self.buff_time = time.time()
         self.pause_thread(1.5)
 
+    def drag_and_drop_fish(self, pos_fish, pos_trade_window):
+        # print('pos1', pos_fish)
+
+        [(target_pos_x, target_pos_y)] = pos_trade_window
+        target_pos = [(target_pos_x + 50, target_pos_y + 250)]
+        # print('pos2', target_pos)
+        self.q.new_task('mouse',
+                        [pos_fish, target_pos, 'LEFT', False, False, 'drag_and_drop'],
+                        self.fishing_window)
+        self.pause_thread(.5)
+
     def switch_soski(self, search=False):
         self.q.new_task('mouse',
                         [self.fishing_window.get_object('soski', search), True, 'RIGHT', False, False, False],
@@ -757,7 +840,6 @@ class Fisher:
         return True
 
     def if_rebuff_time(self):
-
         if time.time() - self.buff_hawkeye_timer > self.buff_hawkeye_rebufftime:
             self.attack()
             self.rebuff_hawkeye()
@@ -767,10 +849,11 @@ class Fisher:
             self.rebuff_alacrity()
 
     def rebuff_hawkeye(self):
-        self.send_message('rebuff hawkeye')
+
         self.buff_hawkeye_timer = time.time()
         temp = self.fishing_window.is_hawk_buff()
         if temp:
+            self.send_message('rebuff hawkeye')
             self.reeling_skill_CD = 1.9
             self.pumping_skill_CD = 1.9
             self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)

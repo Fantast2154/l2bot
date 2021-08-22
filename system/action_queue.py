@@ -246,10 +246,19 @@ class ActionQueue:
         keyboard.send(k)
         time.sleep(0.01)
 
-    def click(self, x, y, param=False, params=False):
+    def click(self, x, y, swtich_window=False, params=False):
         # print('params', params)
         self.mouse.position = (x - random.randint(0, 3), y - random.randint(0, 3))
         time.sleep(0.03)
+        if swtich_window:
+            time.sleep(0.02)
+            self.mouse.press(Button.left)
+            time.sleep(0.02)
+            self.mouse.release(Button.left)
+            time.sleep(0.03)
+            self.mouse.move(4, 4)
+            time.sleep(0.03)
+
         if 'double' in params:
             print('double click')
             self.mouse.press(Button.left)
@@ -262,24 +271,37 @@ class ActionQueue:
             time.sleep(0.03)
             return
 
-        if param:
-            time.sleep(0.02)
+        if params[1] and params[5] == 'drag_and_drop':
             self.mouse.press(Button.left)
-            time.sleep(0.02)
+            time.sleep(0.04)
+            VK_CODE = {'alt':0x12}
+            args = []
+            args.append('alt')
+            for i in args:
+                win32api.keybd_event(VK_CODE[i], 0,0,0)
+                time.sleep(0.1)
+
+            [(temp_x, temp_y)] = params[1]
+            self.mouse.position = (temp_x, temp_y)
+            time.sleep(0.04)
+
+            for i in args:
+                win32api.keybd_event(VK_CODE[i],0 ,win32con.KEYEVENTF_KEYUP ,0)
+                time.sleep(0.1)
+
             self.mouse.release(Button.left)
-            time.sleep(0.03)
-            self.mouse.move(4, 4)
-            time.sleep(0.03)
+            time.sleep(0.04)
+            return
 
         self.mouse.press(Button.left)
         time.sleep(0.07)
         self.mouse.release(Button.left)
         time.sleep(0.03)
 
-    def click2(self, x, y, param=False):
+    def click2(self, x, y, params=False):
 
         win32api.SetCursorPos((x, y))
-        if param:
+        if params:
 
             time.sleep(0.01)
             win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, 0, 0)
@@ -299,30 +321,17 @@ class ActionQueue:
     def task_execution(self, action, params, window, action_rate='High'):
         if action == 'mouse':
 
-            parameters = params
             if len(params) != 6:
                 return
-
             [(x_temp, y_temp)] = params[0]
-            key = params[5]
             x = x_temp + window.wincap.offset_x[window.window_id]
             y = y_temp + window.wincap.offset_y[window.window_id]
 
             if window.hwnd != self.last_active_window:
                 self.last_active_window = window.hwnd
-                # if key:
-                #     print(f'window {window.window_id}: SWITCH {key}')
-                #     self.keyboard_button_press(x, y, key, param=True)
-                # else:
-                #     self.click(x, y, param=True, params=params)
-                self.click(x, y, param=True, params=params)
+                self.click(x, y, swtich_window=True, params=params)
             else:
-                # if key:
-                #     print(f'window {window.window_id}: {key}')
-                #     self.keyboard_button_press(x, y, key, param=False)
-                # else:
-                #     self.click(x, y, param=False, params=params)
-                self.click(x, y, param=False, params=params)
+                self.click(x, y, swtich_window=False, params=params)
 
             if 'insert' in params:
                 keyboard.send('ctrl+v')
@@ -331,6 +340,8 @@ class ActionQueue:
     def start_queueing(cls):
         pass
 
+    def initial_task(self, action, action_param, window, priority='Normal', action_rate='High'):
+        pass
     # def start(self):
     #     # self.send_message('start queueing')
     #     t = threading.Thread(target=self.run)
