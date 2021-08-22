@@ -40,6 +40,7 @@ class Supplier:
         self.trading_is_allowed = manager.list()
         self.trading_is_allowed.append(False)
         self.requested_items_to_supply = manager.list()
+        self.requested_items_to_supply_d = manager.dict()
 
         # self.supply_request[0] = manager.list()
         # self.supply_request[0].append(False)
@@ -66,10 +67,16 @@ class Supplier:
         self.supply_request[0] = True
         self.current_state[0] = 'busy'
         self.supplied_clients.append(bot_id)
-        self.requested_items_to_supply.append(goods['dbaits'])
-        self.requested_items_to_supply.append(goods['nbaits'])
-        self.requested_items_to_supply.append(goods['soski'])
-        print('111111111', self.requested_items_to_supply)
+        #self.requested_items_to_supply.append(goods['dbaits'])
+        #self.requested_items_to_supply.append(goods['nbaits'])
+        #self.requested_items_to_supply.append(goods['soski'])
+
+        self.requested_items_to_supply_d['dbaits'] = goods['dbaits']
+        self.requested_items_to_supply_d['nbaits'] = goods['nbaits']
+        self.requested_items_to_supply_d['soski'] = goods['soski']
+
+        #print('111111111', self.requested_items_to_supply)
+        print('111111111', self.requested_items_to_supply_d)
 
     def __del__(self):
         self.send_message(f"destroyed")
@@ -136,9 +143,14 @@ class Supplier:
             return False
 
         self.pause_thread(0.7)
-        request_soski = self.requested_items_to_supply.pop(2)
-        request_nbaits = self.requested_items_to_supply.pop(1)
-        request_dbaits = self.requested_items_to_supply.pop(0)
+        #request_soski = self.requested_items_to_supply.pop(2)
+        #request_nbaits = self.requested_items_to_supply.pop(1)
+        #request_dbaits = self.requested_items_to_supply.pop(0)
+
+        request_soski = self.requested_items_to_supply_d['dbaits']
+        request_nbaits = self.requested_items_to_supply_d['nbaits']
+        request_dbaits = self.requested_items_to_supply_d['soski']
+
         print('dbaits', request_dbaits)
         print('nbaits', request_nbaits)
         print('soski', request_soski)
