@@ -246,7 +246,7 @@ class ActionQueue:
         keyboard.send(k)
         time.sleep(0.01)
 
-    def click(self, x, y, swtich_window=False, params=False):
+    def click(self, x, y, swtich_window=False, params=False, delta_x=0, delta_y=0):
         # print('params', params)
         self.mouse.position = (x - random.randint(0, 3), y - random.randint(0, 3))
         time.sleep(0.03)
@@ -273,7 +273,7 @@ class ActionQueue:
 
         if params[1] and params[5] == 'drag_and_drop':
             self.mouse.press(Button.left)
-            time.sleep(0.04)
+            time.sleep(0.1)
             VK_CODE = {'alt':0x12}
             args = []
             args.append('alt')
@@ -282,15 +282,15 @@ class ActionQueue:
                 time.sleep(0.1)
 
             [(temp_x, temp_y)] = params[1]
-            self.mouse.position = (temp_x, temp_y)
-            time.sleep(0.04)
+            self.mouse.position = (temp_x + delta_x, temp_y + delta_y)
+            time.sleep(0.1)
 
             for i in args:
                 win32api.keybd_event(VK_CODE[i],0 ,win32con.KEYEVENTF_KEYUP ,0)
                 time.sleep(0.1)
 
             self.mouse.release(Button.left)
-            time.sleep(0.04)
+            time.sleep(0.1)
             return
 
         self.mouse.press(Button.left)
@@ -323,15 +323,18 @@ class ActionQueue:
 
             if len(params) != 6:
                 return
+
             [(x_temp, y_temp)] = params[0]
-            x = x_temp + window.wincap.offset_x[window.window_id]
-            y = y_temp + window.wincap.offset_y[window.window_id]
+            deltaX = window.wincap.offset_x[window.window_id]
+            deltaY = window.wincap.offset_y[window.window_id]
+            x = x_temp + deltaX
+            y = y_temp + deltaY
 
             if window.hwnd != self.last_active_window:
                 self.last_active_window = window.hwnd
-                self.click(x, y, swtich_window=True, params=params)
+                self.click(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
             else:
-                self.click(x, y, swtich_window=False, params=params)
+                self.click(x, y, swtich_window=False, params=params, delta_x=deltaX, delta_y=deltaY)
 
             if 'insert' in params:
                 keyboard.send('ctrl+v')

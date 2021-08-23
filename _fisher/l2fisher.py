@@ -58,9 +58,9 @@ class Fisher:
 
         # send/receive counters
         if self.fisher_id == 0:
-            self.send_counter = 2
+            self.send_counter = 1
         else:
-            self.send_counter = 2
+            self.send_counter = 1
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -558,6 +558,7 @@ class Fisher:
         self.send_message('exchange_menu found')
 
         self.send_fish_to_supplier(self.fishing_window.is_exchange_menu())
+        self.pause_thread(10)
 
         self.smart_press_button('ok', self.fishing_window.is_exchange_menu, searching_time=5)
 

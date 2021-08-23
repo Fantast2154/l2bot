@@ -203,10 +203,13 @@ class Supplier:
         self.pause_thread(0.7)
         self.click(confirm_button_pos)
         self.pause_thread(0.7)
+        self.pause_thread(20)
         self.click(ok_button_pos)
         self.pause_thread(0.7)
 
         pyperclip.copy(0)
+
+
 
         self.supply_request[0] = False
         self.update_current_attempt()
