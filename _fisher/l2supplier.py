@@ -265,7 +265,7 @@ class Supplier:
             self.click(confirm_button_pos)
             self.pause_thread(0.7)
 
-        self.pause_thread(20)
+        self.pause_thread(8)
         self.click(ok_button_pos)
         self.pause_thread(0.7)
 
