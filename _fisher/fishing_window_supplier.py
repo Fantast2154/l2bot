@@ -43,7 +43,11 @@ class FishingSupplierWindow(L2window):
             ['catched_item1', 'images/items/catcheditem1.jpg', 0.8],
             ['catched_item2', 'images/items/catcheditem2.jpg', 0.8],
             ['catched_item3', 'images/items/catcheditem3.jpg', 0.8],
-            ['claim_items_button', 'images/claim_items_button.jpg', 0.8]
+            ['claim_items_button', 'images/claim_items_button.jpg', 0.8],
+
+            ['alacrity', 'images/alacrity.jpg', 0.8],
+            ['soski_pet', 'images/soski_pet.jpg', 0.8],
+            ['potion', 'images/potion.jpg', 0.8]
         ]
 
         self.init_images()
@@ -103,6 +107,39 @@ class FishingSupplierWindow(L2window):
             [(x, y)] = temp_coordinates
             temp_coordinates2 = [(x-260//2, y-35//2)]
             coordinates = self.find('soski', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
+            [(out_x, out_y)] = coordinates
+            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+        else:
+            return []
+
+    def is_alacrity(self):
+        temp_coordinates = self.find('exchange_menu')
+        if temp_coordinates:
+            [(x, y)] = temp_coordinates
+            temp_coordinates2 = [(x-260//2, y-35//2)]
+            coordinates = self.find('alacrity', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
+            [(out_x, out_y)] = coordinates
+            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+        else:
+            return []
+
+    def is_soski_pet(self):
+        temp_coordinates = self.find('exchange_menu')
+        if temp_coordinates:
+            [(x, y)] = temp_coordinates
+            temp_coordinates2 = [(x-260//2, y-35//2)]
+            coordinates = self.find('soski_pet', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
+            [(out_x, out_y)] = coordinates
+            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+        else:
+            return []
+
+    def is_potion(self):
+        temp_coordinates = self.find('exchange_menu')
+        if temp_coordinates:
+            [(x, y)] = temp_coordinates
+            temp_coordinates2 = [(x-260//2, y-35//2)]
+            coordinates = self.find('potion', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             [(out_x, out_y)] = coordinates
             return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:

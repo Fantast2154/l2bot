@@ -506,12 +506,19 @@ class Fisher:
             required_dbaits = 1
             required_nbaits = 2
             required_soski = 3
-        else:
-            required_dbaits = 4
-            required_nbaits = 5
-            required_soski = 6
+            required_alacrity = 4
+            required_soski_pet = 5
+            required_potion = 6
 
-        if required_dbaits > 1 or required_nbaits > 1 or required_soski > 1:
+        else:
+            required_dbaits = 7
+            required_nbaits = 8
+            required_soski = 9
+            required_alacrity = 10
+            required_soski_pet = 11
+            required_potion = 12
+
+        if required_dbaits > 1 or required_nbaits > 1 or required_soski > 1 or required_alacrity > 1 or required_soski_pet > 1 or required_potion > 1:
             self.requested_items_to_supply.append(required_dbaits)  # dbaits
             self.requested_items_to_supply.append(required_nbaits)  # nbaits
             self.requested_items_to_supply.append(required_soski)  # soski
@@ -519,6 +526,10 @@ class Fisher:
             self.requested_items_to_supply_d['dbaits'] = required_dbaits
             self.requested_items_to_supply_d['nbaits'] = required_nbaits
             self.requested_items_to_supply_d['soski'] = required_soski
+
+            self.requested_items_to_supply_d['alacrity'] = required_alacrity
+            self.requested_items_to_supply_d['soski_pet'] = required_soski_pet
+            self.requested_items_to_supply_d['potion'] = required_potion
 
             self.fishers_requested_supps[0] = self.requested_items_to_supply_d
             self.fishers_request[0] = 'requests supplying'

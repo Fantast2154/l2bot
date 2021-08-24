@@ -67,15 +67,18 @@ class Supplier:
         self.supply_request[0] = True
         self.current_state[0] = 'busy'
         self.supplied_clients.append(bot_id)
-        #self.requested_items_to_supply.append(goods['dbaits'])
-        #self.requested_items_to_supply.append(goods['nbaits'])
-        #self.requested_items_to_supply.append(goods['soski'])
+        # self.requested_items_to_supply.append(goods['dbaits'])
+        # self.requested_items_to_supply.append(goods['nbaits'])
+        # self.requested_items_to_supply.append(goods['soski'])
 
         self.requested_items_to_supply_d['dbaits'] = goods['dbaits']
         self.requested_items_to_supply_d['nbaits'] = goods['nbaits']
         self.requested_items_to_supply_d['soski'] = goods['soski']
+        self.requested_items_to_supply_d['alacrity'] = goods['alacrity']
+        self.requested_items_to_supply_d['soski_pet'] = goods['soski_pet']
+        self.requested_items_to_supply_d['potion'] = goods['potion']
 
-        #print('111111111', self.requested_items_to_supply)
+        # print('111111111', self.requested_items_to_supply)
         print('111111111', self.requested_items_to_supply_d)
 
     def __del__(self):
@@ -143,34 +146,55 @@ class Supplier:
             return False
 
         self.pause_thread(0.7)
-        #request_soski = self.requested_items_to_supply.pop(2)
-        #request_nbaits = self.requested_items_to_supply.pop(1)
-        #request_dbaits = self.requested_items_to_supply.pop(0)
+        # request_soski = self.requested_items_to_supply.pop(2)
+        # request_nbaits = self.requested_items_to_supply.pop(1)
+        # request_dbaits = self.requested_items_to_supply.pop(0)
 
         request_soski = self.requested_items_to_supply_d['dbaits']
         request_nbaits = self.requested_items_to_supply_d['nbaits']
         request_dbaits = self.requested_items_to_supply_d['soski']
+        request_alacrity = self.requested_items_to_supply_d['alacrity']
+        request_soski_pet = self.requested_items_to_supply_d['soski_pet']
+        request_potion = self.requested_items_to_supply_d['potion']
 
         print('dbaits', request_dbaits)
         print('nbaits', request_nbaits)
         print('soski', request_soski)
+        print('dbaits', request_alacrity)
+        print('nbaits', request_soski_pet)
+        print('soski', request_potion)
 
         self.send_message('dbaits')
         self.send_message(f'{request_dbaits}')
         soski_pos = self.supplier_window.is_soski()
         print('soski_pos', soski_pos)
-        if not soski_pos:
-            return False
+        # if not soski_pos:
+        #     return False
 
         dbaits_pos = self.supplier_window.is_baits()
         print('dbaits_pos', dbaits_pos)
-        if not dbaits_pos:
-            return False
+        # if not dbaits_pos:
+        #     return False
+
+        alacrity_pos = self.supplier_window.is_alacrity()
+        print('alacrity_pos', alacrity_pos)
+        # if not alacrity_pos:
+        #     return False
+
+        soski_pet_pos = self.supplier_window.is_soski_pet()
+        print('soski_pet_pos', soski_pet_pos)
+        # if not soski_pet_pos:
+        #     return False
+
+        potion_pos = self.supplier_window.is_potion()
+        print('potion_pos', potion_pos)
+        # if not potion_pos:
+        #     return False
 
         ok_button_pos = self.supplier_window.is_ok_button()
         print('ok_button_pos', ok_button_pos)
-        if not ok_button_pos:
-            return False
+        # if not ok_button_pos:
+        #     return False
 
         pyperclip.copy(request_soski)
         while not self.supplier_window.is_input_field() or not self.supplier_window.is_confirm_button():
@@ -193,23 +217,59 @@ class Supplier:
         self.click(confirm_button_pos)
         self.pause_thread(0.7)
 
-        pyperclip.copy(request_dbaits)
-        if len(dbaits_pos) > 1:
-            self.trade_item(dbaits_pos[0])
-        else:
-            self.trade_item(dbaits_pos)
-        self.pause_thread(0.7)
-        self.enter_number(input_field_pos)
-        self.pause_thread(0.7)
-        self.click(confirm_button_pos)
-        self.pause_thread(0.7)
+        if dbaits_pos:
+            pyperclip.copy(request_dbaits)
+            if len(dbaits_pos) > 1:
+                self.trade_item(dbaits_pos[0])
+            else:
+                self.trade_item(dbaits_pos)
+            self.pause_thread(0.7)
+            self.enter_number(input_field_pos)
+            self.pause_thread(0.7)
+            self.click(confirm_button_pos)
+            self.pause_thread(0.7)
+
+        if alacrity_pos:
+            pyperclip.copy(request_alacrity)
+            if len(request_alacrity) > 1:
+                self.trade_item(request_alacrity[0])
+            else:
+                self.trade_item(request_alacrity)
+            self.pause_thread(0.7)
+            self.enter_number(input_field_pos)
+            self.pause_thread(0.7)
+            self.click(confirm_button_pos)
+            self.pause_thread(0.7)
+
+        if soski_pet_pos:
+            pyperclip.copy(request_soski_pet)
+            if len(request_soski_pet) > 1:
+                self.trade_item(request_soski_pet[0])
+            else:
+                self.trade_item(request_soski_pet)
+            self.pause_thread(0.7)
+            self.enter_number(input_field_pos)
+            self.pause_thread(0.7)
+            self.click(confirm_button_pos)
+            self.pause_thread(0.7)
+
+        if potion_pos:
+            pyperclip.copy(request_potion)
+            if len(request_potion) > 1:
+                self.trade_item(request_potion[0])
+            else:
+                self.trade_item(request_potion)
+            self.pause_thread(0.7)
+            self.enter_number(input_field_pos)
+            self.pause_thread(0.7)
+            self.click(confirm_button_pos)
+            self.pause_thread(0.7)
+
         self.pause_thread(20)
         self.click(ok_button_pos)
         self.pause_thread(0.7)
 
         pyperclip.copy(0)
-
-
 
         self.supply_request[0] = False
         self.update_current_attempt()
