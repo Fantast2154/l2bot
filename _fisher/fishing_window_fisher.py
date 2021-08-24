@@ -32,8 +32,8 @@ class FishingWindow(L2window):
             ['soski', 'images/soski.jpg', 0.7],
             ['hp_window', 'images/farming/hp_window.jpg', 0.77],
             ['hawk_buff', 'images/fishing/hawk_buff.jpg', 0.77],
-            ['fenrir_party', 'images/party/fenrir_party.jpg', 0.67],
-            ['pet_items_tab', 'images/party/pet_items_tab.jpg', 0.8],
+            ['fenrir_party', 'images/party/fenrir_party.jpg', 0.63],
+            ['pet_menu_name_button', 'images/party/pet_menu_name_button.jpg', 0.67],
             ['mini_map', 'images/mini_map.jpg', 0.7],
             ['status_bar', 'images/status_bar.jpg', 0.65],
             ['blue_bar', 'images/fishing/blue_bar2.jpg', 0.75],
@@ -292,7 +292,6 @@ class FishingWindow(L2window):
         if search:
             # pos = self.library[object][0].find(self.update_screenshot())
             pos = self.find(object)
-
             if pos:
                 self.library[object][1] = pos
                 # print(f'DATABASE IF {self.window_id}: {pos}')
