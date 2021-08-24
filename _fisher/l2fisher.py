@@ -58,9 +58,9 @@ class Fisher:
 
         # send/receive counters
         if self.fisher_id == 0:
-            self.send_counter = 10000000000000
+            self.send_counter = 9999
         else:
-            self.send_counter = 10000000000000
+            self.send_counter = 9999
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -132,8 +132,8 @@ class Fisher:
         # main fishing loop
         timer = time.time()
         run_hours = 5
-        if self.fisher_id == 1:
-            run_hours = 5
+        # if self.fisher_id == 1:
+        #     run_hours = 6.6
         while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
             if time.time() - timer > 3600 * run_hours:
                 self.pause_fisher()
@@ -164,7 +164,7 @@ class Fisher:
         # trial rod case
 
         delay = 1
-        delay_correction = delay + 20 * self.fisher_id
+        delay_correction = delay + 10 * self.fisher_id
         self.send_message(f'will start fishing in .... {delay_correction} sec')
         self.pause_thread(delay_correction)
 
@@ -173,12 +173,15 @@ class Fisher:
 
         self.send_message(f'starts fishing')
 
+        self.init_setup()
+
+
+
         if not self.trial_rod_cast():
             self.send_message(f'trial rod cast FAILURE')
             self.stop_fisher()
 
-        if not self.init_setup():
-            pass
+        self.if_rebuff_time()
 
         self.fishing_window.start_accurate_search()
         self.pause_thread(1)
@@ -231,18 +234,9 @@ class Fisher:
         # initial fishing window search
         # recording fishing window position
         # activation of accurate search in wincap
-        self.move_to_supplier()
-        self.move_to_supplier()
 
-        keyboard.send('Alt+J')
-        self.pause_thread(.6)
-        keyboard.send('Alt+Shift+s')
-        # self.pause_thread(.6)
-        # keyboard.send('Alt+Shift+r')
-
-        self.pause_thread(.2)
         self.fishing()
-        self.pause_thread(1.5)
+        self.pause_thread(0.7)
         if not self.search_object_with_click(self.fishing_window.get_object, self.fishing, 18, 'fishing_window', True):
             return False
         self.fishing_window.record_fishing_window()
@@ -309,7 +303,10 @@ class Fisher:
         # self.attack()
         # fishing main loop
 
+        max_fishing_time = time.time()
         while self.fishing_window.is_fishing_window() and not self.exit_is_set[0]:
+            if time.time() - max_fishing_time > 40: # emergency antibug exit
+                self.fishing()
             self.pause_thread(0.1)
 
             if self.is_day_time():
@@ -887,12 +884,17 @@ class Fisher:
     def rebuff_alacrity(self):
         self.send_message('rebuff alacrity')
         self.alacrity_potion_timer = time.time()
-        temp = self.fishing_window.is_alacrity_potion_small()
-        if temp:
-            self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
-            self.pause_thread(0.7)
-        else:
-            self.alacrity_potion_rebufftime = 10000000
+
+        self.q.new_task('mouse', [self.fishing_window.get_object('fenrir_party'), True, 'LEFT', False, 'double', False], self.fishing_window)
+        self.pause_thread(0.1)
+        self.q.new_task('mouse', [self.fishing_window.get_object('fenrir_party'), True, 'LEFT', False, 'double', False], self.fishing_window)
+        self.pause_thread(0.4)
+        self.q.new_task('mouse', [self.fishing_window.get_object('pet_items_tab'), True, 'LEFT', False, False, False], self.fishing_window)
+        self.pause_thread(0.4)
+        self.q.new_task('mouse', [self.fishing_window.get_object('alacrity_potion_small'), True, 'RIGHT', False, False, False], self.fishing_window)
+        self.pause_thread(0.3)
+        self.q.new_task('keyboard', ['Alt+N', 'ctrlv', False, False, False, False], self.fishing_window)
+        self.pause_thread(0.1)
 
         # temp2 = self.fishing_window.is_alacrity_dex_warlock()
         # if temp2:
@@ -902,19 +904,85 @@ class Fisher:
     def rebuff_fishing_potion(self):
         self.send_message('rebuff fishing potion')
         self.fishing_potion_timer = time.time()
-        temp = self.fishing_window.is_fishing_potion_white()
-        if temp:
-            self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
-            self.pause_thread(0.7)
-        else:
-            self.fishing_potion_rebufftime = 10000000
+        self.q.new_task('mouse', [self.fishing_window.get_object('fishing_potion_white'), True, 'LEFT', False, False, False], self.fishing_window)
+        self.pause_thread(0.3)
 
     def move_to_supplier(self):
-        temp = self.fishing_window.is_move_to_supplier()
-        if temp:
-            self.q.new_task('mouse', [temp, True, 'LEFT', False, False, False], self.fishing_window)
-            self.pause_thread(2)
+        self.q.new_task('mouse', [self.fishing_window.get_object('move_to_supplier'), True, 'LEFT', False, False, False], self.fishing_window)
+        self.pause_thread(2)
 
     def init_setup(self):
-        self.if_rebuff_time()
-        return True
+        self.send_message('initializing setup...')
+        self.move_to_supplier()
+        self.move_to_supplier()
+        self.q.new_task('keyboard', ['Alt+N', 'ctrlv', False, False, False, False], self.fishing_window)
+        self.pause_thread(0.1)
+        self.q.new_task('keyboard', ['Alt+1', 'ctrlv', False, False, False, False], self.fishing_window)
+        self.pause_thread(6)
+        fishing_potion_white = self.fishing_window.get_object('fishing_potion_white', search=True)
+        if fishing_potion_white:
+            self.send_message('fishing_potion_white')
+            # self.q.new_task('mouse', [fishing_potion_white, True, 'LEFT', False, False, False], self.fishing_window)
+            # self.pause_thread(0.5)
+        else:
+            self.fishing_potion_rebufftime = 99999999
+
+        status_bar = self.fishing_window.get_object('status_bar', search=True)
+        if status_bar:
+            self.send_message('status_bar')
+            self.q.new_task('keyboard', ['Alt+Shift+s', 'ctrlv', False, False, False, False], self.fishing_window)
+            self.pause_thread(0.5)
+
+        mini_map = self.fishing_window.get_object('mini_map', search=True)
+        if mini_map:
+            self.send_message('mini_map')
+            self.q.new_task('keyboard', ['Alt+Shift+r', 'ctrlv', False, False, False, False], self.fishing_window)
+            self.pause_thread(0.5)
+
+        alacrity_dex_warlock = self.fishing_window.get_object('alacrity_dex_warlock', search=True)
+        if alacrity_dex_warlock:
+            self.send_message('alacrity_dex_warlock')
+            # self.q.new_task('mouse', [fishing_potion_white, True, 'LEFT', False, 'double', False], self.fishing_window)
+            # self.fishing_potion_rebufftime = 1200 - 30
+
+        hawk_buff = self.fishing_window.is_hawk_buff()
+        if hawk_buff:
+            self.send_message('hawk_buff')
+            # self.q.new_task('mouse', [hawk_buff, True, 'LEFT', False, False, False], self.fishing_window)
+            # self.pause_thread(2.5)
+        else:
+            self.buff_hawkeye_rebufftime = 1000000000000
+
+        fenrir = self.fishing_window.get_object('fenrir_party', search=True)
+        if fenrir:
+            self.send_message('fenrir')
+            self.q.new_task('mouse', [fenrir, True, 'LEFT', False, 'double', False], self.fishing_window)
+            self.pause_thread(0.1)
+            self.q.new_task('mouse', [fenrir, True, 'LEFT', False, 'double', False], self.fishing_window)
+            self.pause_thread(0.7)
+            pet_items_tab = self.fishing_window.get_object('pet_items_tab', search=True)
+            if pet_items_tab:
+                self.send_message('pet_items_tab')
+                self.q.new_task('mouse', [pet_items_tab, True, 'LEFT', False, False, False], self.fishing_window)
+                self.pause_thread(0.7)
+                alacrity_potion_small = self.fishing_window.get_object('alacrity_potion_small', search=True)
+                if alacrity_potion_small:
+                    self.send_message('alacrity_potion_small')
+                    # self.q.new_task('mouse', [alacrity_potion_small, True, 'RIGHT', False, False, False], self.fishing_window)
+                    # self.pause_thread(0.5)
+                else:
+                    self.alacrity_potion_rebufftime = 99999999
+            else:
+                self.alacrity_potion_rebufftime = 99999999
+        else:
+            self.alacrity_potion_rebufftime = 99999999
+
+        self.buff_hawkeye_timer = 0
+        self.fishing_potion_timer = 0
+        self.alacrity_potion_timer = 0
+
+        keyboard.send('Alt+N')
+        self.pause_thread(0.5)
+
+    def init_buff(self):
+        pass

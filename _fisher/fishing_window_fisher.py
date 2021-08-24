@@ -32,6 +32,10 @@ class FishingWindow(L2window):
             ['soski', 'images/soski.jpg', 0.7],
             ['hp_window', 'images/farming/hp_window.jpg', 0.77],
             ['hawk_buff', 'images/fishing/hawk_buff.jpg', 0.77],
+            ['fenrir_party', 'images/party/fenrir_party.jpg', 0.77],
+            ['pet_items_tab', 'images/party/pet_items_tab.jpg', 0.8],
+            ['mini_map', 'images/mini_map.jpg', 0.7],
+            ['status_bar', 'images/status_bar.jpg', 0.65],
             ['blue_bar', 'images/fishing/blue_bar2.jpg', 0.75],
             ['colored', 'images/fishing/colored_2.jpg', 0.94],
             ['luminous', 'images/fishing/luminous_2.jpg', 0.94],
@@ -77,9 +81,8 @@ class FishingWindow(L2window):
 
         self.init_images()
 
-    def __del__(self):
-        pass
-        #self.send_message(f"destroyed")
+    # def __del__(self):
+    #     self.send_message(f"destroyed")
     # [{hwnd1: [], hwnd2: []}]
 
     def update_screenshot(self):
@@ -214,11 +217,9 @@ class FishingWindow(L2window):
 
 
     def is_alacrity_potion_small(self):
-        print('ALACRITY')
         if self.library['alacrity_potion_small'][1]:
             return self.library['alacrity_potion_small'][1]
         else:
-
             return self.get_object('alacrity_potion_small', search=True)
 
     def is_alacrity_dex_warlock(self):

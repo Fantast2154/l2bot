@@ -245,8 +245,23 @@ class ActionQueue:
         # time.sleep(0.03)
         keyboard.send(k)
         time.sleep(0.01)
+    def click_right(self, x, y, swtich_window=False, params=False, delta_x=0, delta_y=0):
+        self.mouse.position = (x - random.randint(0, 3), y - random.randint(0, 3))
+        time.sleep(0.03)
+        if swtich_window:
+            time.sleep(0.02)
+            self.mouse.press(Button.left)
+            time.sleep(0.02)
+            self.mouse.release(Button.left)
+            time.sleep(0.03)
+            self.mouse.move(4, 4)
+            time.sleep(0.03)
+        self.mouse.press(Button.right)
+        time.sleep(0.07)
+        self.mouse.release(Button.right)
+        time.sleep(0.03)
 
-    def click(self, x, y, swtich_window=False, params=False, delta_x=0, delta_y=0):
+    def click_left(self, x, y, swtich_window=False, params=False, delta_x=0, delta_y=0):
         # print('params', params)
         self.mouse.position = (x - random.randint(0, 3), y - random.randint(0, 3))
         time.sleep(0.03)
@@ -260,7 +275,6 @@ class ActionQueue:
             time.sleep(0.03)
 
         if 'double' in params:
-            print('double click')
             self.mouse.press(Button.left)
             time.sleep(0.02)
             self.mouse.release(Button.left)
@@ -332,12 +346,24 @@ class ActionQueue:
 
             if window.hwnd != self.last_active_window:
                 self.last_active_window = window.hwnd
-                self.click(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
+                if 'LEFT' in params:
+                    self.click_left(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
+                elif 'RIGHT' in params:
+                    self.click_right(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
             else:
-                self.click(x, y, swtich_window=False, params=params, delta_x=deltaX, delta_y=deltaY)
+                if 'LEFT' in params:
+                    self.click_left(x, y, swtich_window=False, params=params, delta_x=deltaX, delta_y=deltaY)
+                elif 'RIGHT' in params:
+                    self.click_right(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
 
             if 'insert' in params:
                 keyboard.send('ctrl+v')
+        if action == 'keyboard':
+            if len(params) != 6:
+                return
+            if 'ctrlv' in params:
+                keyboard.send(params[0])
+                time.sleep(0.1)
 
     @classmethod
     def start_queueing(cls):
