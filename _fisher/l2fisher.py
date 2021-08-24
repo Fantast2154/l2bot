@@ -58,9 +58,9 @@ class Fisher:
 
         # send/receive counters
         if self.fisher_id == 0:
-            self.send_counter = 9999
+            self.send_counter = 2
         else:
-            self.send_counter = 9999
+            self.send_counter = 2
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -164,8 +164,7 @@ class Fisher:
         # trial rod case
 
         delay = 1
-        delay_correction = delay + 10 * self.fisher_id
-        self.send_message(f'will start fishing in .... {delay_correction} sec')
+        delay_correction = delay + 15 * self.fisher_id
         self.pause_thread(delay_correction)
 
         if not self.fishing_window.init_search():
@@ -174,8 +173,9 @@ class Fisher:
         self.send_message(f'starts fishing')
 
         self.init_setup()
-
-
+        delay = 15
+        self.send_message(f'will start fishing in .... {delay} sec')
+        self.pause_thread(delay)
 
         if not self.trial_rod_cast():
             self.send_message(f'trial rod cast FAILURE')
@@ -500,6 +500,14 @@ class Fisher:
 
         self.send_message('overweight_baits_soski_correction')
         if self.fisher_id == 0:
+            required_dbaits = 1
+            required_nbaits = 2
+            required_soski = 3
+            required_alacrity = 4
+            required_soski_pet = 5
+            required_potion = 6
+
+        elif self.fisher_id == 1:
             required_dbaits = 1
             required_nbaits = 2
             required_soski = 3
@@ -891,9 +899,9 @@ class Fisher:
         self.q.new_task('mouse', [self.fishing_window.get_object('fenrir_party'), True, 'LEFT', False, 'double', False], self.fishing_window)
         self.pause_thread(0.4)
         self.q.new_task('mouse', [self.fishing_window.get_object('pet_items_tab'), True, 'LEFT', False, False, False], self.fishing_window)
-        self.pause_thread(0.4)
+        self.pause_thread(0.5)
         self.q.new_task('mouse', [self.fishing_window.get_object('alacrity_potion_small'), True, 'RIGHT', False, False, False], self.fishing_window)
-        self.pause_thread(0.3)
+        self.pause_thread(0.5)
         self.q.new_task('mouse', [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+N'], self.fishing_window)
         self.pause_thread(0.1)
 
@@ -914,9 +922,7 @@ class Fisher:
 
     def init_setup(self):
         self.send_message('initializing setup...')
-        # move_to_supplier = self.fishing_window.get_object('move_to_supplier', search=True)
-        # if move_to_supplier:
-        #     self.send_message('move_to_supplier')
+        self.move_to_supplier()
         self.move_to_supplier()
         self.q.new_task('mouse', [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+N'], self.fishing_window)
         self.pause_thread(0.1)
@@ -959,7 +965,7 @@ class Fisher:
             # self.q.new_task('mouse', [hawk_buff, True, 'LEFT', False, False, False], self.fishing_window)
             # self.pause_thread(2.5)
         else:
-            self.buff_hawkeye_rebufftime = 1000000000000
+            self.buff_hawkeye_rebufftime = 10000000
 
         fenrir = self.fishing_window.get_object('fenrir_party', search=True)
         if fenrir:
@@ -967,7 +973,7 @@ class Fisher:
             self.q.new_task('mouse', [fenrir, True, 'LEFT', False, 'double', False], self.fishing_window)
             self.pause_thread(0.1)
             self.q.new_task('mouse', [fenrir, True, 'LEFT', False, 'double', False], self.fishing_window)
-            self.pause_thread(0.7)
+            self.pause_thread(0.5)
             pet_items_tab = self.fishing_window.get_object('pet_items_tab', search=True)
             if pet_items_tab:
                 self.send_message('pet_items_tab')
