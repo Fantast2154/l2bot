@@ -239,7 +239,7 @@ class Fisher:
 
         self.fishing()
         self.pause_thread(0.7)
-        if not self.search_object_with_click(self.fishing_window.get_object, self.fishing, 18, 'fishing_window', True):
+        if not self.search_object_with_click(self.fishing_window.get_object, self.fishing_window.get_object('fishing', False), 18, 4, 'fishing_window', True):
             return False
         self.fishing_window.record_fishing_window()
         self.fishing()
@@ -252,7 +252,7 @@ class Fisher:
         # fishing algorithm
 
         # searching for fishing window
-        if not self.search_object_with_click(self.fishing_window.is_fishing_window, self.fishing, 12):
+        if not self.search_object_with_click(self.fishing_window.is_fishing_window, self.fishing_window.get_object('fishing', False), 12, 4):
             self.move_to_supplier()
             # if time.time() - self.absence_of_fishing_window_timer > 180:
             #     self.pause_fisher()
@@ -453,9 +453,8 @@ class Fisher:
             self.move_to_supplier()
             self.position_correction_timer = time.time()
 
-    def search_object_with_click(self, search_object, task_proc, searching_time, *args):
+    def search_object_with_click(self, search_object, click_coordinates, searching_time, time_between_actions, *args):
         counter = 0
-        time_between_actions = 6
         repeat_times = searching_time // time_between_actions
         temp_timer = time.time()
 
@@ -463,8 +462,8 @@ class Fisher:
 
             if time.time() - temp_timer > time_between_actions * counter:
                 counter += 1
-                task_proc()
-                self.pause_thread(0.5)
+                self.click(click_coordinates)
+                self.pause_thread(0.2)
 
             if time.time() - temp_timer > searching_time or counter > repeat_times:
                 return False
@@ -581,7 +580,7 @@ class Fisher:
         #     self.send_trade_to_supplier()
         #     self.pause_thread(6)
 
-        if not self.search_object_with_click(self.fishing_window.is_exchange_menu, self.send_trade_to_supplier, 20):
+        if not self.search_object_with_click(self.fishing_window.is_exchange_menu, self.fishing_window.get_object('trade_supplier', False), 20, 4):
             self.fishing_window.start_accurate_search()
             self.pause_thread(1)
             return False
@@ -807,7 +806,7 @@ class Fisher:
         # print('pos1', pos_fish)
 
         [(target_pos_x, target_pos_y)] = pos_trade_window
-        target_pos = [(target_pos_x + 50, target_pos_y + 250)]
+        target_pos = [(target_pos_x, target_pos_y - 220)]
         # print('pos2', target_pos)
         self.q.new_task('mouse',
                         [pos_fish, target_pos, 'LEFT', False, 'drag_and_drop', False],
@@ -903,10 +902,8 @@ class Fisher:
         #                 self.fishing_window)
         # self.pause_thread(0.1)
 
-        self.q.new_task('mouse',
-                        [self.fishing_window.get_object('fenrir_party'), False, 'LEFT', False, 'double', False],
-                        self.fishing_window)
-        self.pause_thread(0.5)
+        self.search_object_with_click(self.fishing_window.get_object, self.fishing_window.get_object('fenrir_party'), 7, 1, 'pet_items_tab', True)
+
         self.q.new_task('mouse', [self.fishing_window.get_object('pet_items_tab'), False, 'LEFT', False, False, False],
                         self.fishing_window)
         self.pause_thread(0.5)
@@ -996,10 +993,11 @@ class Fisher:
         fenrir = self.fishing_window.get_object('fenrir_party', search=True)
         if fenrir:
             self.send_message('fenrir')
-            # self.q.new_task('mouse', [fenrir, False, 'LEFT', False, 'double', False], self.fishing_window)
-            # self.pause_thread(0.1)
-            self.q.new_task('mouse', [fenrir, False, 'LEFT', False, 'double', False], self.fishing_window)
-            self.pause_thread(0.5)
+            self.search_object_with_click(self.fishing_window.get_object, fenrir, 7, 1, 'pet_items_tab', True)
+            # self.q.new_task('mouse', [fenrir, False, 'LEFT', False, False, False], self.fishing_window)
+            # self.pause_thread(0.5)
+            # self.q.new_task('mouse', [fenrir, False, 'LEFT', False, False, False], self.fishing_window)
+            # self.pause_thread(0.5)
             pet_items_tab = self.fishing_window.get_object('pet_items_tab', search=True)
             if pet_items_tab:
                 self.send_message('pet_items_tab')

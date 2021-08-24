@@ -57,7 +57,7 @@ class FishingWindow(L2window):
             ['ok_button', 'images/trade/ok_button.jpg', 0.8],
             ['disconnect_EN', 'images/disconnect_EN.jpg', 0.4],
             ['weight_icon', 'images/weight.jpg', 0.9],
-            ['exchange_menu', 'images/trade/exchange_menu2.jpg', 0.8],
+            ['exchange_menu', 'images/trade/exchange_menu3.jpg', 0.8],
             ['login', 'images/login.jpg', 0.95],
             ['mailbox', 'images/mailbox.jpg', 0.8],
             ['sendmail_button', 'images/sendmail_button.jpg', 0.8],

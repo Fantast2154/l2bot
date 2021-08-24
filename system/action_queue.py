@@ -276,13 +276,13 @@ class ActionQueue:
 
         if 'double' in params:
             self.mouse.press(Button.left)
-            time.sleep(0.02)
+            time.sleep(0.07)
             self.mouse.release(Button.left)
-            time.sleep(0.03)
+            time.sleep(0.07)
             self.mouse.press(Button.left)
-            time.sleep(0.02)
+            time.sleep(0.07)
             self.mouse.release(Button.left)
-            time.sleep(0.03)
+            time.sleep(0.07)
             return
 
         if params[1] and params[4] == 'drag_and_drop':

@@ -32,7 +32,7 @@ class FishingSupplierWindow(L2window):
             ['mailbox', 'images/mailbox.jpg', 0.8],
             ['sendmail_button', 'images/sendmail_button.jpg', 0.8],
             ['send_button', 'images/send_button.jpg', 0.8],
-            ['exchange_menu', 'images/trade/exchange_menu2.jpg', 0.8],
+            ['exchange_menu', 'images/trade/exchange_menu3.jpg', 0.8],
             ['treangle', 'images/trade/treangle.jpg', 0.8],
             ['ok_button', 'images/trade/ok_button_2.jpg', 0.7],
             ['cancel_button', 'images/trade/cancel_button.jpg', 0.8],
@@ -105,11 +105,11 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 460 // 2)]
             coordinates = self.find('soski', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             if coordinates:
                 (out_x, out_y) = coordinates[0]
-                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+                return [(out_x + x - 260 // 2, out_y + y - 460 // 2)]
         else:
             return []
 
@@ -117,11 +117,11 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 460 // 2)]
             coordinates = self.find('alacrity', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             if coordinates:
                 (out_x, out_y) = coordinates[0]
-                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+                return [(out_x + x - 260 // 2, out_y + y - 460 // 2)]
         else:
             return []
 
@@ -129,11 +129,11 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 460 // 2)]
             coordinates = self.find('soski_pet', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             if coordinates:
                 (out_x, out_y) = coordinates[0]
-                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+                return [(out_x + x - 260 // 2, out_y + y - 460 // 2)]
         else:
             return []
 
@@ -141,11 +141,11 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 460 // 2)]
             coordinates = self.find('potion', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             if coordinates:
                 (out_x, out_y) = coordinates[0]
-                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+                return [(out_x + x - 260 // 2, out_y + y - 460 // 2)]
         else:
             return []
 
@@ -153,12 +153,12 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 460 // 2)]
             coordinates = self.find('baits', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             # print(coordinates)
             if coordinates:
                 (out_x, out_y) = coordinates[0]
-                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+                return [(out_x + x - 260 // 2, out_y + y - 460 // 2)]
         else:
             return []
 
@@ -184,10 +184,10 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 460 // 2)]
             coordinates = self.find('small_bag', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             [(out_x, out_y)] = coordinates
-            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+            return [(out_x + x - 260 // 2, out_y + y - 460 // 2)]
         else:
             return []
 
@@ -214,11 +214,11 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 460 // 2)]
             coordinates = self.find('cancel_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             if coordinates:
                 (out_x, out_y) = coordinates[0]
-                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+                return [(out_x + x - 260 // 2, out_y + y - 460 // 2)]
             #return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
