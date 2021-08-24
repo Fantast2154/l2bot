@@ -285,7 +285,7 @@ class ActionQueue:
             time.sleep(0.03)
             return
 
-        if params[1] and params[5] == 'drag_and_drop':
+        if params[1] and params[4] == 'drag_and_drop':
             self.mouse.press(Button.left)
             time.sleep(0.1)
             VK_CODE = {'alt':0x12}
@@ -307,6 +307,11 @@ class ActionQueue:
             time.sleep(0.1)
             return
 
+        if params[5]:
+            print(params[5])
+            keyboard.send(params[5])
+            time.sleep(0.1)
+            return
         self.mouse.press(Button.left)
         time.sleep(0.07)
         self.mouse.release(Button.left)
@@ -358,12 +363,8 @@ class ActionQueue:
 
             if 'insert' in params:
                 keyboard.send('ctrl+v')
-        if action == 'keyboard':
-            if len(params) != 6:
-                return
-            if 'ctrlv' in params:
-                keyboard.send(params[0])
-                time.sleep(0.1)
+
+
 
     @classmethod
     def start_queueing(cls):
