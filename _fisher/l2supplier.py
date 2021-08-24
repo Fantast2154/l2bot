@@ -271,6 +271,11 @@ class Supplier:
 
         pyperclip.copy(0)
 
+        tim = time.time()
+        while time.time() - tim < 20:
+            if not self.supplier_window.is_exchange_menu():
+                break
+        self.pause_thread(0.55)
         self.supply_request[0] = False
         self.update_current_attempt()
         self.current_state[0] = 'available'

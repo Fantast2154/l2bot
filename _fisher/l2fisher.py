@@ -181,7 +181,7 @@ class Fisher:
         self.if_rebuff_time()
 
         if self.number_of_fishers > 1:
-            delay = 15 * (self.number_of_fishers - self.fisher_id - 1) + self.fisher_id * 7
+            delay = 16 * (self.number_of_fishers - self.fisher_id - 1) + self.fisher_id * 2
             self.send_message(f'will start fishing in .... {delay} sec')
             self.pause_thread(delay)
 
@@ -243,8 +243,9 @@ class Fisher:
             return False
         self.fishing_window.record_fishing_window()
         self.fishing()
+        # self.bar_limits()
         self.pause_thread(2)
-        self.bar_limits()
+
         return True
 
     def actions_while_fishing(self):
@@ -501,30 +502,30 @@ class Fisher:
 
         self.send_message('overweight_baits_soski_correction')
         if self.fisher_id == 0:
-            required_dbaits = 1
-            required_nbaits = 2
-            required_soski = 3
-            required_alacrity = 4
-            required_soski_pet = 5
-            required_potion = 6
+            required_dbaits = 50
+            required_nbaits = 0
+            required_soski = 3000
+            required_alacrity = 50
+            required_soski_pet = 50
+            required_potion = 10
 
         elif self.fisher_id == 1:
             required_dbaits = 1
-            required_nbaits = 2
-            required_soski = 3
-            required_alacrity = 4
-            required_soski_pet = 5
-            required_potion = 6
+            required_nbaits = 0
+            required_soski = 3000
+            required_alacrity = 1
+            required_soski_pet = 1
+            required_potion = 1
 
         else:
-            required_dbaits = 7
-            required_nbaits = 8
-            required_soski = 9
-            required_alacrity = 10
-            required_soski_pet = 11
-            required_potion = 12
+            required_dbaits = 40
+            required_nbaits = 0
+            required_soski = 5000
+            required_alacrity = 1
+            required_soski_pet = 1
+            required_potion = 1
 
-        if required_dbaits > 1 or required_nbaits > 1 or required_soski > 1 or required_alacrity > 1 or required_soski_pet > 1 or required_potion > 1:
+        if required_dbaits >= 1 or required_nbaits >= 1 or required_soski >= 1 or required_alacrity >= 1 or required_soski_pet >= 1 or required_potion >= 1:
             self.requested_items_to_supply.append(required_dbaits)  # dbaits
             self.requested_items_to_supply.append(required_nbaits)  # nbaits
             self.requested_items_to_supply.append(required_soski)  # soski
@@ -589,7 +590,7 @@ class Fisher:
 
         tim = time.time()
         self.send_fish_to_supplier(self.fishing_window.is_exchange_menu())
-        while time.time() - tim < 30:
+        while time.time() - tim < 25:
             self.pause_thread(1)
 
         self.smart_press_button('ok', self.fishing_window.is_exchange_menu, searching_time=5)
@@ -914,10 +915,14 @@ class Fisher:
                         [self.fishing_window.get_object('alacrity_potion_small'), False, 'RIGHT', False, False, False],
                         self.fishing_window)
         self.pause_thread(0.5)
-        self.q.new_task('mouse',
-                        [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+N'],
-                        self.fishing_window)
-        self.pause_thread(0.1)
+        timer = time.time()
+        while time.time() - timer < 7:
+            temp = self.fishing_window.get_object('pet_items_tab', search=True)
+            if temp:
+                self.q.new_task('mouse',
+                                [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+N'],
+                                self.fishing_window)
+            self.pause_thread(0.7)
 
         # temp2 = self.fishing_window.is_alacrity_dex_warlock()
         # if temp2:

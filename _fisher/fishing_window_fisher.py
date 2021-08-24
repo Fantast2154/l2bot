@@ -24,7 +24,7 @@ class FishingWindow(L2window):
             ['pumping', 'images/fishing/pumping.jpg', 0.77],
             ['reeling', 'images/fishing/reeling.jpg', 0.77],
             ['attack', 'images/fishing/attack.jpg', 0.87],
-            ['move_to_supplier', 'images/fishing/move_to_supplier.jpg', 0.77],
+            ['move_to_supplier', 'images/fishing/move_to_supplier.jpg', 0.6],
             ['trade_supplier', 'images/trade/trade_icon.jpg', 0.7]]
 
         self.extended_image_database = [
@@ -32,7 +32,7 @@ class FishingWindow(L2window):
             ['soski', 'images/soski.jpg', 0.7],
             ['hp_window', 'images/farming/hp_window.jpg', 0.77],
             ['hawk_buff', 'images/fishing/hawk_buff.jpg', 0.77],
-            ['fenrir_party', 'images/party/fenrir_party.jpg', 0.77],
+            ['fenrir_party', 'images/party/fenrir_party.jpg', 0.67],
             ['pet_items_tab', 'images/party/pet_items_tab.jpg', 0.8],
             ['mini_map', 'images/mini_map.jpg', 0.7],
             ['status_bar', 'images/status_bar.jpg', 0.65],
