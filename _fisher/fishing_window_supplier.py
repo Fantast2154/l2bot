@@ -45,9 +45,9 @@ class FishingSupplierWindow(L2window):
             ['catched_item3', 'images/items/catcheditem3.jpg', 0.8],
             ['claim_items_button', 'images/claim_items_button.jpg', 0.8],
 
-            ['alacrity', 'images/alacrity.jpg', 0.8],
-            ['soski_pet', 'images/soski_pet.jpg', 0.8],
-            ['potion', 'images/potion.jpg', 0.8]
+            ['alacrity', 'images/items/alacrity.jpg', 0.8],
+            ['soski_pet', 'images/items/soski_pet.jpg', 0.8],
+            ['potion', 'images/items/potion.jpg', 0.8]
         ]
 
         self.init_images()
