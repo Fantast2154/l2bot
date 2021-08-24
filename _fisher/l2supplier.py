@@ -232,9 +232,9 @@ class Supplier:
         if alacrity_pos:
             pyperclip.copy(request_alacrity)
             if len(alacrity_pos):
-                self.trade_item(request_alacrity[0])
+                self.trade_item(alacrity_pos[0])
             else:
-                self.trade_item(request_alacrity)
+                self.trade_item(alacrity_pos)
             self.pause_thread(0.7)
             self.enter_number(input_field_pos)
             self.pause_thread(0.7)
@@ -244,9 +244,9 @@ class Supplier:
         if soski_pet_pos:
             pyperclip.copy(request_soski_pet)
             if len(soski_pet_pos):
-                self.trade_item(request_soski_pet[0])
+                self.trade_item(soski_pet_pos[0])
             else:
-                self.trade_item(request_soski_pet)
+                self.trade_item(soski_pet_pos)
             self.pause_thread(0.7)
             self.enter_number(input_field_pos)
             self.pause_thread(0.7)
@@ -256,9 +256,9 @@ class Supplier:
         if potion_pos:
             pyperclip.copy(request_potion)
             if len(potion_pos) > 1:
-                self.trade_item(request_potion[0])
+                self.trade_item(potion_pos[0])
             else:
-                self.trade_item(request_potion)
+                self.trade_item(potion_pos)
             self.pause_thread(0.7)
             self.enter_number(input_field_pos)
             self.pause_thread(0.7)
