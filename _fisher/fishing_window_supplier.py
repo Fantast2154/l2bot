@@ -105,10 +105,11 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x-260//2, y-35//2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
             coordinates = self.find('soski', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            [(out_x, out_y)] = coordinates
-            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+            if coordinates:
+                (out_x, out_y) = coordinates[0]
+                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
 
@@ -116,10 +117,11 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x-260//2, y-35//2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
             coordinates = self.find('alacrity', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            [(out_x, out_y)] = coordinates
-            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+            if coordinates:
+                (out_x, out_y) = coordinates[0]
+                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
 
@@ -127,10 +129,11 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x-260//2, y-35//2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
             coordinates = self.find('soski_pet', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            [(out_x, out_y)] = coordinates
-            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+            if coordinates:
+                (out_x, out_y) = coordinates[0]
+                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
 
@@ -138,10 +141,11 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x-260//2, y-35//2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
             coordinates = self.find('potion', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            [(out_x, out_y)] = coordinates
-            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+            if coordinates:
+                (out_x, out_y) = coordinates[0]
+                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
 
@@ -149,26 +153,27 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x-260//2, y-35//2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
             coordinates = self.find('baits', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            #print(coordinates)
+            # print(coordinates)
             if coordinates:
                 (out_x, out_y) = coordinates[0]
                 return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
+
     def is_input_field(self):
         temp_coordinates = self.is_confirm_button()
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            coordinates = [(x, y-35)]
+            coordinates = [(x, y - 35)]
             return coordinates
         else:
             return []
 
     def is_confirm_button(self):
         temp_coordinates = self.find('confirm_button')
-        #print(temp_coordinates)
+        # print(temp_coordinates)
         if temp_coordinates:
             return temp_coordinates
         else:
@@ -178,7 +183,7 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x-260//2, y-35//2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
             coordinates = self.find('small_bag', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             [(out_x, out_y)] = coordinates
             return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
@@ -189,13 +194,13 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            #temp_coordinates2 = [(x-260//2, y-35//2)]
-            temp_coordinates2 = [(x-300//2, y-40//2)]
-            #coordinates = self.find('ok_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            #coordinates = self.find('ok_button', coordinates=temp_coordinates2, w=300, d=550, accurate=True)
+            # temp_coordinates2 = [(x-260//2, y-35//2)]
+            temp_coordinates2 = [(x - 300 // 2, y - 40 // 2)]
+            # coordinates = self.find('ok_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
+            # coordinates = self.find('ok_button', coordinates=temp_coordinates2, w=300, d=550, accurate=True)
             coordinates = self.find('ok_button')
-            #[(out_x, out_y)] = coordinates
-            #return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+            # [(out_x, out_y)] = coordinates
+            # return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
             return coordinates
         else:
             return []
@@ -204,7 +209,7 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('exchange_menu')
         if temp_coordinates:
             [(x, y)] = temp_coordinates
-            temp_coordinates2 = [(x-260//2, y-35//2)]
+            temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
             coordinates = self.find('cancel_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             [(out_x, out_y)] = coordinates
             return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
