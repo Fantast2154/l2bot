@@ -78,7 +78,8 @@ class FishingWindow(L2window):
         self.init_images()
 
     def __del__(self):
-        self.send_message(f"destroyed")
+        pass
+        #self.send_message(f"destroyed")
     # [{hwnd1: [], hwnd2: []}]
 
     def update_screenshot(self):

@@ -15,7 +15,7 @@ class Fisher:
         manager = Manager()
         self.exit_is_set = manager.list()
         self.exit_is_set.append(False)
-        
+
         self.fishing_window = fishing_window
         self.fisher_id = fisher_id
         self.number_of_fishers = number_of_fishers
@@ -42,7 +42,7 @@ class Fisher:
         self.paused = manager.list()
         self.paused.append(0)
 
-       # trading
+        # trading
         # self.supplying_request = False # fisher wants supplying. options: True, False
         self.supplying_request = manager.list()
         self.supplying_request.append(False)
@@ -58,9 +58,9 @@ class Fisher:
 
         # send/receive counters
         if self.fisher_id == 0:
-            self.send_counter = 1
+            self.send_counter = 10000000000000
         else:
-            self.send_counter = 1
+            self.send_counter = 10000000000000
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -135,7 +135,7 @@ class Fisher:
         if self.fisher_id == 1:
             run_hours = 5
         while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
-            if time.time() - timer > 3600*run_hours:
+            if time.time() - timer > 3600 * run_hours:
                 self.pause_fisher()
 
             self.update_current_attempt()
@@ -291,6 +291,11 @@ class Fisher:
         coords_saved = False
         x_border = None
         previous_position = None
+
+        clock_time_without_bars = 0
+        clock_is_checked = False
+        threshold_time_without_any_bar = 2
+
         pump_skill_cast_time = 0
         reeling_skill_cast_time = 0
         pump_was_pressed = False
@@ -305,6 +310,7 @@ class Fisher:
         # fishing main loop
 
         while self.fishing_window.is_fishing_window() and not self.exit_is_set[0]:
+            self.pause_thread(0.1)
 
             if self.is_day_time():
                 temp = self.fishing_window.is_blue_bar()
@@ -315,90 +321,100 @@ class Fisher:
             # else:
             #     temp = self.fishing_window.get_object('blue_bar', True) + self.fishing_window.get_object('red_bar', True)
 
-            if temp:
-                (x_temp, y_temp) = temp[-1]
-                # self.send_message(f'temp {temp[-1]}')
-                x_border = x_temp
+            # SMART loop breaker depending on conditions
 
-                # SMART loop breaker depending on conditions
+            # if not self.ai_fishing_breaker(x_border, fishing_fight_time):
+            #     self.fishing()
+            #     self.pause_thread(0.7)
+            #     return True
 
-                # if not self.ai_fishing_breaker(x_border, fishing_fight_time):
-                #     self.fishing()
-                #     self.pause_thread(0.7)
-                #     return True
+            if self.fishing_window.is_clock():
 
-            elif self.fishing_window.is_clock():
-                delta_pump_skill = time.time() - pump_skill_cast_time
-                if delta_pump_skill >= self.pumping_skill_CD:
-                    self.pumping()
-                    pump_skill_cast_time = time.time()
+                if temp:
+                    (x_temp, y_temp) = temp[-1]
+                    # self.send_message(f'temp {temp[-1]}')
+                    x_border = x_temp
+                    clock_time_without_bars = time.time()
+                else:
+                    #if not clock_is_checked:
 
-            if not coords_saved and (x_border != None):
-                pumping_time = time.time()
-                coords_saved = True
-                previous_position = x_border
-                # self.send_message('COORDS SAVED!!!!')
-            # self.send_message(previous_position - x_border)
-            if previous_position != None and x_border != None:
-                delta_pump_skill = time.time() - pump_skill_cast_time
-                delta_reel_skill = time.time() - reeling_skill_cast_time
+                        #clock_is_checked = True
 
-                if pump_was_pressed and 15 <= x_border - previous_position < 45 and delta_reel_skill >= self.reeling_skill_CD:
-                    pump_was_pressed = False
-                    reel_count = 0
-                    self.reeling()
-                    reeling_skill_cast_time = time.time()
-                    # self.send_message('ОШИБКА PUMP. ИСПРАВЛЯЮ.')
-
-                elif reel_was_pressed and 15 <= x_border - previous_position < 45 and delta_pump_skill >= self.pumping_skill_CD:
-                    reel_was_pressed = False
-                    reel_count = 0
-                    self.pumping()
-                    pump_skill_cast_time = time.time()
-                    # self.send_message('ОШИБКА REEL. ИСПРАВЛЯЮ.')
-
-                # if x_border != previous_position:
-                if 10 > math.fabs(x_border - previous_position) > 3:  # было not < 3
-                    pumping_time = time.time()
-
-                if x_border - previous_position < 4:
-                    if not pump_timer_was_set:
-                        pump_timer_was_set = True
-                        pumping_time = time.time()
-
-                    delta = time.time() - pumping_time  # NEW
-                    delta_pump_skill = time.time() - pump_skill_cast_time
-                    if delta >= self.pumping_CD and delta_pump_skill >= self.pumping_skill_CD:  # NEW
-                        pump_timer_was_set = False
-                        reel_count = 0
+                    if time.time() - clock_time_without_bars > threshold_time_without_any_bar:
+                        #clock_is_checked = False
                         self.pumping()
-                        pump_skill_cast_time = time.time()
-                        pump_was_pressed = True
-                        reel_was_pressed = False
 
-                elif 4 <= x_border - previous_position < 12:
-                    reel_count += 1
+                # delta_pump_skill = time.time() - pump_skill_cast_time
+                # if delta_pump_skill >= self.pumping_skill_CD:
+                #     self.pumping()
+                #     pump_skill_cast_time = time.time()
+
+                if not coords_saved and x_border is not None:
+                    pumping_time = time.time()
+                    coords_saved = True
+                    previous_position = x_border
+                    # self.send_message('COORDS SAVED!!!!')
+                # self.send_message(previous_position - x_border)
+                if previous_position is not None and x_border is not None:
+                    delta_pump_skill = time.time() - pump_skill_cast_time
                     delta_reel_skill = time.time() - reeling_skill_cast_time
 
-                    # if reel_count > 0 and delta_reel_skill >= self.reeling_skill_CD:
-                    if delta_reel_skill >= self.reeling_skill_CD:  # reel_count > 1
+                    if pump_was_pressed and 15 <= x_border - previous_position < 45 and delta_reel_skill >= self.reeling_skill_CD:
+                        pump_was_pressed = False
                         reel_count = 0
                         self.reeling()
                         reeling_skill_cast_time = time.time()
-                        reel_was_pressed = True
-                        pump_was_pressed = False
-                        pump_timer_was_set = False  # NEW
-                        # print(x_border - previous_position, 'REEL')
+                        # self.send_message('ОШИБКА PUMP. ИСПРАВЛЯЮ.')
 
-                        if not reel_timer_was_set:
-                            reel_timer_was_set = True
-                            reeling_time = time.time()
+                    elif reel_was_pressed and 15 <= x_border - previous_position < 45 and delta_pump_skill >= self.pumping_skill_CD:
+                        reel_was_pressed = False
+                        reel_count = 0
+                        self.pumping()
+                        pump_skill_cast_time = time.time()
+                        # self.send_message('ОШИБКА REEL. ИСПРАВЛЯЮ.')
 
-                        if time.time() - reeling_time >= self.reeling_skill_CD:
-                            reel_timer_was_set = False
+                    # if x_border != previous_position:
+                    if 10 > math.fabs(x_border - previous_position) > 3:  # было not < 3
+                        pumping_time = time.time()
 
-                # if math.fabs(x_border - previous_position) >= 36:
-                previous_position = x_border
+                    if x_border - previous_position < 4:
+                        if not pump_timer_was_set:
+                            pump_timer_was_set = True
+                            pumping_time = time.time()
+
+                        delta = time.time() - pumping_time  # NEW
+                        delta_pump_skill = time.time() - pump_skill_cast_time
+                        if delta >= self.pumping_CD and delta_pump_skill >= self.pumping_skill_CD:  # NEW
+                            pump_timer_was_set = False
+                            reel_count = 0
+                            self.pumping()
+                            pump_skill_cast_time = time.time()
+                            pump_was_pressed = True
+                            reel_was_pressed = False
+
+                    elif 4 <= x_border - previous_position < 15:
+                        reel_count += 1
+                        delta_reel_skill = time.time() - reeling_skill_cast_time
+
+                        # if reel_count > 0 and delta_reel_skill >= self.reeling_skill_CD:
+                        if delta_reel_skill >= self.reeling_skill_CD:  # reel_count > 1
+                            reel_count = 0
+                            self.reeling()
+                            reeling_skill_cast_time = time.time()
+                            reel_was_pressed = True
+                            pump_was_pressed = False
+                            pump_timer_was_set = False  # NEW
+                            # print(x_border - previous_position, 'REEL')
+
+                            if not reel_timer_was_set:
+                                reel_timer_was_set = True
+                                reeling_time = time.time()
+
+                            if time.time() - reeling_time >= self.reeling_skill_CD:
+                                reel_timer_was_set = False
+
+                    # if math.fabs(x_border - previous_position) >= 36:
+                    previous_position = x_border
 
         return True
 
@@ -437,7 +453,6 @@ class Fisher:
             self.attack()
             self.move_to_supplier()
             self.position_correction_timer = time.time()
-
 
     def search_object_with_click(self, search_object, task_proc, searching_time, *args):
         counter = 0
@@ -508,9 +523,9 @@ class Fisher:
             self.fishers_requested_supps[0] = self.requested_items_to_supply_d
             self.fishers_request[0] = 'requests supplying'
             # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
-            #self.supply_request_proceed[0] = True
-            #self.current_state[0] = 'busy'
-            #self.trading_is_allowed[0] = True
+            # self.supply_request_proceed[0] = True
+            # self.current_state[0] = 'busy'
+            # self.trading_is_allowed[0] = True
 
             self.trading()
 
@@ -535,14 +550,12 @@ class Fisher:
         self.fishers_request[0] = ''
 
         while not self.trading_is_allowed[0]:
-
             time.sleep(0.5)
 
         self.send_message('trading is allowed')
         self.move_to_supplier()
         self.fishing_window.stop_accurate_search()
         self.pause_thread(1)
-
 
         # waiting_time2 = 15
         # temp_timer2 = time.time()
@@ -590,12 +603,11 @@ class Fisher:
 
         self.current_state[0] = 'fishing'
 
-        #self.send_counter += 3
+        # self.send_counter += 3
 
         self.fishing_window.start_accurate_search()
 
         self.pause_thread(1)
-
 
     def send_fish_to_supplier(self, exchange_menu_pos):
         self.send_message('send_fish_to_supplier')
@@ -644,7 +656,6 @@ class Fisher:
         # decorated.sort(reverse=True)
         # sorted2 = [tup for second, tup in decorated]
         # self.send_message(f'sorted {sorted2}')
-
 
         for elem in sorted2:
             # print('elem', elem)
