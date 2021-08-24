@@ -619,6 +619,9 @@ class Fisher:
         self.requested_items_to_supply_d['dbaits'] = 0
         self.requested_items_to_supply_d['nbaits'] = 0
         self.requested_items_to_supply_d['soski'] = 0
+        self.requested_items_to_supply_d['alacrity'] = 0
+        self.requested_items_to_supply_d['soski_pet'] = 0
+        self.requested_items_to_supply_d['potion'] = 0
 
         self.current_state[0] = 'fishing'
 

@@ -62,8 +62,8 @@ class FishingSupplierWindow(L2window):
     def update_accurate_screenshot(self, object, coordinates, w, d):
         [(x, y)] = coordinates
         temp = self.screenshot[-1][self.hwnd][0][y:y + d, x:x + w]
-        cv2.imshow('1', temp)
-        cv2.waitKey(100)
+        #cv2.imshow('1', temp)
+        #cv2.waitKey(100)
         # position = self.library[object][0].find(self.update_screenshot())
         return temp
 
