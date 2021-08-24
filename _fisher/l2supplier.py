@@ -321,7 +321,7 @@ class Supplier:
 
     def trade_item(self, coordinates):
         self.q.new_task('mouse',
-                        [coordinates, True, 'LEFT', False, False, 'double'],
+                        [coordinates, True, 'LEFT', 'double', False, False],
                         self.supplier_window)
 
     def get_status(self):
