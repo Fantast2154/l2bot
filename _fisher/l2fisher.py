@@ -173,15 +173,16 @@ class Fisher:
         self.send_message(f'starts fishing')
 
         self.init_setup()
-        delay = 15*(self.number_of_fishers-self.fisher_id)
-        self.send_message(f'will start fishing in .... {delay} sec')
-        self.pause_thread(delay)
 
         if not self.trial_rod_cast():
             self.send_message(f'trial rod cast FAILURE')
             self.stop_fisher()
 
         self.if_rebuff_time()
+
+        delay = 15*(self.number_of_fishers-self.fisher_id-1) + self.fisher_id*5
+        self.send_message(f'will start fishing in .... {delay} sec')
+        self.pause_thread(delay)
 
         self.fishing_window.start_accurate_search()
         self.pause_thread(1)
