@@ -175,7 +175,8 @@ class FishingSupplierWindow(L2window):
         temp_coordinates = self.find('confirm_button')
         # print(temp_coordinates)
         if temp_coordinates:
-            return temp_coordinates
+            (out_x, out_y) = temp_coordinates[0]
+            return [(out_x, out_y)]
         else:
             return []
 
@@ -199,9 +200,13 @@ class FishingSupplierWindow(L2window):
             # coordinates = self.find('ok_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
             # coordinates = self.find('ok_button', coordinates=temp_coordinates2, w=300, d=550, accurate=True)
             coordinates = self.find('ok_button')
+            if coordinates:
+                (out_x, out_y) = coordinates[0]
+                return [(out_x, out_y)]
+
             # [(out_x, out_y)] = coordinates
             # return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
-            return coordinates
+            #return coordinates
         else:
             return []
 
@@ -211,8 +216,10 @@ class FishingSupplierWindow(L2window):
             [(x, y)] = temp_coordinates
             temp_coordinates2 = [(x - 260 // 2, y - 35 // 2)]
             coordinates = self.find('cancel_button', coordinates=temp_coordinates2, w=260, d=500, accurate=True)
-            [(out_x, out_y)] = coordinates
-            return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+            if coordinates:
+                (out_x, out_y) = coordinates[0]
+                return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
+            #return [(out_x + x - 260 // 2, out_y + y - 35 // 2)]
         else:
             return []
 
