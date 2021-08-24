@@ -231,7 +231,7 @@ class Supplier:
 
         if alacrity_pos:
             pyperclip.copy(request_alacrity)
-            if len(alacrity_pos):
+            if len(alacrity_pos) > 1:
                 self.trade_item(alacrity_pos[0])
             else:
                 self.trade_item(alacrity_pos)
@@ -243,7 +243,7 @@ class Supplier:
 
         if soski_pet_pos:
             pyperclip.copy(request_soski_pet)
-            if len(soski_pet_pos):
+            if len(soski_pet_pos) > 1:
                 self.trade_item(soski_pet_pos[0])
             else:
                 self.trade_item(soski_pet_pos)
