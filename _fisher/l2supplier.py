@@ -231,7 +231,7 @@ class Supplier:
 
         if alacrity_pos:
             pyperclip.copy(request_alacrity)
-            if len(request_alacrity) > 1:
+            if len(alacrity_pos):
                 self.trade_item(request_alacrity[0])
             else:
                 self.trade_item(request_alacrity)
@@ -243,7 +243,7 @@ class Supplier:
 
         if soski_pet_pos:
             pyperclip.copy(request_soski_pet)
-            if len(request_soski_pet) > 1:
+            if len(soski_pet_pos):
                 self.trade_item(request_soski_pet[0])
             else:
                 self.trade_item(request_soski_pet)
@@ -255,7 +255,7 @@ class Supplier:
 
         if potion_pos:
             pyperclip.copy(request_potion)
-            if len(request_potion) > 1:
+            if len(potion_pos) > 1:
                 self.trade_item(request_potion[0])
             else:
                 self.trade_item(request_potion)
