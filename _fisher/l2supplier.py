@@ -201,7 +201,7 @@ class Supplier:
             print('HERE!SUKI')
 
             self.trade_item(soski_pos)
-            self.pause_thread(2)
+            self.pause_thread(0.6)
 
         input_field_pos = self.supplier_window.is_input_field()
         if not input_field_pos:
@@ -211,11 +211,11 @@ class Supplier:
         if not confirm_button_pos:
             return False
         print('confirm_button_pos')
-        self.pause_thread(0.7)
+        self.pause_thread(0.55)
         self.enter_number(input_field_pos)
-        self.pause_thread(0.7)
+        self.pause_thread(0.55)
         self.click(confirm_button_pos)
-        self.pause_thread(0.7)
+        self.pause_thread(0.55)
 
         if dbaits_pos:
             pyperclip.copy(request_dbaits)
@@ -223,11 +223,11 @@ class Supplier:
                 self.trade_item(dbaits_pos[0])
             else:
                 self.trade_item(dbaits_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
             self.enter_number(input_field_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
             self.click(confirm_button_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
 
         if alacrity_pos:
             pyperclip.copy(request_alacrity)
@@ -235,11 +235,11 @@ class Supplier:
                 self.trade_item(alacrity_pos[0])
             else:
                 self.trade_item(alacrity_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
             self.enter_number(input_field_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
             self.click(confirm_button_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
 
         if soski_pet_pos:
             pyperclip.copy(request_soski_pet)
@@ -247,11 +247,11 @@ class Supplier:
                 self.trade_item(soski_pet_pos[0])
             else:
                 self.trade_item(soski_pet_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
             self.enter_number(input_field_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
             self.click(confirm_button_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
 
         if potion_pos:
             pyperclip.copy(request_potion)
@@ -259,15 +259,15 @@ class Supplier:
                 self.trade_item(potion_pos[0])
             else:
                 self.trade_item(potion_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
             self.enter_number(input_field_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
             self.click(confirm_button_pos)
-            self.pause_thread(0.7)
+            self.pause_thread(0.55)
 
         self.pause_thread(8)
         self.click(ok_button_pos)
-        self.pause_thread(0.7)
+        self.pause_thread(0.55)
 
         pyperclip.copy(0)
 
@@ -320,6 +320,7 @@ class Supplier:
                         self.supplier_window)
 
     def trade_item(self, coordinates):
+        print('trade item')
         self.q.new_task('mouse',
                         [coordinates, True, 'LEFT', False, 'double', False],
                         self.supplier_window)

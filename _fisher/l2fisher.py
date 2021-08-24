@@ -60,7 +60,7 @@ class Fisher:
         if self.fisher_id == 0:
             self.send_counter = 2
         else:
-            self.send_counter = 3
+            self.send_counter = 2
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
