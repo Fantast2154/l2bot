@@ -181,7 +181,7 @@ class Fisher:
         self.if_rebuff_time()
 
         if self.number_of_fishers > 1:
-            delay = 16 * (self.number_of_fishers - self.fisher_id - 1) + self.fisher_id * 2
+            delay = 17 * (self.number_of_fishers - self.fisher_id - 1) + self.fisher_id * 2
             self.send_message(f'will start fishing in .... {delay} sec')
             self.pause_thread(delay)
 
@@ -919,11 +919,11 @@ class Fisher:
         while time.time() - timer < 7:
             temp = self.fishing_window.get_object('pet_items_tab', search=True)
             if temp:
-                self.q.new_task('mouse',
-                                [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+N'],
-                                self.fishing_window)
+                [(x, y)] = temp
+                self.q.new_task('mouse', [[(x+104, y-123)], False, 'LEFT', False, False, False], self.fishing_window)
             self.pause_thread(0.7)
-
+        self.move_to_supplier()
+        self.pause_thread(1)
         # temp2 = self.fishing_window.is_alacrity_dex_warlock()
         # if temp2:
         #     self.q.new_task('mouse', [temp2, True, 'LEFT', False, False, False], self.fishing_window)
@@ -1020,18 +1020,15 @@ class Fisher:
                     # self.pause_thread(0.5)
                 else:
                     self.alacrity_potion_rebufftime = 99999999
+                [(x, y)] = pet_items_tab
+                self.q.new_task('mouse', [[(x+104, y-123)], False, 'LEFT', False, False, False], self.fishing_window)
+                self.pause_thread(0.5)
             else:
                 self.alacrity_potion_rebufftime = 99999999
         else:
             self.alacrity_potion_rebufftime = 99999999
 
 
-
-
-
-        self.q.new_task('mouse',
-                        [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+N'],
-                        self.fishing_window)
         self.pause_thread(0.5)
 
     def init_buff(self):
