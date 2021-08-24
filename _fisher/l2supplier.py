@@ -150,9 +150,9 @@ class Supplier:
         # request_nbaits = self.requested_items_to_supply.pop(1)
         # request_dbaits = self.requested_items_to_supply.pop(0)
 
-        request_soski = self.requested_items_to_supply_d['dbaits']
+        request_dbaits = self.requested_items_to_supply_d['dbaits']
         request_nbaits = self.requested_items_to_supply_d['nbaits']
-        request_dbaits = self.requested_items_to_supply_d['soski']
+        request_soski = self.requested_items_to_supply_d['soski']
         request_alacrity = self.requested_items_to_supply_d['alacrity']
         request_soski_pet = self.requested_items_to_supply_d['soski_pet']
         request_potion = self.requested_items_to_supply_d['potion']
