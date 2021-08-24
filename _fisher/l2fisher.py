@@ -173,7 +173,7 @@ class Fisher:
         self.send_message(f'starts fishing')
 
         self.init_setup()
-        delay = 15
+        delay = 15*(self.number_of_fishers-self.fisher_id)
         self.send_message(f'will start fishing in .... {delay} sec')
         self.pause_thread(delay)
 
