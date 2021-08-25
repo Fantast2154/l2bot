@@ -311,7 +311,6 @@ class ActionQueue:
             if params[5] == 'Alt+N':
                 keyboard.send(params[5])
                 time.sleep(1)
-            print(params[5])
             keyboard.send(params[5])
             time.sleep(0.1)
             return
