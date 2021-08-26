@@ -131,9 +131,9 @@ class Fisher:
         # function:
         # main fishing loop
         timer = time.time()
-        run_hours = 7
-        if self.fisher_id == 0:
-            run_hours = 7
+        run_hours = 5.5
+        # if self.fisher_id == 0:
+        #     run_hours = 7
 
         while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
             if time.time() - timer > 3600 * run_hours:
@@ -946,7 +946,7 @@ class Fisher:
             self.fishing_potion_timer = 0
         else:
             self.send_message('NO fishing_potion_white')
-            self.fishing_potion_rebufftime = 99999999
+            self.fishing_potion_rebufftime = time.time() + 999999
 
         status_bar = self.fishing_window.get_object('status_bar', search=True)
         if status_bar:
@@ -967,14 +967,14 @@ class Fisher:
             self.send_message('alacrity_dex_warlock')
             self.alacrity_potion_timer = 0
         else:
-            self.alacrity_potion_timer = 10000000
+            self.alacrity_potion_timer = time.time() + 999999
 
         hawk_buff = self.fishing_window.is_hawk_buff()
         if hawk_buff:
             self.buff_hawkeye_timer = 0
         else:
             self.send_message('NO hawk_buff')
-            self.buff_hawkeye_rebufftime = 10000000
+            self.buff_hawkeye_rebufftime = time.time() + 999999
 
         self.pause_thread(0.5)
 
