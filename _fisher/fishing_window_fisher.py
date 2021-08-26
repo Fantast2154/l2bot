@@ -46,7 +46,7 @@ class FishingWindow(L2window):
             ['fishing_window', 'images/fishing/fishing_window.jpg', 0.7],
             ['red_bar', 'images/fishing/red_bar3.jpg', 0.8],
             ['buff', 'images/fishing/cdbuff.jpg', 0.87],
-            ['fishing_potion_white', 'images/fishing/fishing_potion_white.jpg', 0.65],
+            ['fishing_potion_white', 'images/fishing/fishing_potion_white.jpg', 0.63],
             ['alacrity_potion_small', 'images/fishing/alacrity_potion_small.jpg', 0.7],
             ['alacrity_dex_warlock', 'images/fishing/alacrity_dex_warlock.jpg', 0.7],
             ['pet_atk1', 'images/fishing/pet_atk_1.jpg', 0.7],

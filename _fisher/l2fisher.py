@@ -132,6 +132,8 @@ class Fisher:
         # main fishing loop
         timer = time.time()
         run_hours = 7
+        if self.fisher_id == 0:
+            run_hours = 7
 
         while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
             if time.time() - timer > 3600 * run_hours:
@@ -910,6 +912,8 @@ class Fisher:
     def rebuff_fishing_potion(self):
         self.send_message('rebuff fishing potion')
         self.fishing_potion_timer = time.time()
+        if self.fisher_id == 0:
+            return
         fishing_potion_white = self.fishing_window.get_object('fishing_potion_white')
         if fishing_potion_white:
             self.q.new_task('mouse',
@@ -963,8 +967,7 @@ class Fisher:
             self.send_message('alacrity_dex_warlock')
             self.alacrity_potion_timer = 0
         else:
-
-            self.fishing_potion_rebufftime = 10000000
+            self.alacrity_potion_timer = 10000000
 
         hawk_buff = self.fishing_window.is_hawk_buff()
         if hawk_buff:
