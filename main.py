@@ -1,11 +1,14 @@
+import os
 import time
+
+import win32con
 
 from _fisher.fishing_service import FishingService
 from system.telegram import Telegram
 from system.l2window import L2window
 import keyboard
 from system.action_queue import ActionQueue
-
+from system.relaunch_module import Login
 from system.window_capture import WindowCapture
 import win32gui
 import sys
@@ -62,96 +65,119 @@ def client_server(bots_id_list):
 
 if __name__ == '__main__':
     print('PROGRAM start--------------------------------------\n')
-    l2window_name = 'Asterios'
-    win_capture = WindowCapture(l2window_name)
+    while True:
 
+        number_of_windows = 3
+        logins = ['gnossienne', 'nFantast2151', 'nFantast2152']
+        passwords = ['usUi2001', 'AA5931593aa', 'AA5931593aa']
 
-    # searching running L2 windows
-    name_list, hash_list = get_l2windows_param()
-    n = len(name_list)
-    print('number of l2 windows:', n)
-    print('hash_list of l2 windows:', hash_list)
-    print('-----')
-    if n < 1:
-        sys.exit('NO L2 WINDOWS DETECTED. PROGRAM ENDS.......')
+        for i in range(number_of_windows):
+            os.startfile(r'C:/Users/Dmitry/Desktop/LineageII @ Asterios')
+            time.sleep(11)
 
-    # screenshot SUPER OBJECT
-    manager = Manager()
-    screen_manager = manager.list()
-    screen_manager.append(0)
+        l2window_name = 'Asterios'
+        win_capture = WindowCapture(l2window_name)
 
-    # create n windows L2
-    windows = []
+        # searching running L2 windows
+        name_list, hash_list = get_l2windows_param()
+        n = len(name_list)
+        print('number of l2 windows:', n)
+        print('hash_list of l2 windows:', hash_list)
+        print('-----')
+        if n < 1:
+            sys.exit('NO L2 WINDOWS DETECTED. PROGRAM ENDS.......')
 
-    for i in range(n):
-        temp_window = L2window(i, win_capture, name_list[i], hash_list[i], screen_manager)
-        temp_window.enum_handler()
-        windows.append(temp_window)
+        # screenshot SUPER OBJECT
+        manager = Manager()
+        screen_manager = manager.list()
+        screen_manager.append(0)
 
-    # creating gui class
-    gui_window = Gui_interface(windows)
-    user_input = gui_window.gui_window()
+        # create n windows L2
+        windows = []
 
-    # setting created windows to screenshot maker
-    win_capture.set_windows(windows)
+        for i in range(n):
+            temp_window = L2window(i, win_capture, name_list[i], hash_list[i], screen_manager)
+            temp_window.enum_handler()
+            windows.append(temp_window)
 
-    # setting created windows to queue
-    queue = ActionQueue(windows)
+        # setting created windows to screenshot maker
+        win_capture.set_windows(windows)
 
-    # start queueing of tasks
-    process_queue = threading.Thread(target=queue.run)
-    process_queue.start()
+        # setting created windows to queue
+        queue = ActionQueue(windows)
 
-    # start capturing screenshots
-    Process_wincap = Process(target=win_capture.start_capturing, args=(screen_manager,))
-    Process_wincap.start()
+        # start queueing of tasks
+        process_queue = threading.Thread(target=queue.run)
+        process_queue.start()
 
-    # creating fishing manager
-    FishService = FishingService(windows, user_input, queue)
+        # start capturing screenshots
+        process_wincap = Process(target=win_capture.start_capturing, args=(screen_manager,))
+        process_wincap.start()
 
-    # gui window loop
-    process_fishingService = threading.Thread(target=FishService.run)
-    process_fishingService.start()
+        #login module
+        # login = Login(windows, logins, passwords, queue)
 
-    pause_switch = True
-    while True:  # Event Loop
-        event, values = gui_window.sg_gui.Read(timeout=4)
+        # creating gui class
+        gui_window = Gui_interface(windows)
+        user_input = gui_window.gui_window()
 
-        for fisher in FishService.fishers:
-            temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
-            gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
+        # creating fishing manager
+        FishService = FishingService(windows, user_input, queue)
 
-        if event == sg.WIN_CLOSED or event == 'Exit':
-            print('main: PROGRAM ENDS...')
-            break
+        # gui window loop
+        process_fishingService = threading.Thread(target=FishService.run)
+        process_fishingService.start()
 
-        try:  # used try so that if user pressed other than the given key error will not be shown
-            if keyboard.is_pressed('alt+q'):  # if key 'q' is pressed
-                print('main: EXIT EVENT DETECTED')
-                time.sleep(2)
-                break  # finishing the loop
-            if keyboard.is_pressed('alt+w'):  # if key 'q' is pressed
+        pause_switch = True
+        relaunch_windows = False
+        while True:  # Event Loop
+            event, values = gui_window.sg_gui.Read(timeout=4)
+            try:  # used try so that if user pressed other than the given key error will not be shown
+                if keyboard.is_pressed('alt+q'):  # if key 'q' is pressed
+                    print('main: EXIT EVENT DETECTED')
+                    time.sleep(2)
+                    break  # finishing the loop
+                if keyboard.is_pressed('alt+w'):  # if key 'q' is pressed
 
-                if pause_switch:
-                    print('main: PAUSE EVENT DETECTED')
-                    FishService.pause_fishers()
-                    pause_switch = False
-                else:
-                    print('main: RESUME EVENT DETECTED')
-                    FishService.resume_fishers()
-                    pause_switch = True
-                time.sleep(2)
-        except:
-            continue
-    FishService.stop()
-    process_fishingService.join()
+                    if pause_switch:
+                        print('main: PAUSE EVENT DETECTED')
+                        FishService.pause_fishers()
+                        pause_switch = False
+                    else:
+                        print('main: RESUME EVENT DETECTED')
+                        FishService.resume_fishers()
+                        pause_switch = True
+                    time.sleep(2)
+            except:
+                continue
 
-    queue.stop()
-    process_queue.join()
+            for fisher in FishService.fishers:
+                temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
+                gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
-    win_capture.exit_is_set[0] = True
-    Process_wincap.join()
+            if event == sg.WIN_CLOSED or event == 'Exit':
+                print('main: PROGRAM ENDS...')
+                break
 
-    gui_window.sg_gui.close()
+            if event == 'Relaunch windows':
+                relaunch_windows = True
+                break
 
+        FishService.stop()
+        queue.stop()
+
+        if relaunch_windows:
+            for window in windows:
+                handle = window.hwnd
+                win32gui.PostMessage(handle,win32con.WM_CLOSE,0,0)
+
+        time.sleep(3)
+        # process_fishingService.join()
+        #
+
+        # process_queue.join()
+
+        # process_wincap.join()
+
+        gui_window.sg_gui.close()
     sys.exit('PROGRAM ends ......... BYE BYE BYE BYE BYE BYE')

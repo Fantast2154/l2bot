@@ -645,6 +645,7 @@ class FishingService:
             self.send_message(f'thread stops in ..... {closing_time - counter}')
             time.sleep(1)
 
+        del self.windows
         self.send_message(f'destroyed')
 
         # del self.fishers

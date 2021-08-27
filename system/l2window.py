@@ -36,6 +36,7 @@ class L2window:
         # self.send_message(f'created')
 
     # def __del__(self):
+    #     self.wincap.stop()
     #     self.send_message(f'destroyed')
 
     def enum_handler(self):

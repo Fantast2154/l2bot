@@ -175,6 +175,9 @@ class Fisher:
 
         self.init_setup()
 
+        self.activate_soski()
+        self.activate_soski_pet()
+
         if not self.trial_rod_cast():
             self.send_message(f'trial rod cast FAILURE')
             self.stop_fisher()
@@ -228,7 +231,6 @@ class Fisher:
 
     def stop_fisher(self):
         # global current_state
-        self.send_message('self.exit_is_set[0]=True')
         self.exit_is_set[0] = True
 
     def trial_rod_cast(self):
@@ -241,9 +243,12 @@ class Fisher:
                                              self.fishing_window.get_object('fishing', False), 18, 4, 'fishing_window',
                                              True):
             return False
-        self.fishing_window.record_fishing_window()
-        self.pause_thread(1)
-        self.fishing()
+
+        if self.fishing_window.record_fishing_window():
+            self.fishing()
+        else:
+            self.stop_fisher()
+
         # self.bar_limits()
         self.pause_thread(0.2)
 
@@ -863,6 +868,19 @@ class Fisher:
     def send_trade(self):
         pass
 
+    def activate_soski(self):
+        soski = self.fishing_window.get_object('soski')
+        if soski:
+            self.send_message('soski activated')
+            self.q.new_task('mouse', [soski, False, 'RIGHT', False, False, False], self.fishing_window)
+            self.pause_thread(0.5)
+
+    def activate_soski_pet(self):
+        soski_pet = self.fishing_window.get_object('soski_pet')
+        if soski_pet:
+            self.send_message('soski activated')
+            self.q.new_task('mouse', [soski_pet, False, 'RIGHT', False, False, False], self.fishing_window)
+            self.pause_thread(0.5)
     # def wait_for_trade(self):
     #     pass
 
@@ -947,6 +965,18 @@ class Fisher:
         else:
             self.send_message('NO fishing_potion_white')
             self.fishing_potion_rebufftime = time.time() + 999999
+
+        soski = self.fishing_window.get_object('soski', search=True)
+        if soski:
+            self.send_message('soski recorded')
+        else:
+            self.send_message('Error soski search')
+
+        soski_pet = self.fishing_window.get_object('soski_pet', search=True)
+        if soski_pet:
+            self.send_message('soski_pet recorded')
+        else:
+            self.send_message('Error soski_pet search')
 
         status_bar = self.fishing_window.get_object('status_bar', search=True)
         if status_bar:

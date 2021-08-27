@@ -46,7 +46,7 @@ class Gui_interface:
 
         layout = [
             [sg.Text(f'', key='1_txt_field', size=(22, 1), font=("Helvetica", 13))],
-            [*self.l2window_rectangles, sg.Button(f'OK', size=(4, 1)), sg.Button('Exit')],
+            [*self.l2window_rectangles, sg.Button(f'OK', size=(4, 1)), sg.Button('Exit'), sg.Button('Relaunch windows')],
             [*self.l2window_workers],
             [*self.l2attempt_counter],
             [sg.Text(f'number of unresolved windows: {len(self.windows)}', size=(200, 1), font=("Helvetica", 13),
@@ -124,6 +124,7 @@ class Gui_interface:
                 if event == 'OK':
                     break
 
+        self.sg_gui['1_txt_field'].Update('L2 bot "Boyko & co"')
         self.sg_gui['2_txt_field'].Update(f'To stop the programm press "alt+q"', font=("Helvetica", 13), visible=True)
         self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "alt+w"', font=("Helvetica", 13), visible=True)
         self.sg_gui.Read(timeout=2)

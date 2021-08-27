@@ -29,7 +29,8 @@ class FishingWindow(L2window):
 
         self.extended_image_database = [
             ['bait', 'images/fishing/bait.jpg', 0.90],
-            ['soski', 'images/soski.jpg', 0.7],
+            ['soski', 'images/items/soski.jpg', 0.7],
+            ['soski_pet', 'images/items/soski_pet2.jpg', 0.7],
             ['hp_window', 'images/farming/hp_window.jpg', 0.77],
             ['hawk_buff', 'images/fishing/hawk_buff.jpg', 0.77],
             ['fenrir_party', 'images/party/fenrir_party.jpg', 0.63],
@@ -173,9 +174,11 @@ class FishingWindow(L2window):
             [(x_fishwin, y_fishwin, w_fishwin, h_fishwin)] = self.library['fishing_window'][0].find(
                 self.update_screenshot(), coordinates_and_sizes=True)
             self.wincap.set_fishing_window(self.hwnd, x_fishwin, y_fishwin, w_fishwin, h_fishwin)
+            return True
             # self.send_message('fishing window has been recorded')
         except:
             self.send_message('Error recording fishing window')
+            return False
 
     def is_exchange_menu(self):
         temp_coordinates = self.find('exchange_menu')
