@@ -87,6 +87,9 @@ if __name__ == '__main__':
             for i in range(number_of_windows):
                 os.startfile(r'C:/Users/Dmitry/Desktop/LineageII @ Asterios')
                 time.sleep(11)
+
+            name_list, hash_list = get_l2windows_param()
+            n = len(name_list)
         # screenshot SUPER OBJECT
         manager = Manager()
         screen_manager = manager.list()
