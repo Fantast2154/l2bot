@@ -79,7 +79,10 @@ class Login:
 
     def login(self, window, login_field, pass_field):
         # print('login_field', login_field)
-
+        self.q.new_task('mouse',
+                        [login_field, True, 'LEFT', False, False, False],
+                        window)
+        time.sleep(0.1)
         self.q.new_task('mouse',
                         [login_field, True, 'LEFT', False, 'double', False],
                         window)
@@ -90,6 +93,10 @@ class Login:
         keyboard.send('ctrl+v')
         time.sleep(1)
         # print('pass_field', pass_field)
+        self.q.new_task('mouse',
+                        [pass_field, True, 'LEFT', False, False, False],
+                        window)
+        time.sleep(0.1)
         self.q.new_task('mouse',
                         [pass_field, True, 'LEFT', False, 'double', False],
                         window)
