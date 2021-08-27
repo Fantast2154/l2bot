@@ -901,7 +901,7 @@ class Fisher:
             self.attack()
             self.rebuff_hawkeye()
         if time.time() - self.fishing_potion_timer > self.fishing_potion_rebufftime:
-            self.rebuff_fishing_potion()
+             self.rebuff_fishing_potion()
         if time.time() - self.alacrity_potion_timer > self.alacrity_potion_rebufftime:
             self.rebuff_warlock_wex()
         pass

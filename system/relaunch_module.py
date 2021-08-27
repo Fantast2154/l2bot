@@ -1,3 +1,8 @@
+import time
+
+import keyboard
+import pyperclip
+
 from system.screen_analyzer import *
 from system.l2window import L2window
 import cv2
@@ -10,32 +15,39 @@ class Login:
 
     def __init__(self, windows, logins, passwords, q):
         self.send_message(f'login module created')
-        self.logins = logins
-        self.passwords = passwords
 
         self.windows = windows
         self.q = q
         self.library = {}
 
+        self.logins = {}
+        self.passwords = {}
+        log = iter(logins)
+        pas = iter(passwords)
+
+        for window in self.windows:
+            self.logins[window.hwnd] = next(log)
+            self.passwords[window.hwnd] = next(pas)
+
         self.win_capture = None
         self.accurate_search = False
         self.screenshot_accurate = None
         self.init_image_database = [
-            ['1st', 'images/login/stages/1st.jpg', 0.77],
-            ['2nd', 'images/login/stages/2nd.jpg', 0.77],
-            ['3rd', 'images/login/stages/3rd.jpg', 0.77],
-            ['4th', 'images/login/stages/4th.jpg', 0.87],
+            # ['1st', 'images/login/stages/1st.jpg', 0.77],
+            # ['2nd', 'images/login/stages/2nd.jpg', 0.77],
+            # ['3rd', 'images/login/stages/3rd.jpg', 0.77],
+            # ['4th', 'images/login/stages/4th.jpg', 0.87],
             ['logging', 'images/login/stages/logging.jpg', 0.6],
-            ['login', 'images/login/stages/login.jpg', 0.6],
-            ['login_field', 'images/login/stages/login_field2.jpg', 0.95],
-            ['pass_field', 'images/login/stages/pass_field2.jpg', 0.95],
+            ['login', 'images/login/stages/login.jpg', 0.95],
+            ['login_field', 'images/login/stages/login_field2.jpg', 0.99],
+            ['pass_field', 'images/login/stages/pass_field2.jpg', 0.97],
             ['select', 'images/login/stages/select.jpg', 0.6],
             ['server', 'images/login/stages/server.jpg', 0.6],
             ['terms', 'images/login/stages/terms.jpg', 0.6],
-            ['character', 'images/login/stages/character.jpg', 0.6],
-            ['logging', 'images/login/stages/logging.jpg', 0.7]]
+            ['character', 'images/login/stages/character.jpg', 0.6]]
 
         self.init_images()
+        print(self.library)
         self.stages()
 
     def __del__(self):
@@ -43,38 +55,78 @@ class Login:
 
     def stages(self):
         error_found = False
-        stage0 = self.stage_zero()
+        stage1 = self.stage_one()
+        self.stage_two_four()
 
-    def stage_zero(self):
+    def stage_one(self):
         for window in self.windows:
-            stage0 = self.find('1st', window.hwnd)
-            if stage0:
-                self.q.new_task('mouse',
-                                [self.find('fishing', window.id), True, 'LEFT', False, False, False],
-                                window)
+            login = self.find('login', window)
+            if login:
+                login_field = self.find('login_field', window)
+                pass_field = self.find('pass_field', window)
+                self.login(window, login_field, pass_field)
             else:
                 return False
 
-    def update_screenshot(self, id):
-        screenshot = self.windows[id].screenshot
-        hwnd = self.windows[id].hwnd
-        temp = screenshot[-1][hwnd][0]
-        if len(temp) != 0:
-            return temp
-        else:
-            return []
+    def stage_two_four(self):
+        for _ in range(3):
+            for window in self.windows:
+                self.q.new_task('mouse',
+                                [[(100, 100)], True, 'LEFT', False, False, False],
+                                window)
+                time.sleep(1)
+                keyboard.send('enter')
+
+    def login(self, window, login_field, pass_field):
+        # print('login_field', login_field)
+
+        self.q.new_task('mouse',
+                        [login_field, True, 'LEFT', False, 'double', False],
+                        window)
+        time.sleep(1)
+        pyperclip.copy(self.logins[window.hwnd])
+        # print('login', self.logins[window.hwnd])
+        time.sleep(0.1)
+        keyboard.send('ctrl+v')
+        time.sleep(1)
+        # print('pass_field', pass_field)
+        self.q.new_task('mouse',
+                        [pass_field, True, 'LEFT', False, 'double', False],
+                        window)
+        time.sleep(1)
+        pyperclip.copy(self.passwords[window.hwnd])
+        # print('password', self.passwords[window.hwnd])
+        time.sleep(0.1)
+        keyboard.send('ctrl+v')
+        time.sleep(0.5)
+        keyboard.send('enter')
+        time.sleep(1)
+
+    def update_screenshot(self, window):
+        while True:
+            screenshot = window.screenshot
+            if not screenshot[0]:
+                continue
+            hwnd = window.hwnd
+
+            # print(screenshot)
+            temp = screenshot[-1][hwnd][0]
+            if len(temp) != 0:
+                return temp
+            else:
+                return []
 
     def send_message(cls, message):
         print(message)
 
-    def find(self, object, id):  # returns list of positions
-        try:
-            position = self.library[object][0].find(self.update_screenshot(id))
-            return position
-        except KeyError:
-            self.send_message(f'find function ERROR object search')
-            self.send_message(f'{KeyError}')
-            return []
+    def find(self, object, window):  # returns list of positions
+        # try:
+        position = self.library[object][0].find(self.update_screenshot(window))
+        return position
+        # except KeyError:
+        #     self.send_message(f'find function ERROR object search')
+        #     self.send_message(f'{KeyError}')
+        #     return []
 
     def init_images(self):
         for obj in self.init_image_database:

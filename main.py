@@ -68,10 +68,10 @@ if __name__ == '__main__':
     while True:
 
         number_of_windows = 3
-        logins = ['gnossienne', 'nFantast2151', 'nFantast2152']
-        passwords = ['usUi2001', 'AA5931593aa', 'AA5931593aa']
-
-
+        # logins = ['gnossienne', 'nFantast2151', 'nFantast2152']
+        # passwords = ['usUi2001', 'AA5931593aa', 'AA5931593aa']
+        logins = ['privetvsem2', 'smeshnoy', 'privetvsem']
+        passwords = ['hpzaiCKwmFpX2', 'Wcg-rtT-2i9-rxY', 'Km0G46x18YL5']
 
         l2window_name = 'Asterios'
         win_capture = WindowCapture(l2window_name)
@@ -82,10 +82,11 @@ if __name__ == '__main__':
         print('number of l2 windows:', n)
         print('hash_list of l2 windows:', hash_list)
         print('-----')
-
+        login = False
         if n == 0:
+            login = True
             for i in range(number_of_windows):
-                os.startfile(r'C:/Users/Dmitry/Desktop/LineageII @ Asterios')
+                os.startfile(r'E:\TorrentsDownloads\god_tauti_asterios\Asterios1.exe.lnk')
                 time.sleep(11)
 
             name_list, hash_list = get_l2windows_param()
@@ -117,8 +118,11 @@ if __name__ == '__main__':
         process_wincap = Process(target=win_capture.start_capturing, args=(screen_manager,))
         process_wincap.start()
 
-        #login module
+        # login module
         # login = Login(windows, logins, passwords, queue)
+        if login:
+            print('++++LOGIN')
+            l = Login(windows, logins, passwords, queue)
 
         # creating gui class
         gui_window = Gui_interface(windows)
@@ -133,6 +137,7 @@ if __name__ == '__main__':
 
         pause_switch = True
         relaunch_windows = False
+
         while True:  # Event Loop
             event, values = gui_window.sg_gui.Read(timeout=4)
             try:  # used try so that if user pressed other than the given key error will not be shown
@@ -172,7 +177,7 @@ if __name__ == '__main__':
         if relaunch_windows:
             for window in windows:
                 handle = window.hwnd
-                win32gui.PostMessage(handle,win32con.WM_CLOSE,0,0)
+                win32gui.PostMessage(handle, win32con.WM_CLOSE, 0, 0)
 
         time.sleep(3)
         # process_fishingService.join()
