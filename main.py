@@ -71,9 +71,7 @@ if __name__ == '__main__':
         logins = ['gnossienne', 'nFantast2151', 'nFantast2152']
         passwords = ['usUi2001', 'AA5931593aa', 'AA5931593aa']
 
-        for i in range(number_of_windows):
-            os.startfile(r'C:/Users/Dmitry/Desktop/LineageII @ Asterios')
-            time.sleep(11)
+
 
         l2window_name = 'Asterios'
         win_capture = WindowCapture(l2window_name)
@@ -84,9 +82,11 @@ if __name__ == '__main__':
         print('number of l2 windows:', n)
         print('hash_list of l2 windows:', hash_list)
         print('-----')
-        if n < 1:
-            sys.exit('NO L2 WINDOWS DETECTED. PROGRAM ENDS.......')
 
+        if n == 0:
+            for i in range(number_of_windows):
+                os.startfile(r'C:/Users/Dmitry/Desktop/LineageII @ Asterios')
+                time.sleep(11)
         # screenshot SUPER OBJECT
         manager = Manager()
         screen_manager = manager.list()
