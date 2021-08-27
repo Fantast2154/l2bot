@@ -168,7 +168,7 @@ if __name__ == '__main__':
 
         FishService.stop()
         queue.stop()
-
+        process_wincap.terminate()
         if relaunch_windows:
             for window in windows:
                 handle = window.hwnd
