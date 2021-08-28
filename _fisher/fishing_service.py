@@ -39,10 +39,12 @@ class FishingService:
 
     def __init__(self, windows, user_input, q):
         self.machine_id = random.randint(0, 10000000)
+        self.send_message(f'created')
         # super().__init__(self.machine_id)  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС Client И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
         manager = Manager()
         # self.fishing_service_client = Client(self.machine_id)
         self.exit_is_set = False
+
         self.windows = windows
         self.window_fishers = user_input[0]
         self.window_buffers = user_input[1]
@@ -50,14 +52,21 @@ class FishingService:
         self.window_teleporters = user_input[3]
 
         self.number_of_fishers = len(user_input[0])
+        self.send_message(f'{self.number_of_fishers}')
         self.number_of_buffers = len(user_input[1])
         self.number_of_suppliers = len(user_input[2])
         self.number_of_teleporters = len(user_input[3])
+        self.send_message(f'{ self.number_of_teleporters}')
 
         self.fishers = []
         self.buffers = []
         self.suppliers = []
         self.teleporters = []
+        self.fishing_windows = []
+        self.supplier_windows = []
+        self.buffer_windows = []
+        self.teleporter_windows = []
+
         # self.process_fishers = list(range(self.number_of_fishers))
         self.process_suppliers = list(range(self.number_of_suppliers))
         self.process_buffers = list(range(self.number_of_buffers))
@@ -115,10 +124,11 @@ class FishingService:
         else:
             self.has_supplier = False
 
-        self.send_message(f'created')
+
         # self.exit = threading.Event()
 
         q.activate_l2windows(self.windows)
+
 
         for fisher_id in range(self.number_of_fishers):
             # print('fisher_id', fisher_id)
@@ -127,8 +137,8 @@ class FishingService:
             window_name = self.window_fishers[fisher_id].window_name
             hwnd = self.window_fishers[fisher_id].hwnd
             screenshot = self.window_fishers[fisher_id].screenshot
-            temp_fishing_window = FishingWindow(fisher_id, win_capture, window_name, hwnd, screenshot)
-            temp_fishing_window.window_id = self.window_fishers[fisher_id].window_id
+            window_id = self.window_fishers[fisher_id].window_id
+            temp_fishing_window = FishingWindow(fisher_id, window_id, win_capture, window_name, hwnd, screenshot)
             self.fishing_windows.append(temp_fishing_window)
 
             # fishers
@@ -189,10 +199,15 @@ class FishingService:
         self.start_buffers()
         self.start_suppliers()
 
-    def __del__(self):
-        self.send_message("destroyed")
 
-        del self
+    def __del__(self):
+        del self.fishers
+        del self.buffers
+        del self.suppliers
+        del self.teleporters
+        for process in self.process_fishers:
+            process.terminate()
+        self.send_message("destroyed")
 
     @classmethod
     def send_message(cls, message):
@@ -625,13 +640,15 @@ class FishingService:
         return who_to_supply_
 
     def run(self):
+        self.send_message('run loop started')
         flag = False
         timer_fishing_service_start = time.time()
-        self.server_update_start()
+        # self.server_update_start()
         while not self.exit_is_set:
             # if time.time() - timer_fishing_service_start > self.number_of_fishers * 9:
             #     self.antiphase_fishing('on')
             time.sleep(1)
+        self.send_message('end of the run loop')
 
     def stop(self):
         self.exit_is_set = True
@@ -645,8 +662,11 @@ class FishingService:
             self.send_message(f'thread stops in ..... {closing_time - counter}')
             time.sleep(1)
 
+
+        self.send_message(f'stopped')
         del self.windows
-        self.send_message(f'destroyed')
+        del self
+
 
         # del self.fishers
         # del self.fishing_windows

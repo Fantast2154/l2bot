@@ -47,7 +47,7 @@ class Login:
             ['character', 'images/login/stages/character.jpg', 0.6]]
 
         self.init_images()
-        print(self.library)
+
         self.stages()
 
     def __del__(self):
@@ -76,6 +76,7 @@ class Login:
                                 window)
                 time.sleep(1)
                 keyboard.send('enter')
+                time.sleep(0.2)
 
     def login(self, window, login_field, pass_field):
         # print('login_field', login_field)
@@ -157,7 +158,7 @@ class RelaunchWindow(L2window):
         self.hwnd = hwnd
 
     def __del__(self):
-        self.send_message(f"TEST FishingWindow {self.window_id} destroyed")
+        self.send_message(f"RelaunchWindow destroyed")
 
     def update_screenshot(self):
         self.screenshot = self.wincap.get_screenshot(self.window_id)

@@ -11,17 +11,19 @@ import cv2
 class Fisher:
 
     def __init__(self, fishing_window, fisher_id, number_of_fishers, q):
+        self.fisher_id = fisher_id
+        self.send_message(f'created')
         # global current_state, supply_request, request_proceed, trading_is_allowed, requested_items_to_supply
         manager = Manager()
         self.exit_is_set = manager.list()
         self.exit_is_set.append(False)
 
         self.fishing_window = fishing_window
-        self.fisher_id = fisher_id
+
         self.number_of_fishers = number_of_fishers
         self.q = q
         # self.fishing_service = fishing_service
-        self.send_message(f'created')
+
 
         # communication with fisher service
         self.current_state = manager.list()
@@ -118,7 +120,8 @@ class Fisher:
         self.bar_length = 0
 
     def __del__(self):
-        self.send_message(f"destroyed")
+        del self.attempt_counter
+        self.send_message(f'=destroyed=')
 
     def send_message(self, message):
         temp = '\t' * 11 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
@@ -878,7 +881,7 @@ class Fisher:
     def activate_soski_pet(self):
         soski_pet = self.fishing_window.get_object('soski_pet')
         if soski_pet:
-            self.send_message('soski activated')
+            self.send_message('soski_pet activated')
             self.q.new_task('mouse', [soski_pet, False, 'RIGHT', False, False, False], self.fishing_window)
             self.pause_thread(0.5)
     # def wait_for_trade(self):
@@ -963,38 +966,40 @@ class Fisher:
         if fishing_potion_white:
             self.fishing_potion_timer = 0
         else:
-            self.send_message('NO fishing_potion_white')
+            # self.send_message('NO fishing_potion_white')
             self.fishing_potion_rebufftime = time.time() + 999999
 
         soski = self.fishing_window.get_object('soski', search=True)
         if soski:
-            self.send_message('soski recorded')
+            pass
+            # self.send_message('soski recorded')
         else:
             self.send_message('Error soski search')
 
         soski_pet = self.fishing_window.get_object('soski_pet', search=True)
         if soski_pet:
-            self.send_message('soski_pet recorded')
+            pass
+            # self.send_message('soski_pet recorded')
         else:
             self.send_message('Error soski_pet search')
 
         status_bar = self.fishing_window.get_object('status_bar', search=True)
         if status_bar:
-            self.send_message('status_bar')
+            # self.send_message('status_bar')
             self.q.new_task('mouse', [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False,
                                       'Alt+Shift+s'], self.fishing_window)
             self.pause_thread(0.5)
 
         radar = self.fishing_window.get_object('mini_map', search=True)
         if radar:
-            self.send_message('radar')
+            # self.send_message('radar')
             self.q.new_task('mouse', [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False,
                                       'Alt+Shift+r'], self.fishing_window)
             self.pause_thread(0.5)
 
         alacrity_dex_warlock = self.fishing_window.get_object('alacrity_dex_warlock', search=True)
         if alacrity_dex_warlock:
-            self.send_message('alacrity_dex_warlock')
+            # self.send_message('alacrity_dex_warlock')
             self.alacrity_potion_timer = 0
         else:
             self.alacrity_potion_timer = time.time() + 999999
@@ -1003,7 +1008,7 @@ class Fisher:
         if hawk_buff:
             self.buff_hawkeye_timer = 0
         else:
-            self.send_message('NO hawk_buff')
+            # self.send_message('NO hawk_buff')
             self.buff_hawkeye_rebufftime = time.time() + 999999
 
         self.pause_thread(0.5)

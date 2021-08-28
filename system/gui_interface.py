@@ -128,7 +128,7 @@ class Gui_interface:
                     break
 
         self.sg_gui['Relaunch windows'].Update(visible=True)
-        self.sg_gui['1_txt_field'].Update('L2 bot "Boyko & co"')
+        self.sg_gui['1_txt_field'].Update('L2 bot "Boy & co"')
         self.sg_gui['2_txt_field'].Update(f'To stop the programm press "alt+q"', font=("Helvetica", 13), visible=True)
         self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "alt+w"', font=("Helvetica", 13), visible=True)
         self.sg_gui.Read(timeout=2)
@@ -143,6 +143,39 @@ class Gui_interface:
     def update_window(self, param, *args):
         self.sg_gui[param].Update(*args)
         self.sg_gui.Read(timeout=0)
+
+    def reinit_windows(self, windows):
+        self.windows = windows
+        user_input = []
+        for i in range(len(self.windows_f)):
+            id = self.windows_f[i].window_id
+            self.windows_f[i].hwnd = windows[id].hwnd
+            self.windows_f[i].wincap = windows[id].wincap
+            self.windows_f[i].screenshot = windows[id].screenshot
+
+        for i in range(len(self.windows_b)):
+            id = self.windows_b[i].window_id
+            self.windows_b[i].hwnd = windows[id].hwnd
+            self.windows_b[i].wincap = windows[id].wincap
+            self.windows_b[i].screenshot = windows[id].screenshot
+
+        for i in range(len(self.windows_s)):
+            id = self.windows_s[i].window_id
+            self.windows_s[i].hwnd = windows[id].hwnd
+            self.windows_s[i].wincap = windows[id].wincap
+            self.windows_s[i].screenshot = windows[id].screenshot
+
+        for i in range(len(self.windows_t)):
+            id = self.windows_t[i].window_id
+            self.windows_t[i].hwnd = windows[id].hwnd
+            self.windows_t[i].wincap = windows[id].wincap
+            self.windows_t[i].screenshot = windows[id].screenshot
+
+        user_input.append(self.windows_f)
+        user_input.append(self.windows_b)
+        user_input.append(self.windows_s)
+        user_input.append(self.windows_t)
+        return user_input
 
     def set_fishers(self, fishers):
         self.fishers = fishers

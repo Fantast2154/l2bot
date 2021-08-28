@@ -8,8 +8,10 @@ import time
 
 class FishingWindow(L2window):
 
-    def __init__(self, window_id, wincap, window_name, hwnd, screenshot):
+    def __init__(self, fisher_id, window_id, wincap, window_name, hwnd, screenshot):
         super().__init__(window_id, wincap, window_name, hwnd, screenshot)
+        self.fisher_id = fisher_id
+        self.send_message('created')
         self.wincap = wincap
         self.screenshot = screenshot
 
@@ -47,7 +49,7 @@ class FishingWindow(L2window):
             ['fishing_window', 'images/fishing/fishing_window.jpg', 0.7],
             ['red_bar', 'images/fishing/red_bar3.jpg', 0.8],
             ['buff', 'images/fishing/cdbuff.jpg', 0.87],
-            ['fishing_potion_white', 'images/fishing/fishing_potion_white.jpg', 0.63],
+            ['fishing_potion_white', 'images/fishing/fishing_potion_white.jpg', 0.6],
             ['alacrity_potion_small', 'images/fishing/alacrity_potion_small.jpg', 0.7],
             ['alacrity_dex_warlock', 'images/fishing/alacrity_dex_warlock.jpg', 0.7],
             ['pet_atk1', 'images/fishing/pet_atk_1.jpg', 0.7],
@@ -92,6 +94,7 @@ class FishingWindow(L2window):
         #     temp = self.screenshot[-1][0][0]
         #     cv2.imshow('BOYKO MALCHISHKA', temp)
         #     cv2.waitKey(1)
+
         if len(temp) != 0:
             # cv2.imshow('BOYKO MALCHISHKA', temp[0])
             # cv2.waitKey(1)
@@ -142,7 +145,7 @@ class FishingWindow(L2window):
             return []
 
     def send_message(self, message):
-        temp = '\t' * 11 * self.window_id + 'FishingWindow ' + f'{self.window_id}: {message}'
+        temp = '\t' * 11 * self.fisher_id + 'FishingWindow ' + f'{self.fisher_id}: {message}'
         print(temp)
 
     def find(self, object, accurate=False):  # returns list of positions
