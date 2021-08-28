@@ -1,3 +1,4 @@
+import time
 from multiprocessing import Manager, Process
 import PySimpleGUI as sg
 import win32gui
@@ -23,7 +24,7 @@ class Gui_interface:
         self.l2button_width = 12
         self.l2button_height = 6
         self.app_height = 285
-        self.app_base_width = 600
+        self.app_base_width = 650
 
         self.l2attempt_counter = manager.list()
 
@@ -46,7 +47,8 @@ class Gui_interface:
 
         layout = [
             [sg.Text(f'', key='1_txt_field', size=(22, 1), font=("Helvetica", 13))],
-            [*self.l2window_rectangles, sg.Button(f'OK', size=(4, 1)), sg.Button('Exit'), sg.Button('Relaunch windows', visible=False)],
+            [*self.l2window_rectangles, sg.Button(f'OK', size=(4, 1)), sg.Button('Exit'),
+             sg.Button('Relaunch windows', visible=False)],
             [*self.l2window_workers],
             [*self.l2attempt_counter],
             [sg.Text(f'number of unresolved windows: {len(self.windows)}', size=(200, 1), font=("Helvetica", 13),
@@ -55,7 +57,7 @@ class Gui_interface:
         ]
 
         self.sg_gui = sg.FlexForm(title="PIDAR RADAR", layout=layout, size=(
-        self.app_base_width, self.app_height),
+            self.app_base_width, self.app_height),
                                   location=(self.L2_min_x, self.L2_total_height))
 
     def gui_window(self):
@@ -127,18 +129,34 @@ class Gui_interface:
                 if event == 'OK':
                     break
 
-        self.sg_gui['Relaunch windows'].Update(visible=True)
+
         self.sg_gui['1_txt_field'].Update('L2 bot "Boy & co"')
+        self.sg_gui.Read(timeout=10)
+
+        layout2 = [[sg.Text('Set relaunch time (in hours)')],
+                   [sg.Input()],
+                   [sg.OK()]]
+
+        window = sg.Window('pip? pip.', layout2, size=(220, 100))
+
+        event, values = window.read()
+        output = 3600*int(values[0])
+
+        window.close()
+
+        time.sleep(0.3)
+        self.sg_gui['Relaunch windows'].Update(visible=True)
         self.sg_gui['2_txt_field'].Update(f'To stop the programm press "alt+q"', font=("Helvetica", 13), visible=True)
-        self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "alt+w"', font=("Helvetica", 13), visible=True)
-        self.sg_gui.Read(timeout=2)
+        self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "alt+w"', font=("Helvetica", 13),
+                                          visible=True)
+        self.sg_gui.Read(timeout=10)
 
         user_input = []
         user_input.append(self.windows_f)
         user_input.append(self.windows_b)
         user_input.append(self.windows_s)
         user_input.append(self.windows_t)
-        return user_input
+        return user_input, output
 
     def update_window(self, param, *args):
         self.sg_gui[param].Update(*args)

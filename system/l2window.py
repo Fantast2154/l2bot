@@ -19,12 +19,12 @@ class L2window:
         self.window_id = window_id
         x = 0
         y = 0
-        width = 630
-        height = 710
-        self.left_top_x = width * window_id + 0
+        self.width = 630
+        self.height = 710
+        self.left_top_x = self.width * window_id + 0
         self.left_top_y = y
-        self.width = width
-        self.height = height
+        self.width = self.width
+        self.height = self.height
         self.window_name = window_name
         self.screenshot = screenhot
         self.hwnd = hwnd

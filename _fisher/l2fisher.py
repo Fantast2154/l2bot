@@ -986,7 +986,7 @@ class Fisher:
                         self.fishing_window)
         self.pause_thread(6)
 
-        self.register_nickname()
+        # self.register_nickname()
         # self.camera_top_zoom_in()
 
         fishing_potion_white = self.fishing_window.get_object('fishing_potion_white', search=True)

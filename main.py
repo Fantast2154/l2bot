@@ -73,6 +73,7 @@ if __name__ == '__main__':
 
     gui_window = None
     user_input = None
+    relaunch_time = None
 
     while True:
 
@@ -105,8 +106,17 @@ if __name__ == '__main__':
         print('number of l2 windows:', n)
         print('hash_list of l2 windows:', hash_list)
         print('-----')
+
+        rect_windows_list = []
+        for hwnd in hash_list:
+            rect = win32gui.GetWindowRect(hwnd)
+            rect_windows_list.append([rect[0], hwnd])
+
+        rect_windows_list.sort(key=lambda x: x[0])
+
         for i in range(n):
             temp_window = L2window(i, win_capture, name_list[i], hash_list[i], screen_manager)
+            temp_window.hwnd = rect_windows_list[i][1]
             if log:
                 temp_window.enum_handler()
             windows.append(temp_window)
@@ -144,7 +154,8 @@ if __name__ == '__main__':
         # creating gui class
         if gui_window is None:
             gui_window = Gui_interface(windows)
-            user_input = gui_window.gui_window()
+            user_input, relaunch_time = gui_window.gui_window()
+            print('relaunch_time ', relaunch_time/3600, 'hours')
         else:
             user_input = gui_window.reinit_windows(windows)
 
@@ -155,8 +166,7 @@ if __name__ == '__main__':
         process_fishingService = threading.Thread(target=FishService.run)
         process_fishingService.start()
 
-        pause_switch = True
-        relaunch_windows = False
+
 
         # for fisher in FishService.fishers:
         #     temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
@@ -191,10 +201,17 @@ if __name__ == '__main__':
         #         custom_personal_data.relog_logins.append(log)
         #         custom_personal_data.relog_passwords.append(pas)
 
+        relaunch_timer = time.time()
+        pause_switch = True
+        relaunch_windows = False
+        counter = 0
+        time_between_msg = 60
         while True:  # Event Loop
 
             event, values = gui_window.sg_gui.Read(timeout=3)
 
+            if time.time() - relaunch_timer > relaunch_time:
+                event = 'Relaunch windows'
             try:  # used try so that if user pressed other than the given key error will not be shown
 
                 if keyboard.is_pressed('alt+q'):  # if key 'q' is pressed
@@ -228,6 +245,12 @@ if __name__ == '__main__':
                 relaunch_windows = True
                 break
 
+            if time.time() - relaunch_timer > time_between_msg * counter:
+                counter += 1
+                print('main: Time to restart = ', (relaunch_time - (time.time() - relaunch_timer))//60, ' minutes')
+
+            time.sleep(0.5)
+
         FishService.stop()
         queue.stop()
         process_wincap.terminate()
@@ -235,6 +258,7 @@ if __name__ == '__main__':
             for window in windows:
                 handle = window.hwnd
                 win32gui.PostMessage(handle, win32con.WM_CLOSE, 0, 0)
+
 
         time.sleep(3)
 

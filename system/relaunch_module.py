@@ -76,7 +76,7 @@ class Login:
                                 window)
                 time.sleep(1)
                 keyboard.send('enter')
-                time.sleep(0.2)
+                time.sleep(1.2)
 
     def login(self, window, login_field, pass_field):
         # print('login_field', login_field)

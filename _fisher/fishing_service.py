@@ -52,11 +52,11 @@ class FishingService:
         self.window_teleporters = user_input[3]
 
         self.number_of_fishers = len(user_input[0])
-        self.send_message(f'{self.number_of_fishers}')
+
         self.number_of_buffers = len(user_input[1])
         self.number_of_suppliers = len(user_input[2])
         self.number_of_teleporters = len(user_input[3])
-        self.send_message(f'{ self.number_of_teleporters}')
+
 
         self.fishers = []
         self.buffers = []
