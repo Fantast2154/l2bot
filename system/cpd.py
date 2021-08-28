@@ -3,7 +3,7 @@ class CPD:
     accounts = {
         'podscarbiy': ['log1222222', 'pas1222222'],
         'starosta_derevni': ['log22222', 'pas2'],
-        'nat_peggl': ['lowwwg3', 'pas3']
+        'nat_peggl': ['lowwwg3', 'pas222223']
     }
     relog_logins = []
     relog_passwords = []
