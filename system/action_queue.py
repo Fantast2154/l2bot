@@ -263,7 +263,8 @@ class ActionQueue:
 
     def click_left(self, x, y, swtich_window=False, params=False, delta_x=0, delta_y=0):
         # print('params', params)
-        self.mouse.position = (x - random.randint(0, 3), y - random.randint(0, 3))
+        position = (x - random.randint(0, 3), y - random.randint(0, 3))
+        self.mouse.position = position
         time.sleep(0.03)
         if swtich_window:
             time.sleep(0.02)
@@ -285,7 +286,7 @@ class ActionQueue:
             time.sleep(0.07)
             return
 
-        if params[1] and params[4] == 'drag_and_drop':
+        if params[1] and params[4] == 'drag_and_drop_alt':
             self.mouse.press(Button.left)
             time.sleep(0.1)
             VK_CODE = {'alt':0x12}
@@ -305,6 +306,31 @@ class ActionQueue:
 
             self.mouse.release(Button.left)
             time.sleep(0.1)
+            return
+
+        if params[1] and params[4] == 'drag_and_drop_right':
+            (x1, y1) = position
+            [(temp_x, temp_y)] = params[1]
+            (x2, y2) = (temp_x + delta_x, temp_y + delta_y)
+
+            win32api.SetCursorPos([x1, y1])
+            self.send_message('move1-------')
+            time.sleep(4)
+
+            win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN,x1,y1,0,0)
+            time.sleep(0.1)
+
+            step_size = 2
+            counter = 0
+            new_pos_x, new_pos_y = x1, y1
+            while new_pos_y < y1+100:
+                new_pos_x, new_pos_y = x1, y1 + counter*step_size
+                win32api.SetCursorPos([new_pos_x, new_pos_y])
+                counter += 1
+                time.sleep(0.02)
+
+            # win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP,x1,y1,0,0)
+            # time.sleep(0.1)
             return
 
         if params[5]:

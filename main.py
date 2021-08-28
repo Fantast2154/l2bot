@@ -86,6 +86,7 @@ if __name__ == '__main__':
         if n == 0:
             log = True
             print('log = ', log)
+
             for i in range(custom_personal_data.number_of_windows):
                 os.startfile(custom_personal_data.launcher_path)
                 time.sleep(11)
@@ -106,7 +107,8 @@ if __name__ == '__main__':
         print('-----')
         for i in range(n):
             temp_window = L2window(i, win_capture, name_list[i], hash_list[i], screen_manager)
-            temp_window.enum_handler()
+            if log:
+                temp_window.enum_handler()
             windows.append(temp_window)
 
         # setting created windows to screenshot maker
@@ -126,7 +128,17 @@ if __name__ == '__main__':
 
         # login module
         if log:
-            l = Login(windows, custom_personal_data.logins, custom_personal_data.passwords, queue)
+            # if not custom_personal_data.relog_logins and gui_window is None:
+            custom_personal_data.relog_logins = []
+            custom_personal_data.relog_passwords = []
+            for nick, account in list(custom_personal_data.accounts.items())[:custom_personal_data.number_of_windows]:
+                nickname = nick
+                log = account[0]
+                pas = account[1]
+                custom_personal_data.relog_logins.append(log)
+                custom_personal_data.relog_passwords.append(pas)
+
+            Login(windows, custom_personal_data.relog_logins, custom_personal_data.relog_passwords, queue)
             time.sleep(2)
 
         # creating gui class
@@ -149,6 +161,35 @@ if __name__ == '__main__':
         # for fisher in FishService.fishers:
         #     temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
         #     gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
+
+        # if not log:
+        #     print('not default order')
+        #
+        #     nick_name_list = [0]*custom_personal_data.number_of_windows
+        #     if FishService.number_of_fishers != 0:
+        #         exit_is_set = False
+        #         while not exit_is_set:
+        #             for fisher in FishService.fishers:
+        #                 if fisher.nickname[0] is not None and fisher.nickname[0] not in nick_name_list:
+        #                     nick_name_list[fisher.fishing_window.window_id] = fisher.nickname[0]
+        #                 if len(nick_name_list) == FishService.number_of_fishers:
+        #                     exit_is_set = True
+        #                     break
+        #
+        #     window_fishers = user_input[0]
+        #     window_buffers = user_input[1]
+        #     window_suppliers = user_input[2]
+        #     window_teleporters = user_input[3]
+        #
+        #     # if custom_personal_data.number_of_windows - len(nick_name_list) == 1: # PIZDA
+        #     custom_personal_data.relog_logins = []
+        #     custom_personal_data.relog_passwords = []
+        #     for nick in nick_name_list:
+        #         nickname = nick
+        #         log = custom_personal_data.accounts[nick][0]
+        #         pas = custom_personal_data.accounts[nick][1]
+        #         custom_personal_data.relog_logins.append(log)
+        #         custom_personal_data.relog_passwords.append(pas)
 
         while True:  # Event Loop
 

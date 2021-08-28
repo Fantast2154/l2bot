@@ -14,7 +14,6 @@ class FishingWindow(L2window):
         self.send_message('created')
         self.wincap = wincap
         self.screenshot = screenshot
-
         self.hwnd = hwnd
         self.library = {}
 
@@ -80,6 +79,13 @@ class FishingWindow(L2window):
             ['catched_item_6', 'images/items/catcheditem6.jpg', 0.83],
             ['catched_item_7', 'images/items/catcheditem7.jpg', 0.83]
         ]
+
+        self.character_database = [
+            ['nat_peggl', 'images/character/nat_peggl.jpg', 0.83],
+            ['starosta_derevni', 'images/character/starosta_derevni.jpg', 0.83],
+            ['character_small_bag', 'images/character/bag.jpg', 0.83],
+            ['podscarbiy', 'images/character/podscarbiy.jpg', 0.83]
+        ]
         # self.send_message(f'<-L2window created')
 
         self.init_images()
@@ -144,6 +150,11 @@ class FishingWindow(L2window):
         else:
             return []
 
+    def update_screenshot_rectangle(self, coordinates, w, d):
+        [(x, y)] = coordinates
+        temp = self.screenshot[-1][self.hwnd][0][y:y + d, x:x + w]
+        return temp
+
     def send_message(self, message):
         temp = '\t' * 11 * self.fisher_id + 'FishingWindow ' + f'{self.fisher_id}: {message}'
         print(temp)
@@ -157,6 +168,17 @@ class FishingWindow(L2window):
                 position = self.library[object][0].find(self.update_accurate_screenshot(object=object))
             # self.send_message((f'TIMER {time.time() - timer}'))
             return position
+        except KeyError:
+            self.send_message(f'find function ERROR object search')
+            self.send_message(f'{KeyError}')
+            return []
+
+    def find_in_rectangle(self, object, coordinates, w, d):  # returns list of positions
+        try:
+            position = self.library[object][0].find(
+                self.update_screenshot_rectangle(coordinates=coordinates, w=w, d=d))
+            return position
+
         except KeyError:
             self.send_message(f'find function ERROR object search')
             self.send_message(f'{KeyError}')
@@ -221,6 +243,10 @@ class FishingWindow(L2window):
         else:
             return self.get_object('attack', search=True)
 
+    def window_center_pos(self):
+        x = self.left_top_x + self.width//2
+        y = self.left_top_y + self.height//2
+        return [(x, y)]
 
     def is_alacrity_potion_small(self):
         if self.library['alacrity_potion_small'][1]:
@@ -270,6 +296,16 @@ class FishingWindow(L2window):
         else:
             return self.get_object('move_to_supplier', search=True)
 
+    def get_self_nickname(self):
+        temp = self.find('character_small_bag')
+        if temp:
+            [(x, y)] = temp
+            for character in self.character_database:
+                nickname = self.find_in_rectangle(character[0], [(x-176, y-106)], 180, 50)
+                if nickname:
+                    return character[0]
+        return False
+
     def init_images(self):
         for obj in self.init_image_database:
             try:
@@ -287,6 +323,14 @@ class FishingWindow(L2window):
                 # self.send_message('Error finding images2')
 
         for obj in self.catched_fish_database:
+            try:
+                # {'key', [obj, [(x,y]/None]
+                self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]
+            except:
+                pass
+                # self.send_message('Error finding images2')
+
+        for obj in self.character_database:
             try:
                 # {'key', [obj, [(x,y]/None]
                 self.library[f'{obj[0]}'] = [Vision(obj[1], obj[2]), None]

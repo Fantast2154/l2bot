@@ -17,13 +17,13 @@ class Fisher:
         manager = Manager()
         self.exit_is_set = manager.list()
         self.exit_is_set.append(False)
-
+        self.nickname = manager.list()
+        self.nickname.append(None)
         self.fishing_window = fishing_window
 
         self.number_of_fishers = number_of_fishers
         self.q = q
         # self.fishing_service = fishing_service
-
 
         # communication with fisher service
         self.current_state = manager.list()
@@ -825,7 +825,7 @@ class Fisher:
         target_pos = [(target_pos_x, target_pos_y - 220)]
         # print('pos2', target_pos)
         self.q.new_task('mouse',
-                        [pos_fish, target_pos, 'LEFT', False, 'drag_and_drop', False],
+                        [pos_fish, target_pos, 'LEFT', False, 'drag_and_drop_alt', False],
                         self.fishing_window)
         self.pause_thread(.5)
 
@@ -884,6 +884,7 @@ class Fisher:
             self.send_message('soski_pet activated')
             self.q.new_task('mouse', [soski_pet, False, 'RIGHT', False, False, False], self.fishing_window)
             self.pause_thread(0.5)
+
     # def wait_for_trade(self):
     #     pass
 
@@ -904,7 +905,7 @@ class Fisher:
             self.attack()
             self.rebuff_hawkeye()
         if time.time() - self.fishing_potion_timer > self.fishing_potion_rebufftime:
-             self.rebuff_fishing_potion()
+            self.rebuff_fishing_potion()
         if time.time() - self.alacrity_potion_timer > self.alacrity_potion_rebufftime:
             self.rebuff_warlock_wex()
         pass
@@ -948,6 +949,29 @@ class Fisher:
                         self.fishing_window)
         self.pause_thread(2)
 
+    def camera_top_zoom_in(self):
+        window_center_pos = self.fishing_window.window_center_pos()
+        [(x, y)] = window_center_pos
+        self.q.new_task('mouse',
+                        [[(x, y)], [(x, y + 100)], 'LEFT', False, 'drag_and_drop_right', False],
+                        self.fishing_window)
+        self.pause_thread(12)
+
+    def register_nickname(self):
+        self.q.new_task('mouse',
+                        [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+T'],
+                        self.fishing_window)
+        self.pause_thread(1)
+        self_nickname = self.fishing_window.get_self_nickname()
+        if self_nickname:
+            self.nickname[0] = self_nickname
+            self.send_message(f'my name is !!!!!!!!!!!!! {self_nickname}')
+        else:
+            self.send_message('Error registering nickname')
+        self.q.new_task('mouse',
+                        [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+N'],
+                        self.fishing_window)
+
     def init_setup(self):
         self.send_message('initializing setup...')
         self.move_to_supplier()
@@ -961,6 +985,9 @@ class Fisher:
                         [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+1'],
                         self.fishing_window)
         self.pause_thread(6)
+
+        self.register_nickname()
+        # self.camera_top_zoom_in()
 
         fishing_potion_white = self.fishing_window.get_object('fishing_potion_white', search=True)
         if fishing_potion_white:
