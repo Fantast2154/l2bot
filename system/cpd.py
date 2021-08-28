@@ -1,7 +1,7 @@
 class CPD:
     number_of_windows = 3
     accounts = {
-        'podscarbiy': ['log1', 'pas1'],
+        'podscarbiy': ['log1222222', 'pas1222222'],
         'starosta_derevni': ['log2', 'pas2'],
         'nat_peggl': ['log3', 'pas3']
     }
