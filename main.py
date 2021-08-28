@@ -217,9 +217,10 @@ if __name__ == '__main__':
         relaunch_windows = False
         counter = 0
         time_between_msg = 60
+        program_exit = False
         while True:  # Event Loop
 
-            event, values = gui_window.sg_gui.Read(timeout=3)
+            event, values = gui_window.sg_gui.Read(timeout=2)
 
             if time.time() - relaunch_timer > relaunch_time:
                 event = 'Relaunch windows'
@@ -245,6 +246,7 @@ if __name__ == '__main__':
 
             if event == sg.WIN_CLOSED or event == 'Exit':
                 print('main: PROGRAM ENDS...')
+                program_exit = True
                 break
 
             # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
@@ -253,6 +255,7 @@ if __name__ == '__main__':
                 gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')  # FIXME
 
             if event == 'Relaunch windows':
+                print('main: RELAUNCHING WINDOWS ===========================================')
                 relaunch_windows = True
                 break
 
@@ -260,7 +263,6 @@ if __name__ == '__main__':
                 counter += 1
                 print('main: Time to restart = ', (relaunch_time - (time.time() - relaunch_timer)) // 60, ' minutes')
 
-            time.sleep(0.5)
 
         FishService.stop()
         queue.stop()
@@ -280,6 +282,8 @@ if __name__ == '__main__':
         process_wincap = None
         del FishService
 
+        if program_exit:
+            break
         # process_wincap.join()
 
         # gui_window.sg_gui.close()

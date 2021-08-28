@@ -156,7 +156,7 @@ class FishingWindow(L2window):
         return temp
 
     def send_message(self, message):
-        temp = '\t' * 11 * self.fisher_id + 'FishingWindow ' + f'{self.fisher_id}: {message}'
+        temp = '\t' * 11 * (self.fisher_id+1) + 'FishingWindow ' + f'{self.fisher_id}: {message}'
         print(temp)
 
     def find(self, object, accurate=False):  # returns list of positions
