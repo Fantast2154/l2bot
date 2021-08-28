@@ -1,19 +1,16 @@
 import os
-import time
 
 import win32con
 
 from _fisher.fishing_service import FishingService
-from system.telegram import Telegram
 from system.l2window import L2window
 import keyboard
 from system.action_queue import ActionQueue
 from system.relaunch_module import Login
 from system.window_capture import WindowCapture
-import win32gui
 import sys
 from system.gui_interface import *
-from system.cpd import CPD
+from settings.cpd import CPD
 
 
 
