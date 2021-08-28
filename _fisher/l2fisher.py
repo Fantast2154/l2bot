@@ -124,7 +124,7 @@ class Fisher:
         self.send_message(f'=destroyed=')
 
     def send_message(self, message):
-        temp = '\t' * 11 * self.fisher_id + 'Fisher ' + f'{self.fisher_id}: {message}'
+        temp = '\t' * 11 * (self.fisher_id+1) + 'Fisher ' + f'{self.fisher_id}: {message}'
         print(temp)
 
     def test_action(self, count):

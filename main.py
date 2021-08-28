@@ -244,6 +244,7 @@ if __name__ == '__main__':
                 gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}') #FIXME
 
             if event == 'Relaunch windows':
+                print('main: RELAUNCHING WINDOWS ===========================================')
                 relaunch_windows = True
                 break
 
