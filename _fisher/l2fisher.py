@@ -859,8 +859,7 @@ class Fisher:
 
     def update_current_attempt(self):
         self.attempt_counter[0] += 1
-        temp = '\t' * 11 * self.fisher_id
-        print(f'{temp}Fisher {self.fisher_id}: Attempt # {self.attempt_counter[0]}')
+        self.send_message(f'Attempt # {self.attempt_counter[0]}')
 
     def send_mail(self):
         pass
