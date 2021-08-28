@@ -133,18 +133,18 @@ class Gui_interface:
         self.sg_gui['1_txt_field'].Update('L2 bot "Boy & co"')
         self.sg_gui.Read(timeout=10)
 
-        layout2 = [[sg.Text('Periodic relaunch time (in hours)')],
+        layout2 = [[sg.Text('Periodic relaunch time (in minutes)')],
                    [sg.Input()],
                    [sg.OK()]]
 
-        window = sg.Window('pip? pip.', layout2, size=(220, 100))
+        window = sg.Window('pip? pip.', layout2, size=(240, 100))
 
         event, values = window.read()
-        output = 3600*int(values[0])
+        output = 60*int(values[0])
 
         window.close()
 
-        time.sleep(0.3)
+        time.sleep(0.8)
         self.sg_gui['Relaunch windows'].Update(visible=True)
         self.sg_gui['2_txt_field'].Update(f'To stop the programm press "alt+q"', font=("Helvetica", 13), visible=True)
         self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "alt+w"', font=("Helvetica", 13),
