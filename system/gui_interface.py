@@ -133,7 +133,7 @@ class Gui_interface:
         self.sg_gui['1_txt_field'].Update('L2 bot "Boy & co"')
         self.sg_gui.Read(timeout=10)
 
-        layout2 = [[sg.Text('Set relaunch time (in hours)')],
+        layout2 = [[sg.Text('Periodic relaunch time (in hours)')],
                    [sg.Input()],
                    [sg.OK()]]
 
