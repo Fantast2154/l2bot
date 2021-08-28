@@ -951,9 +951,10 @@ class Fisher:
     def camera_top_zoom_in(self):
         window_center_pos = self.fishing_window.window_center_pos()
         [(x, y)] = window_center_pos
-        self.q.new_task('mouse',
-                        [[(x, y)], [(x, y + 100)], 'LEFT', False, 'drag_and_drop_right', False],
-                        self.fishing_window)
+        # self.q.new_task('mouse',
+        #                 [[(x, y)], [(x, y + 100)], 'AutoHotPy', False, False, False],
+        #                 self.fishing_window)
+        #self.q.turn(x, y)
         self.pause_thread(12)
 
     def register_nickname(self):

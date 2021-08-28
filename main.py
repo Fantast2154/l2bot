@@ -15,6 +15,8 @@ import sys
 from system.gui_interface import *
 from system.cpd import CPD
 
+from AutoHotPy import AutoHotPy
+
 
 def send_message(message):
     temp = 'MAIN' + ': ' + message
@@ -62,6 +64,14 @@ def input_number(message):
 
 def client_server(bots_id_list):
     pass
+
+
+def start_auto_py(auto):
+    auto.start()
+
+
+def exitAutoHotKey(autohotpy, event):
+    autohotpy.stop()
 
 
 if __name__ == '__main__':
@@ -124,13 +134,16 @@ if __name__ == '__main__':
         # setting created windows to screenshot maker
         win_capture.set_windows(windows)
 
+        auto_py = AutoHotPy()
+        auto_py.registerExit(auto_py.ESC, exitAutoHotKey)
+        auto_py_thread = threading.Thread(target=start_auto_py, args=(auto_py,))
+        auto_py_thread.start()
         # setting created windows to queue
-        queue = ActionQueue(windows)
+        queue = ActionQueue(windows, auto_py)
 
         # start queueing of tasks
         process_queue = threading.Thread(target=queue.run)
         process_queue.start()
-
 
         # start capturing screenshots
         process_wincap = Process(target=win_capture.start_capturing, args=(screen_manager,))
@@ -155,7 +168,7 @@ if __name__ == '__main__':
         if gui_window is None:
             gui_window = Gui_interface(windows)
             user_input, relaunch_time = gui_window.gui_window()
-            print('relaunch_time ', relaunch_time/3600, 'hours')
+            print('relaunch_time ', relaunch_time / 3600, 'hours')
         else:
             user_input = gui_window.reinit_windows(windows)
 
@@ -165,8 +178,6 @@ if __name__ == '__main__':
         # gui window loop
         process_fishingService = threading.Thread(target=FishService.run)
         process_fishingService.start()
-
-
 
         # for fisher in FishService.fishers:
         #     temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
@@ -238,10 +249,10 @@ if __name__ == '__main__':
                 program_exit = True
                 break
 
-            #FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
+            # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
             for fisher in FishService.fishers:
                 temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
-                gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}') #FIXME
+                gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')  # FIXME
 
             if event == 'Relaunch windows':
                 print('main: RELAUNCHING WINDOWS ===========================================')
@@ -250,7 +261,7 @@ if __name__ == '__main__':
 
             if time.time() - relaunch_timer > time_between_msg * counter:
                 counter += 1
-                print('main: Time to restart = ', (relaunch_time - (time.time() - relaunch_timer))//60, ' minutes')
+                print('main: Time to restart = ', (relaunch_time - (time.time() - relaunch_timer)) // 60, ' minutes')
 
 
         FishService.stop()
@@ -260,7 +271,6 @@ if __name__ == '__main__':
             for window in windows:
                 handle = window.hwnd
                 win32gui.PostMessage(handle, win32con.WM_CLOSE, 0, 0)
-
 
         time.sleep(3)
 

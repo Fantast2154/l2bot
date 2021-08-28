@@ -18,6 +18,11 @@ from multiprocessing import Manager
 from pynput.mouse import Button
 import pynput
 
+from win32con import *
+
+from InterceptionWrapper import InterceptionMouseState, InterceptionMouseStroke
+
+
 
 class ActionQueue:
     number = None
@@ -28,7 +33,7 @@ class ActionQueue:
     priority_list = []
     action_rate_list = []
 
-    def __init__(self, windows):
+    def __init__(self, windows, auto_py):
         # self.send_message(f'Queue created\n')
 
         # threading.Thread.__init__(self)
@@ -202,6 +207,95 @@ class ActionQueue:
                         "'": 0xDE,
                         '`': 0xC0}
 
+        self.auto_py = auto_py
+        #self.auto_py.registerExit(self.auto_py.ESC, self.exitAutoHotKey)
+        print('++++')
+        #threading.Thread(target=self.start_auto_py, args=(self.auto_py,)).start()
+        #self.turn(self.auto_py)
+
+    def draw_line(self, x1=0, y1=0, x2=0, y2=0):
+        coordinates = []
+
+        dx = x2 - x1
+        dy = y2 - y1
+
+        sign_x = 1 if dx > 0 else -1 if dx < 0 else 0
+        sign_y = 1 if dy > 0 else -1 if dy < 0 else 0
+
+        if dx < 0:
+            dx = -dx
+        if dy < 0:
+            dy = -dy
+
+        if dx > dy:
+            pdx, pdy = sign_x, 0
+            es, el = dy, dx
+        else:
+            pdx, pdy = 0, sign_y
+            es, el = dx, dy
+
+        x, y = x1, y1
+
+        error, t = el / 2, 0
+
+        coordinates.append([x, y])
+
+        while t < el:
+            error -= es
+            if error < 0:
+                error += el
+                x += sign_x
+                y += sign_y
+            else:
+                x += pdx
+                y += pdy
+            t += 1
+            coordinates.append([x, y])
+
+        return coordinates
+
+    def smooth_move(self, x, y):
+        flags, hcursor, (startX, startY) = win32gui.GetCursorInfo()
+        coordinates = self.draw_line(startX, startY, x, y)
+        x = 0
+        for dot in coordinates:
+            time.sleep(0.001)
+            # x += 1
+            # if x % 2 == 0 and x % 3 == 0:
+            #   time.sleep(0.001)
+            self.auto_py.moveMouseToPosition(dot[0], dot[1])
+
+    def turn(self, x, y):
+        time.sleep(0.02)
+        self.smooth_move(self.auto_py, x, y)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
+        stroke = InterceptionMouseStroke()
+
+        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_DOWN
+        self.auto_py.sendToDefaultMouse(stroke)
+        time.sleep(0.02)
+        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
+        self.auto_py.sendToDefaultMouse(stroke)
+        time.sleep(0.02)
+
+        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_DOWN
+        self.auto_py.sendToDefaultMouse(stroke)
+        time.sleep(0.02)
+        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
+        self.auto_py.sendToDefaultMouse(stroke)
+        time.sleep(0.02)
+
+        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_DOWN
+        self.auto_py.sendToDefaultMouse(stroke)
+        # time.sleep(0.02)
+        self.smooth_move(self.auto_py, x, y + 50)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
+        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
+        self.auto_py.sendToDefaultMouse(stroke)
+        time.sleep(0.02)
+        for _ in range(100):
+            time.sleep(0.02)
+            win32api.mouse_event(MOUSEEVENTF_WHEEL, x, y, -1, 0)
+
+
     def activate_l2windows(self, windows):
         try:
 
@@ -245,6 +339,7 @@ class ActionQueue:
         # time.sleep(0.03)
         keyboard.send(k)
         time.sleep(0.01)
+
     def click_right(self, x, y, swtich_window=False, params=False, delta_x=0, delta_y=0):
         self.mouse.position = (x - random.randint(0, 3), y - random.randint(0, 3))
         time.sleep(0.03)
@@ -289,11 +384,11 @@ class ActionQueue:
         if params[1] and params[4] == 'drag_and_drop_alt':
             self.mouse.press(Button.left)
             time.sleep(0.1)
-            VK_CODE = {'alt':0x12}
+            VK_CODE = {'alt': 0x12}
             args = []
             args.append('alt')
             for i in args:
-                win32api.keybd_event(VK_CODE[i], 0,0,0)
+                win32api.keybd_event(VK_CODE[i], 0, 0, 0)
                 time.sleep(0.1)
 
             [(temp_x, temp_y)] = params[1]
@@ -301,7 +396,7 @@ class ActionQueue:
             time.sleep(0.1)
 
             for i in args:
-                win32api.keybd_event(VK_CODE[i],0 ,win32con.KEYEVENTF_KEYUP ,0)
+                win32api.keybd_event(VK_CODE[i], 0, win32con.KEYEVENTF_KEYUP, 0)
                 time.sleep(0.1)
 
             self.mouse.release(Button.left)
@@ -317,14 +412,14 @@ class ActionQueue:
             self.send_message('move1-------')
             time.sleep(4)
 
-            win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN,x1,y1,0,0)
+            win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, x1, y1, 0, 0)
             time.sleep(0.1)
 
             step_size = 2
             counter = 0
             new_pos_x, new_pos_y = x1, y1
-            while new_pos_y < y1+100:
-                new_pos_x, new_pos_y = x1, y1 + counter*step_size
+            while new_pos_y < y1 + 100:
+                new_pos_x, new_pos_y = x1, y1 + counter * step_size
                 win32api.SetCursorPos([new_pos_x, new_pos_y])
                 counter += 1
                 time.sleep(0.02)
@@ -383,16 +478,20 @@ class ActionQueue:
                     self.click_left(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
                 elif 'RIGHT' in params:
                     self.click_right(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
+                elif 'AutoHotPy' in params:
+                    pass
+                    #self.turn(self.auto_py)
             else:
                 if 'LEFT' in params:
                     self.click_left(x, y, swtich_window=False, params=params, delta_x=deltaX, delta_y=deltaY)
                 elif 'RIGHT' in params:
                     self.click_right(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
+                elif 'AutoHotPy' in params:
+                    pass
+                    #self.turn(self.auto_py)
 
             if 'insert' in params:
                 keyboard.send('ctrl+v')
-
-
 
     @classmethod
     def start_queueing(cls):
@@ -400,6 +499,7 @@ class ActionQueue:
 
     def initial_task(self, action, action_param, window, priority='Normal', action_rate='High'):
         pass
+
     # def start(self):
     #     # self.send_message('start queueing')
     #     t = threading.Thread(target=self.run)
