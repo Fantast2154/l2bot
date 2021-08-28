@@ -950,13 +950,15 @@ class Fisher:
         self.pause_thread(2)
 
     def camera_top_zoom_in(self):
+        print('PIZDA ONLINE')
         window_center_pos = self.fishing_window.window_center_pos()
         [(x, y)] = window_center_pos
-        # self.q.new_task('mouse',
-        #                 [[(x, y)], [(x, y + 100)], 'AutoHotPy', False, False, False],
-        #                 self.fishing_window)
+        print(window_center_pos)
+        self.q.new_task('mouse',
+                        [[(x, y)], [(x, y + 100)], 'AutoHotPy', False, False, False],
+                        self.fishing_window)
         #self.q.turn(x, y)
-        self.pause_thread(12)
+        self.pause_thread(35)
 
     def register_nickname(self):
         self.q.new_task('mouse',
@@ -988,7 +990,7 @@ class Fisher:
         self.pause_thread(6)
 
         # self.register_nickname()
-        # self.camera_top_zoom_in()
+        self.camera_top_zoom_in()
 
         fishing_potion_white = self.fishing_window.get_object('fishing_potion_white', search=True)
         if fishing_potion_white:

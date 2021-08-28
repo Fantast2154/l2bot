@@ -21,7 +21,7 @@ import pynput
 from win32con import *
 
 from InterceptionWrapper import InterceptionMouseState, InterceptionMouseStroke
-
+from AutoHotPy import AutoHotPy
 
 
 class ActionQueue:
@@ -33,7 +33,7 @@ class ActionQueue:
     priority_list = []
     action_rate_list = []
 
-    def __init__(self, windows, auto_py):
+    def __init__(self, windows):
         # self.send_message(f'Queue created\n')
 
         # threading.Thread.__init__(self)
@@ -207,7 +207,7 @@ class ActionQueue:
                         "'": 0xDE,
                         '`': 0xC0}
 
-        self.auto_py = auto_py
+        self.auto_py_started = False
         #self.auto_py.registerExit(self.auto_py.ESC, self.exitAutoHotKey)
         print('++++')
         #threading.Thread(target=self.start_auto_py, args=(self.auto_py,)).start()
@@ -254,7 +254,7 @@ class ActionQueue:
 
         return coordinates
 
-    def smooth_move(self, x, y):
+    def smooth_move(self, autohotpy, x, y):
         flags, hcursor, (startX, startY) = win32gui.GetCursorInfo()
         coordinates = self.draw_line(startX, startY, x, y)
         x = 0
@@ -263,37 +263,57 @@ class ActionQueue:
             # x += 1
             # if x % 2 == 0 and x % 3 == 0:
             #   time.sleep(0.001)
-            self.auto_py.moveMouseToPosition(dot[0], dot[1])
+            autohotpy.moveMouseToPosition(dot[0], dot[1])
 
     def turn(self, x, y):
+        print('WOLK DAN STRIT EN TORN KORNAR')
+        #if not self.auto_py_started:
+        auto_py = AutoHotPy()
+        auto_py.registerExit(auto_py.ESC, auto_py.stop)
+        auto_py_thread = threading.Thread(target=auto_py.start)
+        auto_py_thread.start()
+            #self.auto_py_started = True
+
         time.sleep(0.02)
-        self.smooth_move(self.auto_py, x, y)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
+        #self.smooth_move(auto_py, x, y)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
+        win32api.SetCursorPos((x, y))
         stroke = InterceptionMouseStroke()
 
-        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_DOWN
-        self.auto_py.sendToDefaultMouse(stroke)
+        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_DOWN
+        auto_py.sendToDefaultMouse(stroke)
         time.sleep(0.02)
-        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
-        self.auto_py.sendToDefaultMouse(stroke)
-        time.sleep(0.02)
-
-        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_DOWN
-        self.auto_py.sendToDefaultMouse(stroke)
-        time.sleep(0.02)
-        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
-        self.auto_py.sendToDefaultMouse(stroke)
+        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
+        auto_py.sendToDefaultMouse(stroke)
         time.sleep(0.02)
 
         stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_DOWN
-        self.auto_py.sendToDefaultMouse(stroke)
-        # time.sleep(0.02)
-        self.smooth_move(self.auto_py, x, y + 50)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
+        auto_py.sendToDefaultMouse(stroke)
+        time.sleep(0.02)
         stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
-        self.auto_py.sendToDefaultMouse(stroke)
+        auto_py.sendToDefaultMouse(stroke)
+        time.sleep(0.02)
+
+        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_DOWN
+        auto_py.sendToDefaultMouse(stroke)
+        # time.sleep(0.02)
+        self.smooth_move(auto_py, x, y + 100)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
+        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
+        auto_py.sendToDefaultMouse(stroke)
         time.sleep(0.02)
         for _ in range(100):
-            time.sleep(0.02)
+            #time.sleep(0.02)
             win32api.mouse_event(MOUSEEVENTF_WHEEL, x, y, -1, 0)
+
+        #auto_py_thread.join()
+
+    def start_auto_py(self, auto):
+        auto.start()
+
+    def exitAutoHotKey(self, autohotpy, event):
+        autohotpy.stop()
+
+    def test_f(self):
+        print('test_f')
 
 
     def activate_l2windows(self, windows):
@@ -479,16 +499,14 @@ class ActionQueue:
                 elif 'RIGHT' in params:
                     self.click_right(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
                 elif 'AutoHotPy' in params:
-                    pass
-                    #self.turn(self.auto_py)
+                    self.turn(x_temp, y_temp)
             else:
                 if 'LEFT' in params:
                     self.click_left(x, y, swtich_window=False, params=params, delta_x=deltaX, delta_y=deltaY)
                 elif 'RIGHT' in params:
                     self.click_right(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
                 elif 'AutoHotPy' in params:
-                    pass
-                    #self.turn(self.auto_py)
+                    self.turn(x_temp, y_temp)
 
             if 'insert' in params:
                 keyboard.send('ctrl+v')

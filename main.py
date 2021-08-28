@@ -15,7 +15,7 @@ import sys
 from system.gui_interface import *
 from system.cpd import CPD
 
-from AutoHotPy import AutoHotPy
+
 
 
 def send_message(message):
@@ -134,12 +134,9 @@ if __name__ == '__main__':
         # setting created windows to screenshot maker
         win_capture.set_windows(windows)
 
-        auto_py = AutoHotPy()
-        auto_py.registerExit(auto_py.ESC, exitAutoHotKey)
-        auto_py_thread = threading.Thread(target=start_auto_py, args=(auto_py,))
-        auto_py_thread.start()
+
         # setting created windows to queue
-        queue = ActionQueue(windows, auto_py)
+        queue = ActionQueue(windows)
 
         # start queueing of tasks
         process_queue = threading.Thread(target=queue.run)

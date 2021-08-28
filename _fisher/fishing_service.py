@@ -220,8 +220,8 @@ class FishingService:
             for fisher in self.fishers:
                 temp_fisher_process = Process(target=fisher.start_fishing)
                 self.process_fishers.append(temp_fisher_process)
-                # self.process_fishers[fisher.fisher_id].start()
-                # self.process_fishers[fisher.fisher_id] = None
+                #self.process_fishers[fisher.fisher_id].start()
+                #self.process_fishers[fisher.fisher_id] = None
                 temp_fisher_process.start()
         # else:
         #     if fisher_id < len(self.process_fishers):
