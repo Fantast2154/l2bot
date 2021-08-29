@@ -134,7 +134,10 @@ class Client:
         #data_to_encode = {self.id: data}
         # data_to_encode = data
         encoded_data_to_send = pickle.dumps(data_to_encode)
-        self.server.send(encoded_data_to_send)
+        try:
+            self.server.send(encoded_data_to_send)
+        except ConnectionResetError:
+            self.server.close()
 
     def client_receive_message(self):
         #self.dtr[0] = self.bots_data_collection
