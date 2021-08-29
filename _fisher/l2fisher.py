@@ -59,10 +59,10 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        if self.fisher_id == 0:
-            self.send_counter = 99999
-        else:
-            self.send_counter = 99999
+        # if self.fisher_id == 0:
+        #     self.send_counter = 2
+        # else:
+        self.send_counter = 9000
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -513,28 +513,28 @@ class Fisher:
 
         self.send_message('overweight_baits_soski_correction')
         if self.fisher_id == 0:
-            required_dbaits = 50
-            required_nbaits = 0
-            required_soski = 3000
-            required_alacrity = 50
-            required_soski_pet = 50
-            required_potion = 10
-
-        elif self.fisher_id == 1:
             required_dbaits = 1
             required_nbaits = 0
-            required_soski = 3000
-            required_alacrity = 1
-            required_soski_pet = 1
-            required_potion = 1
+            required_soski = 2
+            required_alacrity = 3
+            required_soski_pet = 4
+            required_potion = 5
+
+        elif self.fisher_id == 1:
+            required_dbaits = 6
+            required_nbaits = 0
+            required_soski = 7
+            required_alacrity = 8
+            required_soski_pet = 9
+            required_potion = 10
 
         else:
-            required_dbaits = 40
+            required_dbaits = 11
             required_nbaits = 0
-            required_soski = 5000
-            required_alacrity = 1
-            required_soski_pet = 1
-            required_potion = 1
+            required_soski = 12
+            required_alacrity = 13
+            required_soski_pet = 14
+            required_potion = 15
 
         if required_dbaits >= 1 or required_nbaits >= 1 or required_soski >= 1 or required_alacrity >= 1 or required_soski_pet >= 1 or required_potion >= 1:
             self.requested_items_to_supply.append(required_dbaits)  # dbaits
@@ -637,6 +637,7 @@ class Fisher:
         self.requested_items_to_supply_d['potion'] = 0
 
         self.current_state[0] = 'fishing'
+        self.send_counter = 9999
 
         # self.send_counter += 3
 

@@ -38,12 +38,17 @@ class FishingService:
     sg_gui = None
 
     def __init__(self, windows, user_input, q):
+
         self.machine_id = random.randint(0, 10000000)
         self.send_message(f'created')
         # super().__init__(self.machine_id)  # ИНИЦИАЛИЗИРУЕМ РОДИТЕЛЬСКИЙ КЛАСС Client И ПРИСОЕДИНЯЕМСЯ К СЕРВАЧКУ
         manager = Manager()
         # self.fishing_service_client = Client(self.machine_id)
         self.exit_is_set = False
+
+        self.server_update_process1 = None
+        self.server_update_process2 = None
+        self.server_update_process3 = None
 
         self.windows = windows
         self.window_fishers = user_input[0]
@@ -56,7 +61,6 @@ class FishingService:
         self.number_of_buffers = len(user_input[1])
         self.number_of_suppliers = len(user_input[2])
         self.number_of_teleporters = len(user_input[3])
-
 
         self.fishers = []
         self.buffers = []
@@ -124,11 +128,9 @@ class FishingService:
         else:
             self.has_supplier = False
 
-
         # self.exit = threading.Event()
 
         q.activate_l2windows(self.windows)
-
 
         for fisher_id in range(self.number_of_fishers):
             # print('fisher_id', fisher_id)
@@ -199,7 +201,6 @@ class FishingService:
         self.start_buffers()
         self.start_suppliers()
 
-
     def __del__(self):
         del self.fishers
         del self.buffers
@@ -220,8 +221,8 @@ class FishingService:
             for fisher in self.fishers:
                 temp_fisher_process = Process(target=fisher.start_fishing)
                 self.process_fishers.append(temp_fisher_process)
-                #self.process_fishers[fisher.fisher_id].start()
-                #self.process_fishers[fisher.fisher_id] = None
+                # self.process_fishers[fisher.fisher_id].start()
+                # self.process_fishers[fisher.fisher_id] = None
                 temp_fisher_process.start()
         # else:
         #     if fisher_id < len(self.process_fishers):
@@ -616,10 +617,10 @@ class FishingService:
             # print('self.has_supplier and anyone_is_requesting', self.has_supplier, anyone_is_requesting)
             if self.has_supplier and who_requests_supplying_new:
                 self.pinged_fishers[0].clear()
-                #print('/////////////who_requests_supplying_new', who_requests_supplying_new)
-                #print('////////who_has_been_supplied', who_has_been_supplied)
+                # print('/////////////who_requests_supplying_new', who_requests_supplying_new)
+                # print('////////who_has_been_supplied', who_has_been_supplied)
                 who_to_supply = self.is_in(who_has_been_supplied, who_requests_supplying_new)
-                #print('////who_to_supply', who_to_supply)
+                # print('////who_to_supply', who_to_supply)
                 if who_to_supply:
                     who_has_been_supplied = self.start_supply(who_to_supply)
                 # who_has_been_supplied = {machine_id: [fisher_id, ...]}
@@ -643,15 +644,32 @@ class FishingService:
         self.send_message('run loop started')
         flag = False
         timer_fishing_service_start = time.time()
-        # self.server_update_start()
+        self.server_update_process1, self.server_update_process2, self.server_update_process3 = self.server_update_start()
         while not self.exit_is_set:
             # if time.time() - timer_fishing_service_start > self.number_of_fishers * 9:
             #     self.antiphase_fishing('on')
+            #print('server_update_process1.is_alive()', self.server_update_process1.is_alive())
+            #print('server_update_process2.is_alive()', self.server_update_process2.is_alive())
+            #print('server_update_process3.is_alive()', self.server_update_process3.is_alive())
             time.sleep(1)
-        self.send_message('end of the run loop')
 
     def stop(self):
         self.exit_is_set = True
+
+        self.server_update_process1.terminate()
+        self.server_update_process2.terminate()
+        self.server_update_process3.terminate()
+
+        # print('server_update_process1.is_alive() AFTER', self.server_update_process1.is_alive())
+        # print('server_update_process2.is_alive() AFTER', self.server_update_process2.is_alive())
+        # print('server_update_process3.is_alive() AFTER', self.server_update_process3.is_alive())
+
+        self.server_update_process1 = None
+        self.server_update_process2 = None
+        self.server_update_process3 = None
+
+        self.send_message('end of the run loop')
+
         self.stop_fishers()
 
         closing_time = 6
@@ -662,11 +680,10 @@ class FishingService:
             self.send_message(f'thread stops in ..... {closing_time - counter}')
             time.sleep(1)
 
-
         self.send_message(f'stopped')
+
         del self.windows
         del self
-
 
         # del self.fishers
         # del self.fishing_windows
@@ -698,16 +715,19 @@ class FishingService:
     def server_update_start(self):
         # self.data_to_transmit.append(0)
         # self.data_to_receive.append(0)
+
         if self.fishing_service_client.is_connected():
             print('IS CONNECTED')
-            server_update_process1 = Process(target=self.up_to_serv)
-            server_update_process1.start()
+            server_update_process1 = Process(target=self.process_commands)
             server_update_process2 = Process(target=self.proc_serv_dat)
+            server_update_process3 = Process(target=self.up_to_serv)
+            server_update_process1.start()
             server_update_process2.start()
-            server_update_process3 = Process(target=self.process_commands)
             server_update_process3.start()
+
+            return server_update_process1, server_update_process2, server_update_process3
 
         else:
             print('NO CONNECTION')
-            server_update_process3 = Process(target=self.offline_requests)
-            server_update_process3.start()
+            # server_update_process3 = Process(target=self.offline_requests)
+            # server_update_process3.start()

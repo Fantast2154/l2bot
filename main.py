@@ -1,4 +1,5 @@
 import os
+import time
 
 import win32con
 
@@ -11,8 +12,6 @@ from system.window_capture import WindowCapture
 import sys
 from system.gui_interface import *
 from settings.cpd import CPD
-
-
 
 
 def send_message(message):
@@ -97,7 +96,7 @@ if __name__ == '__main__':
 
             for i in range(custom_personal_data.number_of_windows):
                 os.startfile(custom_personal_data.launcher_path)
-                time.sleep(11)
+                time.sleep(13)
 
             name_list, hash_list = get_l2windows_param()
             n = len(name_list)
@@ -108,41 +107,47 @@ if __name__ == '__main__':
         screen_manager = manager.list()
         screen_manager.append(0)
 
-        # create n windows L2
-        windows = []
-        print('number of l2 windows:', n)
-        print('hash_list of l2 windows:', hash_list)
-        print('-----')
+        def tue():
+            # create n windows L2
+            windows = []
+            print('number of l2 windows:', n)
+            print('hash_list of l2 windows:', hash_list)
+            print('-----')
 
-        rect_windows_list = []
-        for hwnd in hash_list:
-            rect = win32gui.GetWindowRect(hwnd)
-            rect_windows_list.append([rect[0], hwnd])
+            rect_windows_list = []
+            for hwnd in hash_list:
+                rect = win32gui.GetWindowRect(hwnd)
+                rect_windows_list.append([rect[0], hwnd])
 
-        rect_windows_list.sort(key=lambda x: x[0])
+            rect_windows_list.sort(key=lambda x: x[0])
 
-        for i in range(n):
-            temp_window = L2window(i, win_capture, name_list[i], hash_list[i], screen_manager)
-            temp_window.hwnd = rect_windows_list[i][1]
-            if log:
-                temp_window.enum_handler()
-            windows.append(temp_window)
+            for i in range(n):
+                temp_window = L2window(i, win_capture, name_list[i], hash_list[i], screen_manager)
+                temp_window.hwnd = rect_windows_list[i][1]
+                if log:
+                    temp_window.enum_handler()
+                windows.append(temp_window)
 
-        # setting created windows to screenshot maker
-        win_capture.set_windows(windows)
+            # setting created windows to screenshot maker
+            win_capture.set_windows(windows)
 
+            # setting created windows to queue
+            queue = ActionQueue(windows)
 
-        # setting created windows to queue
-        queue = ActionQueue(windows)
+            # start queueing of tasks
+            process_queue = threading.Thread(target=queue.run)
+            process_queue.start()
 
-        # start queueing of tasks
-        process_queue = threading.Thread(target=queue.run)
-        process_queue.start()
+            # start capturing screenshots
+            process_wincap = Process(target=win_capture.start_capturing, args=(screen_manager,))
+            process_wincap.start()
+            #time.sleep(1)
+            #process_wincap.terminate()
+            #win_capture.stop()
 
-        # start capturing screenshots
-        process_wincap = Process(target=win_capture.start_capturing, args=(screen_manager,))
-        process_wincap.start()
+            return windows, queue, process_queue, process_wincap
 
+        windows, queue, process_queue, process_wincap = tue()
         # login module
         if log:
             # if not custom_personal_data.relog_logins and gui_window is None:
@@ -155,7 +160,25 @@ if __name__ == '__main__':
                 custom_personal_data.relog_logins.append(log)
                 custom_personal_data.relog_passwords.append(pas)
 
-            Login(windows, custom_personal_data.relog_logins, custom_personal_data.relog_passwords, queue)
+            login = Login(windows, custom_personal_data.relog_logins, custom_personal_data.relog_passwords, queue)
+            windows_to_restart = login.join_the_game()
+            if windows_to_restart:
+                pass
+                # queue.stop()
+                # process_queue.join()
+                # process_wincap.terminate()
+                #
+                # for window in windows_to_restart:
+                #     handle = window.hwnd
+                #     win32gui.PostMessage(handle, win32con.WM_CLOSE, 0, 0)
+                #
+                #     os.startfile(custom_personal_data.launcher_path)
+                #     time.sleep(13)
+                #
+                # name_list, hash_list = get_l2windows_param()
+                # n = len(name_list)
+                # time.sleep(1)
+                # windows, queue, process_queue, process_wincap = tue()
             time.sleep(2)
 
         # creating gui class
@@ -257,10 +280,15 @@ if __name__ == '__main__':
                 counter += 1
                 print('main: Time to restart = ', (relaunch_time - (time.time() - relaunch_timer)) // 60, ' minutes')
 
-
         FishService.stop()
         queue.stop()
         process_wincap.terminate()
+        time.sleep(1)
+        process_wincap.close()
+        del win_capture
+        #print('process_wincap.terminate()', process_wincap.is_alive())
+        process_fishingService.join()
+        print('process_fishingService.join()', process_fishingService.is_alive())
         if relaunch_windows:
             for window in windows:
                 handle = window.hwnd
