@@ -82,6 +82,9 @@ if __name__ == '__main__':
     relaunch_time = None
 
     while True:
+        force_restart = False
+        relaunch_windows = False
+        program_exit = False
 
         l2window_name = 'Asterios'
         win_capture = WindowCapture(l2window_name)
@@ -164,6 +167,7 @@ if __name__ == '__main__':
             windows_to_restart = login.join_the_game()
             if windows_to_restart:
                 pass
+                #force_restart = True
                 # queue.stop()
                 # process_queue.join()
                 # process_wincap.terminate()
@@ -180,117 +184,118 @@ if __name__ == '__main__':
                 # time.sleep(1)
                 # windows, queue, process_queue, process_wincap = tue()
             time.sleep(2)
+        if not force_restart:
+            # creating gui class
+            if gui_window is None:
+                gui_window = Gui_interface(windows)
+                user_input, relaunch_time = gui_window.gui_window()
+                print('relaunch_time ', relaunch_time / 3600, 'hours')
+            else:
+                user_input = gui_window.reinit_windows(windows)
 
-        # creating gui class
-        if gui_window is None:
-            gui_window = Gui_interface(windows)
-            user_input, relaunch_time = gui_window.gui_window()
-            print('relaunch_time ', relaunch_time / 3600, 'hours')
-        else:
-            user_input = gui_window.reinit_windows(windows)
+            # creating fishing manager
+            FishService = FishingService(windows, user_input, queue)
 
-        # creating fishing manager
-        FishService = FishingService(windows, user_input, queue)
+            # gui window loop
+            process_fishingService = threading.Thread(target=FishService.run)
+            process_fishingService.start()
 
-        # gui window loop
-        process_fishingService = threading.Thread(target=FishService.run)
-        process_fishingService.start()
+            # for fisher in FishService.fishers:
+            #     temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
+            #     gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
-        # for fisher in FishService.fishers:
-        #     temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
-        #     gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
+            # if not log:
+            #     print('not default order')
+            #
+            #     nick_name_list = [0]*custom_personal_data.number_of_windows
+            #     if FishService.number_of_fishers != 0:
+            #         exit_is_set = False
+            #         while not exit_is_set:
+            #             for fisher in FishService.fishers:
+            #                 if fisher.nickname[0] is not None and fisher.nickname[0] not in nick_name_list:
+            #                     nick_name_list[fisher.fishing_window.window_id] = fisher.nickname[0]
+            #                 if len(nick_name_list) == FishService.number_of_fishers:
+            #                     exit_is_set = True
+            #                     break
+            #
+            #     window_fishers = user_input[0]
+            #     window_buffers = user_input[1]
+            #     window_suppliers = user_input[2]
+            #     window_teleporters = user_input[3]
+            #
+            #     # if custom_personal_data.number_of_windows - len(nick_name_list) == 1: # PIZDA
+            #     custom_personal_data.relog_logins = []
+            #     custom_personal_data.relog_passwords = []
+            #     for nick in nick_name_list:
+            #         nickname = nick
+            #         log = custom_personal_data.accounts[nick][0]
+            #         pas = custom_personal_data.accounts[nick][1]
+            #         custom_personal_data.relog_logins.append(log)
+            #         custom_personal_data.relog_passwords.append(pas)
 
-        # if not log:
-        #     print('not default order')
-        #
-        #     nick_name_list = [0]*custom_personal_data.number_of_windows
-        #     if FishService.number_of_fishers != 0:
-        #         exit_is_set = False
-        #         while not exit_is_set:
-        #             for fisher in FishService.fishers:
-        #                 if fisher.nickname[0] is not None and fisher.nickname[0] not in nick_name_list:
-        #                     nick_name_list[fisher.fishing_window.window_id] = fisher.nickname[0]
-        #                 if len(nick_name_list) == FishService.number_of_fishers:
-        #                     exit_is_set = True
-        #                     break
-        #
-        #     window_fishers = user_input[0]
-        #     window_buffers = user_input[1]
-        #     window_suppliers = user_input[2]
-        #     window_teleporters = user_input[3]
-        #
-        #     # if custom_personal_data.number_of_windows - len(nick_name_list) == 1: # PIZDA
-        #     custom_personal_data.relog_logins = []
-        #     custom_personal_data.relog_passwords = []
-        #     for nick in nick_name_list:
-        #         nickname = nick
-        #         log = custom_personal_data.accounts[nick][0]
-        #         pas = custom_personal_data.accounts[nick][1]
-        #         custom_personal_data.relog_logins.append(log)
-        #         custom_personal_data.relog_passwords.append(pas)
+            relaunch_timer = time.time()
+            pause_switch = True
 
-        relaunch_timer = time.time()
-        pause_switch = True
-        relaunch_windows = False
-        counter = 0
-        time_between_msg = 60
-        program_exit = False
-        while True:  # Event Loop
+            counter = 0
+            time_between_msg = 60
 
-            event, values = gui_window.sg_gui.Read(timeout=2)
+            while True:  # Event Loop
 
-            if time.time() - relaunch_timer > relaunch_time:
-                event = 'Relaunch windows'
-            try:  # used try so that if user pressed other than the given key error will not be shown
+                event, values = gui_window.sg_gui.Read(timeout=2)
 
-                if keyboard.is_pressed('alt+q'):  # if key 'q' is pressed
-                    print('main: EXIT EVENT DETECTED')
-                    time.sleep(2)
-                    break  # finishing the loop
-                if keyboard.is_pressed('alt+w'):  # if key 'q' is pressed
+                if time.time() - relaunch_timer > relaunch_time:
+                    event = 'Relaunch windows'
+                try:  # used try so that if user pressed other than the given key error will not be shown
 
-                    if pause_switch:
-                        print('main: PAUSE EVENT DETECTED')
-                        FishService.pause_fishers()
-                        pause_switch = False
-                    else:
-                        print('main: RESUME EVENT DETECTED')
-                        FishService.resume_fishers()
-                        pause_switch = True
-                    time.sleep(2)
-            except:
-                continue
+                    if keyboard.is_pressed('alt+q'):  # if key 'q' is pressed
+                        print('main: EXIT EVENT DETECTED')
+                        time.sleep(2)
+                        break  # finishing the loop
+                    if keyboard.is_pressed('alt+w'):  # if key 'q' is pressed
 
-            if event == sg.WIN_CLOSED or event == 'Exit':
-                print('main: PROGRAM ENDS...')
-                program_exit = True
-                break
+                        if pause_switch:
+                            print('main: PAUSE EVENT DETECTED')
+                            FishService.pause_fishers()
+                            pause_switch = False
+                        else:
+                            print('main: RESUME EVENT DETECTED')
+                            FishService.resume_fishers()
+                            pause_switch = True
+                        time.sleep(2)
+                except:
+                    continue
 
-            # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
-            for fisher in FishService.fishers:
-                temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
-                gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')  # FIXME
+                if event == sg.WIN_CLOSED or event == 'Exit':
+                    print('main: PROGRAM ENDS...')
+                    program_exit = True
+                    break
 
-            if event == 'Relaunch windows':
-                print('main: RELAUNCHING WINDOWS ===========================================')
-                relaunch_windows = True
-                break
+                # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
+                for fisher in FishService.fishers:
+                    temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
+                    gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')  # FIXME
 
-            if time.time() - relaunch_timer > time_between_msg * counter:
-                counter += 1
-                print('main: Time to restart = ', (relaunch_time - (time.time() - relaunch_timer)) // 60, ' minutes')
+                if event == 'Relaunch windows':
+                    print('main: RELAUNCHING WINDOWS ===========================================')
+                    relaunch_windows = True
+                    break
 
-        FishService.stop()
-        queue.stop()
-        process_wincap.terminate()
-        time.sleep(1)
-        process_wincap.close()
-        del win_capture
-        #print('process_wincap.terminate()', process_wincap.is_alive())
-        process_fishingService.join()
-        print('process_fishingService.join()', process_fishingService.is_alive())
-        if relaunch_windows:
+                if time.time() - relaunch_timer > time_between_msg * counter:
+                    counter += 1
+                    print('main: Time to restart = ', (relaunch_time - (time.time() - relaunch_timer)) // 60, ' minutes')
+
+            FishService.stop()
+            queue.stop()
+            process_wincap.terminate()
+            time.sleep(1)
+            process_wincap.close()
+            del win_capture
+            #print('process_wincap.terminate()', process_wincap.is_alive())
+            process_fishingService.join()
+            print('process_fishingService.join()', process_fishingService.is_alive())
+        if relaunch_windows or force_restart:
             for window in windows:
+                print('restart', window.hwnd)
                 handle = window.hwnd
                 win32gui.PostMessage(handle, win32con.WM_CLOSE, 0, 0)
 

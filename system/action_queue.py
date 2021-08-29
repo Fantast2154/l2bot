@@ -208,10 +208,10 @@ class ActionQueue:
                         '`': 0xC0}
 
         self.auto_py_started = False
-        #self.auto_py.registerExit(self.auto_py.ESC, self.exitAutoHotKey)
+        # self.auto_py.registerExit(self.auto_py.ESC, self.exitAutoHotKey)
         print('++++')
-        #threading.Thread(target=self.start_auto_py, args=(self.auto_py,)).start()
-        #self.turn(self.auto_py)
+        # threading.Thread(target=self.start_auto_py, args=(self.auto_py,)).start()
+        # self.turn(self.auto_py)
 
     def draw_line(self, x1=0, y1=0, x2=0, y2=0):
         coordinates = []
@@ -267,15 +267,15 @@ class ActionQueue:
 
     def turn(self, x, y):
         print('WOLK DAN STRIT EN TORN KORNAR')
-        #if not self.auto_py_started:
+        # if not self.auto_py_started:
         auto_py = AutoHotPy()
         auto_py.registerExit(auto_py.ESC, auto_py.stop)
         auto_py_thread = threading.Thread(target=auto_py.start)
         auto_py_thread.start()
-            #self.auto_py_started = True
+        # self.auto_py_started = True
 
         time.sleep(0.02)
-        #self.smooth_move(auto_py, x, y)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
+        # self.smooth_move(auto_py, x, y)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
         win32api.SetCursorPos((x, y))
         stroke = InterceptionMouseStroke()
 
@@ -301,10 +301,10 @@ class ActionQueue:
         auto_py.sendToDefaultMouse(stroke)
         time.sleep(0.02)
         for _ in range(100):
-            #time.sleep(0.02)
+            # time.sleep(0.02)
             win32api.mouse_event(MOUSEEVENTF_WHEEL, x, y, -1, 0)
 
-        #auto_py_thread.join()
+        # auto_py_thread.join()
 
     def start_auto_py(self, auto):
         auto.start()
@@ -314,7 +314,6 @@ class ActionQueue:
 
     def test_f(self):
         print('test_f')
-
 
     def activate_l2windows(self, windows):
         try:
@@ -378,7 +377,10 @@ class ActionQueue:
 
     def click_left(self, x, y, swtich_window=False, params=False, delta_x=0, delta_y=0):
         # print('params', params)
-        position = (x - random.randint(0, 3), y - random.randint(0, 3))
+        if 'NoRand' in params:
+            position = (x, y)
+        else:
+            position = (x - random.randint(0, 3), y - random.randint(0, 3))
         self.mouse.position = position
         time.sleep(0.03)
         if swtich_window:

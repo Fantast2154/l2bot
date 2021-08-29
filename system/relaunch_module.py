@@ -76,7 +76,11 @@ class Login:
         select_character_stage_delay_started = False
         loading_stage_delay_started = False
         joined = False
+        fisrt_time = True
         time_stage_delay = 0
+
+        login_field = []
+        pass_field = []
 
         while not joined:
             login_pos = self.find('login', window)
@@ -133,8 +137,10 @@ class Login:
                 print('Расчитываю...')
                 time.sleep(1)
                 print('Вычисляю...')
-                login_field = self.find('login_field', window)
-                pass_field = self.find('pass_field', window)
+                if fisrt_time:
+                    login_field = self.find('login_field', window)
+                    pass_field = self.find('pass_field', window)
+                    fisrt_time = False
                 self.login(window, login_field, pass_field)
                 print('Авторизация прошла успешно. Вроде...')
                 time.sleep(4)
@@ -163,35 +169,36 @@ class Login:
 
     def login(self, window, login_field, pass_field):
         # print('login_field', login_field)
-        self.q.new_task('mouse',
-                        [login_field, True, 'LEFT', False, False, False],
-                        window)
-        time.sleep(0.1)
-        self.q.new_task('mouse',
-                        [login_field, True, 'LEFT', False, 'double', False],
-                        window)
-        time.sleep(1)
-        pyperclip.copy(self.logins[window.hwnd])
-        # print('login', self.logins[window.hwnd])
-        time.sleep(0.1)
-        keyboard.send('ctrl+v')
-        time.sleep(1)
-        # print('pass_field', pass_field)
-        self.q.new_task('mouse',
-                        [pass_field, True, 'LEFT', False, False, False],
-                        window)
-        time.sleep(0.1)
-        self.q.new_task('mouse',
-                        [pass_field, True, 'LEFT', False, 'double', False],
-                        window)
-        time.sleep(1)
-        pyperclip.copy(self.passwords[window.hwnd])
-        # print('password', self.passwords[window.hwnd])
-        time.sleep(0.1)
-        keyboard.send('ctrl+v')
-        time.sleep(0.5)
-        keyboard.send('enter')
-        time.sleep(1)
+        if login_field and pass_field:
+            self.q.new_task('mouse',
+                            [login_field, True, 'LEFT', False, False, False],
+                            window)
+            time.sleep(0.1)
+            self.q.new_task('mouse',
+                            [login_field, True, 'LEFT', False, 'double', 'NoRand'],
+                            window)
+            time.sleep(1)
+            pyperclip.copy(self.logins[window.hwnd])
+            # print('login', self.logins[window.hwnd])
+            time.sleep(0.1)
+            keyboard.send('ctrl+v')
+            time.sleep(1)
+            # print('pass_field', pass_field)
+            self.q.new_task('mouse',
+                            [pass_field, True, 'LEFT', False, False, False],
+                            window)
+            time.sleep(0.1)
+            self.q.new_task('mouse',
+                            [pass_field, True, 'LEFT', False, 'double', 'NoRand'],
+                            window)
+            time.sleep(1)
+            pyperclip.copy(self.passwords[window.hwnd])
+            # print('password', self.passwords[window.hwnd])
+            time.sleep(0.1)
+            keyboard.send('ctrl+v')
+            time.sleep(0.5)
+            keyboard.send('enter')
+            time.sleep(1)
 
     def update_screenshot(self, window):
         while True:
