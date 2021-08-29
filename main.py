@@ -310,7 +310,7 @@ if __name__ == '__main__':
 
         FishService.pause_fishers()
 
-        closing_time = 10  # awaiting fishers to stop 40 sec is recommended
+        closing_time = 40  # awaiting fishers to stop 40 sec is recommended
         timer = time.time()
         counter = 0
         while time.time() - timer < closing_time:
@@ -332,7 +332,7 @@ if __name__ == '__main__':
         if server_restart_module_activated:
             server_restart_module_activated = False
             relaunch_windows = True
-            waiting_time = 60  # restart timer 1500 is recommended
+            waiting_time = 1500  # restart timer 1500 is recommended
             timer = time.time()
             counter = 0
             while time.time() - timer < waiting_time:
