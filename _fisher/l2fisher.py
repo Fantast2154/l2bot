@@ -958,7 +958,7 @@ class Fisher:
                         [[(x, y)], [(x, y + 100)], 'AutoHotPy', False, False, False],
                         self.fishing_window)
         #self.q.turn(x, y)
-        self.pause_thread(35)
+        self.pause_thread(35 - self.fisher_id * 10)
 
     def register_nickname(self):
         self.q.new_task('mouse',
