@@ -11,7 +11,9 @@ from system.relaunch_module import Login
 from system.window_capture import WindowCapture
 import sys
 from system.gui_interface import *
-from settings.cpd import CPD
+from tests.cpd import CPD
+import datetime
+import pytz
 
 
 def send_message(message):
@@ -70,16 +72,55 @@ def exitAutoHotKey(autohotpy, event):
     autohotpy.stop()
 
 
+def calculate_time_to_server_restart(cpd):
+    temp = datetime.datetime.strptime(cpd.moscow_server_restart_time, '%H:%M:%S').time()
+    h = temp.hour
+    m = temp.minute
+    s = temp.second
+
+    timezone = cpd.timezone
+    utcmoment_naive = datetime.datetime.utcnow()
+    utcmoment = utcmoment_naive.replace(tzinfo=pytz.utc)
+
+    server_datetime = utcmoment.astimezone(pytz.timezone(timezone))
+    server_datetime = server_datetime.replace(tzinfo=None)
+    print('main: L2 server date', server_datetime.date())
+    server_time_format = server_datetime.time().strftime("%H:%M:%S")
+    print('main: L2 server time', server_time_format)
+    print(f'main: Server planned restart time {cpd.moscow_server_restart_time} {cpd.timezone}')
+    moscow_server_restart_temp = server_datetime.replace(hour=h, minute=m, second=s)
+    if moscow_server_restart_temp < server_datetime:
+        temper_delta = moscow_server_restart_temp + datetime.timedelta(days=1)
+        temper = (temper_delta - server_datetime).total_seconds()
+        print('main: time left to server restart (in hours)', round(temper / 3600, 2))
+        print('main: time left to server restart (in minutes)', int(temper / 60))
+        return temper
+
+    else:
+        temper = (moscow_server_restart_temp - server_datetime).total_seconds()
+        print('main: time left to server restart (in hours)', round(temper / 3600, 2))
+        print('main: time left to server restart (in minutes)', int(temper / 60))
+        return temper
+
+
 if __name__ == '__main__':
     print('PROGRAM start--------------------------------------\n')
 
     custom_personal_data = CPD()
-
-    time.sleep(10)
-
+    server_restart_time = calculate_time_to_server_restart(custom_personal_data)
+    print()
+    if server_restart_time > 600:
+        server_restart_time_adjusted = server_restart_time - 300  # 5 minutes in advance
+    else:
+        server_restart_time_adjusted = server_restart_time
+    print('server_restart_time_adjusted', server_restart_time_adjusted)
     gui_window = None
     user_input = None
     relaunch_time = None
+    global_program_timing = time.time()
+    running_max_time = 13
+
+    server_restart_module_activated = False
 
     while True:
         force_restart = False
@@ -99,7 +140,7 @@ if __name__ == '__main__':
 
             for i in range(custom_personal_data.number_of_windows):
                 os.startfile(custom_personal_data.launcher_path)
-                time.sleep(13)
+                time.sleep(14)
 
             name_list, hash_list = get_l2windows_param()
             n = len(name_list)
@@ -110,12 +151,11 @@ if __name__ == '__main__':
         screen_manager = manager.list()
         screen_manager.append(0)
 
+
         def tue():
             # create n windows L2
             windows = []
             print('number of l2 windows:', n)
-            print('hash_list of l2 windows:', hash_list)
-            print('-----')
 
             rect_windows_list = []
             for hwnd in hash_list:
@@ -144,11 +184,12 @@ if __name__ == '__main__':
             # start capturing screenshots
             process_wincap = Process(target=win_capture.start_capturing, args=(screen_manager,))
             process_wincap.start()
-            #time.sleep(1)
-            #process_wincap.terminate()
-            #win_capture.stop()
+            # time.sleep(1)
+            # process_wincap.terminate()
+            # win_capture.stop()
 
             return windows, queue, process_queue, process_wincap
+
 
         windows, queue, process_queue, process_wincap = tue()
         # login module
@@ -167,7 +208,7 @@ if __name__ == '__main__':
             windows_to_restart = login.join_the_game()
             if windows_to_restart:
                 pass
-                #force_restart = True
+                # force_restart = True
                 # queue.stop()
                 # process_queue.join()
                 # process_wincap.terminate()
@@ -184,115 +225,124 @@ if __name__ == '__main__':
                 # time.sleep(1)
                 # windows, queue, process_queue, process_wincap = tue()
             time.sleep(2)
-        if not force_restart:
-            # creating gui class
-            if gui_window is None:
-                gui_window = Gui_interface(windows)
-                user_input, relaunch_time = gui_window.gui_window()
-                print('relaunch_time ', relaunch_time / 3600, 'hours')
-            else:
-                user_input = gui_window.reinit_windows(windows)
+            print('main: RELAUNCH COMPLETED ===========================================')
 
-            # creating fishing manager
-            FishService = FishingService(windows, user_input, queue)
+        # creating gui class
+        if gui_window is None:
+            gui_window = Gui_interface(windows)
+            user_input, relaunch_time = gui_window.gui_window()
+            print('relaunch_time ', relaunch_time / 3600, 'hours')
+        else:
+            user_input = gui_window.reinit_windows(windows)
 
-            # gui window loop
-            process_fishingService = threading.Thread(target=FishService.run)
-            process_fishingService.start()
+        # creating fishing manager
+        FishService = FishingService(windows, user_input, queue)
 
-            # for fisher in FishService.fishers:
-            #     temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
-            #     gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
+        # gui window loop
+        process_fishingService = threading.Thread(target=FishService.run)
+        process_fishingService.start()
 
-            # if not log:
-            #     print('not default order')
-            #
-            #     nick_name_list = [0]*custom_personal_data.number_of_windows
-            #     if FishService.number_of_fishers != 0:
-            #         exit_is_set = False
-            #         while not exit_is_set:
-            #             for fisher in FishService.fishers:
-            #                 if fisher.nickname[0] is not None and fisher.nickname[0] not in nick_name_list:
-            #                     nick_name_list[fisher.fishing_window.window_id] = fisher.nickname[0]
-            #                 if len(nick_name_list) == FishService.number_of_fishers:
-            #                     exit_is_set = True
-            #                     break
-            #
-            #     window_fishers = user_input[0]
-            #     window_buffers = user_input[1]
-            #     window_suppliers = user_input[2]
-            #     window_teleporters = user_input[3]
-            #
-            #     # if custom_personal_data.number_of_windows - len(nick_name_list) == 1: # PIZDA
-            #     custom_personal_data.relog_logins = []
-            #     custom_personal_data.relog_passwords = []
-            #     for nick in nick_name_list:
-            #         nickname = nick
-            #         log = custom_personal_data.accounts[nick][0]
-            #         pas = custom_personal_data.accounts[nick][1]
-            #         custom_personal_data.relog_logins.append(log)
-            #         custom_personal_data.relog_passwords.append(pas)
+        relaunch_timer = time.time()
+        pause_switch = True
+        relaunch_windows = False
+        counter = 0
+        time_between_msg = 60
+        program_exit = False
 
-            relaunch_timer = time.time()
-            pause_switch = True
+        while True:  # Event Loop
 
-            counter = 0
-            time_between_msg = 60
+            event, values = gui_window.sg_gui.Read(timeout=2)
 
-            while True:  # Event Loop
+            if time.time() - relaunch_timer > relaunch_time:
+                event = 'Relaunch windows'
 
-                event, values = gui_window.sg_gui.Read(timeout=2)
+            if time.time() - global_program_timing > running_max_time * 3600:
+                event = 'Exit'
 
-                if time.time() - relaunch_timer > relaunch_time:
-                    event = 'Relaunch windows'
-                try:  # used try so that if user pressed other than the given key error will not be shown
+            if time.time() - relaunch_timer > time_between_msg * counter:
+                counter += 1
+                print('main: Time to windows relaunch', (relaunch_time - (time.time() - relaunch_timer)) // 60,
+                      'minutes')
+                print('main: Time to server restart',
+                      (server_restart_time_adjusted - (time.time() - global_program_timing)) // 60, 'minutes')
+                print('main: Time to ending the program',
+                      (running_max_time * 3600 - (time.time() - global_program_timing)) // 60, 'minutes')
 
-                    if keyboard.is_pressed('alt+q'):  # if key 'q' is pressed
-                        print('main: EXIT EVENT DETECTED')
-                        time.sleep(2)
-                        break  # finishing the loop
-                    if keyboard.is_pressed('alt+w'):  # if key 'q' is pressed
+            if time.time() - global_program_timing > server_restart_time_adjusted:
+                server_restart_module_activated = True
 
-                        if pause_switch:
-                            print('main: PAUSE EVENT DETECTED')
-                            FishService.pause_fishers()
-                            pause_switch = False
-                        else:
-                            print('main: RESUME EVENT DETECTED')
-                            FishService.resume_fishers()
-                            pause_switch = True
-                        time.sleep(2)
-                except:
-                    continue
+                break
 
-                if event == sg.WIN_CLOSED or event == 'Exit':
-                    print('main: PROGRAM ENDS...')
-                    program_exit = True
-                    break
+            try:  # used try so that if user pressed other than the given key error will not be shown
 
-                # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
-                for fisher in FishService.fishers:
-                    temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
-                    gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')  # FIXME
+                if keyboard.is_pressed('alt+q'):  # if key 'q' is pressed
+                    print('main: EXIT EVENT DETECTED')
+                    time.sleep(2)
+                    break  # finishing the loop
+                if keyboard.is_pressed('alt+w'):  # if key 'q' is pressed
 
-                if event == 'Relaunch windows':
-                    print('main: RELAUNCHING WINDOWS ===========================================')
-                    relaunch_windows = True
-                    break
+                    if pause_switch:
+                        print('main: PAUSE EVENT DETECTED')
+                        FishService.pause_fishers()
+                        pause_switch = False
+                    else:
+                        print('main: RESUME EVENT DETECTED')
+                        FishService.resume_fishers()
+                        pause_switch = True
+                    time.sleep(2)
+            except:
+                continue
 
-                if time.time() - relaunch_timer > time_between_msg * counter:
-                    counter += 1
-                    print('main: Time to restart = ', (relaunch_time - (time.time() - relaunch_timer)) // 60, ' minutes')
+            if event == sg.WIN_CLOSED or event == 'Exit':
+                print('main: PROGRAM ENDS...')
+                program_exit = True
+                break
 
-            FishService.stop()
-            queue.stop()
-            process_wincap.terminate()
+            # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
+            for fisher in FishService.fishers:
+                temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
+                gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')  # FIXME
+
+            if event == 'Relaunch windows':
+                print('main: RELAUNCHING WINDOWS ===========================================')
+                relaunch_windows = True
+                break
+
+        FishService.pause_fishers()
+
+        closing_time = 10  # awaiting fishers to stop 40 sec is recommended
+        timer = time.time()
+        counter = 0
+        while time.time() - timer < closing_time:
+            counter += 1
+            print(f'Waiting for fishers to stop fishing ..... {closing_time - counter}')
             time.sleep(1)
-            process_wincap.close()
-            del win_capture
-            #print('process_wincap.terminate()', process_wincap.is_alive())
-            process_fishingService.join()
-            print('process_fishingService.join()', process_fishingService.is_alive())
+
+        FishService.stop()
+        queue.stop()
+
+        process_wincap.terminate()
+        time.sleep(3)
+        process_wincap.close()
+
+        # print('process_wincap.terminate()', process_wincap.is_alive())
+        process_fishingService.join()
+        # print('process_fishingService.join()', process_fishingService.is_alive())
+
+        if server_restart_module_activated:
+            server_restart_module_activated = False
+            relaunch_windows = True
+            waiting_time = 60  # restart timer 1500 is recommended
+            timer = time.time()
+            counter = 0
+            while time.time() - timer < waiting_time:
+                print(f'the program will be relaunched in ..... {(waiting_time - counter) // 60} minutes')
+                counter += 60
+                time.sleep(60)
+
+            server_restart_time = calculate_time_to_server_restart(custom_personal_data)
+            server_restart_time_adjusted = server_restart_time - 300  # 5 minutes in advance
+
         if relaunch_windows or force_restart:
             for window in windows:
                 print('restart', window.hwnd)
@@ -307,10 +357,13 @@ if __name__ == '__main__':
         process_fishingService = None
         process_queue = None
         process_wincap = None
+
+        del win_capture
         del FishService
 
         if program_exit:
             break
+
         # process_wincap.join()
 
         # gui_window.sg_gui.close()

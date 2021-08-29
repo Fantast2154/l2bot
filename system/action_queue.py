@@ -506,7 +506,7 @@ class ActionQueue:
                 if 'LEFT' in params:
                     self.click_left(x, y, swtich_window=False, params=params, delta_x=deltaX, delta_y=deltaY)
                 elif 'RIGHT' in params:
-                    self.click_right(x, y, swtich_window=True, params=params, delta_x=deltaX, delta_y=deltaY)
+                    self.click_right(x, y, swtich_window=False, params=params, delta_x=deltaX, delta_y=deltaY)
                 elif 'AutoHotPy' in params:
                     self.turn(x_temp, y_temp)
 

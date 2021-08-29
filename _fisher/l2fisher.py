@@ -59,10 +59,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        # if self.fisher_id == 0:
-        #     self.send_counter = 2
-        # else:
-        self.send_counter = 9000
+        self.send_counter = 999999
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -133,14 +130,8 @@ class Fisher:
     def run(self):
         # function:
         # main fishing loop
-        timer = time.time()
-        run_hours = 5.5
-        # if self.fisher_id == 0:
-        #     run_hours = 7
 
         while not self.exit_is_set[0]:  # or keyboard was pressed and not disconnected
-            if time.time() - timer > 3600 * run_hours:
-                self.pause_fisher()
 
             self.update_current_attempt()
 
@@ -513,28 +504,28 @@ class Fisher:
 
         self.send_message('overweight_baits_soski_correction')
         if self.fisher_id == 0:
-            required_dbaits = 1
+            required_dbaits = 50
             required_nbaits = 0
-            required_soski = 2
-            required_alacrity = 3
-            required_soski_pet = 4
-            required_potion = 5
-
-        elif self.fisher_id == 1:
-            required_dbaits = 6
-            required_nbaits = 0
-            required_soski = 7
-            required_alacrity = 8
-            required_soski_pet = 9
+            required_soski = 3000
+            required_alacrity = 50
+            required_soski_pet = 50
             required_potion = 10
 
-        else:
-            required_dbaits = 11
+        elif self.fisher_id == 1:
+            required_dbaits = 1
             required_nbaits = 0
-            required_soski = 12
-            required_alacrity = 13
-            required_soski_pet = 14
-            required_potion = 15
+            required_soski = 3000
+            required_alacrity = 1
+            required_soski_pet = 1
+            required_potion = 1
+
+        else:
+            required_dbaits = 40
+            required_nbaits = 0
+            required_soski = 5000
+            required_alacrity = 1
+            required_soski_pet = 1
+            required_potion = 1
 
         if required_dbaits >= 1 or required_nbaits >= 1 or required_soski >= 1 or required_alacrity >= 1 or required_soski_pet >= 1 or required_potion >= 1:
             self.requested_items_to_supply.append(required_dbaits)  # dbaits
