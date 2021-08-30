@@ -277,6 +277,7 @@ if __name__ == '__main__':
 
                 if keyboard.is_pressed('alt+q'):  # if key 'q' is pressed
                     print('main: EXIT EVENT DETECTED')
+                    program_exit = True
                     time.sleep(2)
                     break  # finishing the loop
                 if keyboard.is_pressed('alt+w'):  # if key 'q' is pressed
