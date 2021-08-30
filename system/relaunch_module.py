@@ -38,14 +38,15 @@ class Login:
             ['pumping', 'images/fishing/pumping.jpg', 0.87],
             ['reeling', 'images/fishing/reeling.jpg', 0.87],
             ['logging', 'images/login/stages/logging.jpg', 0.6],
-            ['login', 'images/login/stages/login.jpg', 0.93],
+            ['login', 'images/login/stages/login.jpg', 0.8],
             ['login_field', 'images/login/stages/login_field2.jpg', 0.99],
             ['pass_field', 'images/login/stages/pass_field2.jpg', 0.97],
             ['select', 'images/login/stages/select.jpg', 0.6],
             ['server', 'images/login/stages/server.jpg', 0.6],
             ['terms', 'images/login/stages/terms.jpg', 0.6],
             ['character', 'images/login/stages/character.jpg', 0.6],
-            ['loading', 'images/login/stages/loading_icon.jpg', 0.6]]
+            ['loading', 'images/login/stages/loading_icon.jpg', 0.6],
+            ['menu', 'images/login/stages/menu.jpg', 0.91]]
 
         self.init_images()
 
@@ -88,8 +89,8 @@ class Login:
             terms_pos = self.find('terms', window)
             server_pos = self.find('server', window)
             select_pos = self.find('select', window)
-            pumping_pos = self.find('pumping', window)
-            reeling_pos = self.find('reeling', window)
+            menu_pos = self.find('menu', window)
+            #print('login_pos', login_pos)
 
             if login_pos:
                 stage = 'login_password'
@@ -115,7 +116,7 @@ class Login:
                     select_character_stage_delay_started = True
                     time_stage_delay = time.time()
 
-            elif pumping_pos or reeling_pos:
+            elif menu_pos:
                 stage = 'game'
                 time_stage_delay = time.time()
                 return True, 0
