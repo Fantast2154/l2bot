@@ -38,7 +38,7 @@ class Login:
             ['pumping', 'images/fishing/pumping.jpg', 0.87],
             ['reeling', 'images/fishing/reeling.jpg', 0.87],
             ['logging', 'images/login/stages/logging.jpg', 0.6],
-            ['login', 'images/login/stages/login.jpg', 0.95],
+            ['login', 'images/login/stages/login.jpg', 0.93],
             ['login_field', 'images/login/stages/login_field2.jpg', 0.99],
             ['pass_field', 'images/login/stages/pass_field2.jpg', 0.97],
             ['select', 'images/login/stages/select.jpg', 0.6],
@@ -81,6 +81,7 @@ class Login:
 
         login_field = []
         pass_field = []
+        login = []
 
         while not joined:
             login_pos = self.find('login', window)
@@ -138,8 +139,11 @@ class Login:
                 time.sleep(1)
                 print('Вычисляю...')
                 if fisrt_time:
-                    login_field = self.find('login_field', window)
-                    pass_field = self.find('pass_field', window)
+                    while not login:
+                        login = self.find('login', window)
+                    (x, y) = login[0]
+                    login_field = [(x, y - 60)]
+                    pass_field = [(x, y - 35)]
                     fisrt_time = False
                 self.login(window, login_field, pass_field)
                 print('Авторизация прошла успешно. Вроде...')
@@ -161,7 +165,7 @@ class Login:
                 time.sleep(4)
 
             elif stage == 'loading':
-                print('loading...')
+                #print('loading...')
                 continue
 
             elif stage == 'game':
