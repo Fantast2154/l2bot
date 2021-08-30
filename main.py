@@ -310,12 +310,18 @@ if __name__ == '__main__':
 
         FishService.pause_fishers()
 
-        closing_time = 50  # awaiting fishers to stop 40 sec is recommended
+        closing_time = 50  # awaiting fishers to stop 50 sec is recommended
         timer = time.time()
         counter = 0
+        fishers_are_paused = [False]*FishService.number_of_fishers
         while time.time() - timer < closing_time:
             counter += 1
-            print(f'Waiting for fishers to stop fishing ..... {closing_time - counter}')
+            for i in range(FishService.number_of_fishers):
+                if FishService.fishers[i].current_state[0] == 'paused':
+                    fishers_are_paused[i] = True
+
+            if all(fishers_are_paused):
+                break
             time.sleep(1)
 
         FishService.stop()

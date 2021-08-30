@@ -672,7 +672,7 @@ class FishingService:
 
         self.stop_fishers()
 
-        closing_time = 6
+        closing_time = 2
         timer = time.time()
         counter = 0
         while time.time() - timer < closing_time:

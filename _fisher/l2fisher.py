@@ -205,14 +205,21 @@ class Fisher:
     def pause_fisher(self, delay=None):
         self.attack()
         if delay is None:
+            self.send_message('Check if monster is killed')
+            temp_delay = 7
+            for i in range(temp_delay):
+                self.send_message(f'{temp_delay - i} sec')
+                self.pause_thread(1)
             self.send_message(f'paused permanently')
+            self.current_state.append('paused')
             inf_timer = 100000
             self.paused[0] = inf_timer
             while not self.exit_is_set[0]:
                 if self.paused[0] == 0:
                     break
                 self.pause_thread(1)
-            self.pause_thread(self.fisher_id)
+            self.current_state.append('fishing')
+            self.pause_thread(2*self.fisher_id)
         else:
             self.send_message(f'paused for {delay} sec')
             if delay is None or delay == 0:
