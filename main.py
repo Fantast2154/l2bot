@@ -87,7 +87,7 @@ def calculate_time_to_server_restart(cpd):
     print('main: L2 server date', server_datetime.date())
     server_time_format = server_datetime.time().strftime("%H:%M:%S")
     print('main: L2 server time', server_time_format)
-    print(f'main: Server planned restart time {cpd.moscow_server_restart_time} {cpd.timezone}')
+    print(f'main: L2 server planned restart time {cpd.moscow_server_restart_time} {cpd.timezone}')
     moscow_server_restart_temp = server_datetime.replace(hour=h, minute=m, second=s)
     if moscow_server_restart_temp < server_datetime:
         temper_delta = moscow_server_restart_temp + datetime.timedelta(days=1)
@@ -113,12 +113,12 @@ if __name__ == '__main__':
         server_restart_time_adjusted = server_restart_time - 300  # 5 minutes in advance
     else:
         server_restart_time_adjusted = server_restart_time
-    print('server_restart_time_adjusted', server_restart_time_adjusted)
+
     gui_window = None
     user_input = None
     relaunch_time = None
     global_program_timing = time.time()
-    running_max_time = 13
+    running_max_time = 9
 
     server_restart_module_activated = False
 
@@ -310,7 +310,7 @@ if __name__ == '__main__':
 
         FishService.pause_fishers()
 
-        closing_time = 40  # awaiting fishers to stop 40 sec is recommended
+        closing_time = 50  # awaiting fishers to stop 40 sec is recommended
         timer = time.time()
         counter = 0
         while time.time() - timer < closing_time:
@@ -367,5 +367,5 @@ if __name__ == '__main__':
         # process_wincap.join()
 
         # gui_window.sg_gui.close()
-
+    gui_window.sg_gui.close()
     sys.exit('PROGRAM ends ......... BYE BYE BYE BYE BYE BYE')
