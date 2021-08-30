@@ -212,6 +212,7 @@ class Fisher:
                 if self.paused[0] == 0:
                     break
                 self.pause_thread(1)
+            self.pause_thread(self.fisher_id)
         else:
             self.send_message(f'paused for {delay} sec')
             if delay is None or delay == 0:
@@ -978,7 +979,7 @@ class Fisher:
         self.q.new_task('mouse',
                         [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+1'],
                         self.fishing_window)
-        self.pause_thread(6)
+        self.pause_thread(0.7)
 
         # self.register_nickname()
         self.camera_top_zoom_in()
