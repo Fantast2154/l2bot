@@ -46,7 +46,10 @@ class Login:
             ['terms', 'images/login/stages/terms.jpg', 0.6],
             ['character', 'images/login/stages/character.jpg', 0.6],
             ['loading', 'images/login/stages/loading_icon.jpg', 0.6],
-            ['menu', 'images/login/stages/menu.jpg', 0.91]]
+            ['menu', 'images/login/stages/menu.jpg', 0.91],
+            ['cancel', 'images/login/stages/cancel.jpg', 0.91],
+            ['relogin', 'images/login/stages/relogin.jpg', 0.92],
+            ['disagree', 'images/login/stages/disagree.jpg', 0.92]]
 
         self.init_images()
 
@@ -78,6 +81,7 @@ class Login:
         loading_stage_delay_started = False
         joined = False
         fisrt_time = True
+        t_prev = 0
         time_stage_delay = 0
 
         login_field = []
@@ -90,7 +94,9 @@ class Login:
             server_pos = self.find('server', window)
             select_pos = self.find('select', window)
             menu_pos = self.find('menu', window)
-            #print('login_pos', login_pos)
+            cancel_pos = self.find('cancel', window)
+            disagree_pos = self.find('disagree', window)
+            relogin_pos = self.find('relogin', window)
 
             if login_pos:
                 stage = 'login_password'
@@ -117,6 +123,7 @@ class Login:
                     time_stage_delay = time.time()
 
             elif menu_pos:
+                print(window.hwnd, 'И Г Р А!!!')
                 stage = 'game'
                 time_stage_delay = time.time()
                 return True, 0
@@ -127,18 +134,42 @@ class Login:
                     loading_stage_delay_started = True
                     time_stage_delay = time.time()
 
-            print(stage, time.time() - time_stage_delay)
-            if time.time() - time_stage_delay >= 35:
-                print('ПОЛНЫЙ ПЕРЕЗАПУСК!!!!!!')
-                print('ПОЛНЫЙ ПЕРЕЗАПУСК!!!!!!')
-                print('ПОЛНЫЙ ПЕРЕЗАПУСК!!!!!!')
-                return False, window
+            if time.time() - time_stage_delay >= 5:
+
+                if cancel_pos:
+                    (x, y) = cancel_pos[-1]
+                    cancel = [(x, y)]
+                    self.click(cancel, window)
+                    loading_stage_delay_started = False
+
+                elif disagree_pos:
+                    (x, y) = disagree_pos[-1]
+                    disagree = [(x, y)]
+                    self.click(disagree, window)
+                    loading_stage_delay_started = False
+
+                elif relogin_pos:
+                    (x, y) = relogin_pos[0]
+                    relogin = [(x, y)]
+                    self.click(relogin, window)
+                    loading_stage_delay_started = False
+
+                login_password_stage_delay_started = False
+                terms_stage_delay_started = False
+                select_server_stage_delay_started = False
+                select_character_stage_delay_started = False
+
+                if time.time() - time_stage_delay >= 35:
+                    print('Окно', window.hwnd, 'вход неуспешный.')
+                    print('ТРЕБУЕТСЯ ПОЛНЫЙ ПЕРЕЗАПУСК')
+                    return False, window
 
             if stage == 'login_password':
-                print('Стадия ввода логина и пароля')
-                print('Расчитываю...')
+                print(window.hwnd, 'Стадия ввода логина и пароля')
+                print(window.hwnd, 'Расчитываю...')
                 time.sleep(1)
-                print('Вычисляю...')
+                print(window.hwnd, 'Вычисляю...')
+
                 if fisrt_time:
                     while not login:
                         login = self.find('login', window)
@@ -146,34 +177,39 @@ class Login:
                     login_field = [(x, y - 60)]
                     pass_field = [(x, y - 35)]
                     fisrt_time = False
+
                 self.login(window, login_field, pass_field)
-                print('Авторизация прошла успешно. Вроде...')
+                print(window.hwnd, 'Авторизация прошла успешно. Вроде...')
                 time.sleep(4)
 
             elif stage == 'terms_of_conditions':
-                print('Принятие пользовательского соглашения. БОТЫ ЗАПРЕЩЕНЫ!!!')
+                print(window.hwnd, 'Принятие пользовательского соглашения. БОТЫ ЗАПРЕЩЕНЫ!!!')
                 keyboard.send('enter')
                 time.sleep(4)
 
             elif stage == 'select_server':
-                print('Стадия выбора сервера')
+                print(window.hwnd, 'Стадия выбора сервера')
                 keyboard.send('enter')
                 time.sleep(4)
 
             elif stage == 'select_character':
-                print('Стадия выбора персонажа')
+                print(window.hwnd, 'Стадия выбора персонажа')
                 keyboard.send('enter')
                 time.sleep(4)
 
             elif stage == 'loading':
-                #print('loading...')
                 continue
 
             elif stage == 'game':
+                print('И Г Р А!!!')
                 return True, 0
 
+    def click(self, button_pos, window):
+        self.q.new_task('mouse',
+                        [button_pos, True, 'LEFT', False, 'double', 'NoRand'],
+                        window)
+
     def login(self, window, login_field, pass_field):
-        # print('login_field', login_field)
         if login_field and pass_field:
             self.q.new_task('mouse',
                             [login_field, True, 'LEFT', False, False, False],
@@ -184,11 +220,9 @@ class Login:
                             window)
             time.sleep(1)
             pyperclip.copy(self.logins[window.hwnd])
-            # print('login', self.logins[window.hwnd])
             time.sleep(0.1)
             keyboard.send('ctrl+v')
             time.sleep(1)
-            # print('pass_field', pass_field)
             self.q.new_task('mouse',
                             [pass_field, True, 'LEFT', False, False, False],
                             window)
@@ -198,7 +232,6 @@ class Login:
                             window)
             time.sleep(1)
             pyperclip.copy(self.passwords[window.hwnd])
-            # print('password', self.passwords[window.hwnd])
             time.sleep(0.1)
             keyboard.send('ctrl+v')
             time.sleep(0.5)
