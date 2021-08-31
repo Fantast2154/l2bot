@@ -108,6 +108,7 @@ if __name__ == '__main__':
 
     custom_personal_data = CPD()
     server_restart_time = calculate_time_to_server_restart(custom_personal_data)
+    custom_personal_data.relaunch_windows_time *= 60
     print()
     if server_restart_time > 600:
         server_restart_time_adjusted = server_restart_time - 300  # 5 minutes in advance
