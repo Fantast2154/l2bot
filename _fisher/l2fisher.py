@@ -59,7 +59,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 2
+        self.send_counter = 6
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -86,8 +86,8 @@ class Fisher:
         # else:
         #     self.reeling_skill_CD = 2.3
         #     self.pumping_skill_CD = 2.3
-        self.reeling_skill_CD = 2.3
-        self.pumping_skill_CD = 2.3
+        self.reeling_skill_CD = 1.9
+        self.pumping_skill_CD = 1.9
         self.pumping_CD = 1.05
 
         # overweight, soski, baits
@@ -213,6 +213,7 @@ class Fisher:
                 if self.paused[0] == 0:
                     break
                 self.pause_thread(1)
+            self.send_message('unpaused')
             self.current_state[0] = 'fishing'
             self.pause_thread(2*self.fisher_id)
         else:

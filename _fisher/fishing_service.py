@@ -553,6 +553,16 @@ class FishingService:
                                 who_has_been_supplied[machine_id].update(fishers_and_stuff)
                             else:
                                 who_has_been_supplied[machine_id] = fishers_and_stuff
+
+                            while True:
+                                if self.paused_during_supplying or self.suppliers[0].current_state[0] == 'available':
+                                    temp_machine_id, temp_fisher_id = self.paused_during_supplying.pop()
+                                    if self.machine_id == temp_machine_id:
+                                        self.resume_fishers()
+                                    else:
+                                        self.send_command(temp_machine_id, '', -2, '', highpriority=1,
+                                                      highpriority_command=f'self.resume_fishers()')
+                                    break
                     return who_has_been_supplied
                     # exit_ = True
                 else:
@@ -671,12 +681,6 @@ class FishingService:
                             who_requests_supplying_new = {}
                     else:
                         pass
-
-                    for supplier in self.suppliers:
-                        if supplier.current_state[0] == 'available' and self.paused_during_supplying:
-                            temp_machine_id, temp_fisher_id = self.paused_during_supplying.pop()
-                            self.send_command(temp_machine_id, '', -2, '', highpriority=1,
-                                              highpriority_command=f'self.resume_fishers()')
 
             # print('self.has_supplier and anyone_is_requesting', self.has_supplier, anyone_is_requesting)
             if self.has_supplier and who_requests_supplying_new:
