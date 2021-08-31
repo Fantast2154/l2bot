@@ -146,8 +146,8 @@ class Gui_interface:
 
         time.sleep(0.8)
         self.sg_gui['Relaunch windows'].Update(visible=True)
-        self.sg_gui['2_txt_field'].Update(f'To stop the programm press "alt+q"', font=("Helvetica", 13), visible=True)
-        self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "alt+w"', font=("Helvetica", 13),
+        self.sg_gui['2_txt_field'].Update(f'To stop the programm press "Ctrl+alt+q"', font=("Helvetica", 13), visible=True)
+        self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "Ctrl+alt+w"', font=("Helvetica", 13),
                                           visible=True)
         self.sg_gui.Read(timeout=10)
 

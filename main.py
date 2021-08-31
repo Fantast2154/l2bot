@@ -318,11 +318,19 @@ if __name__ == '__main__':
         while time.time() - timer < closing_time:
             counter += 1
             for i in range(FishService.number_of_fishers):
-                if FishService.fishers[i].current_state[0] == 'paused':
-                    fishers_are_paused[i] = True
-
+                if not fishers_are_paused[i]:
+                    if FishService.fishers[i].current_state[0] == 'paused':
+                        fishers_are_paused[i] = True
             if all(fishers_are_paused):
                 break
+            time.sleep(1)
+
+        closing_time = 7
+        timer = time.time()
+        counter = 0
+        while time.time() - timer < closing_time:
+            counter += 1
+            print(f'main: Awaiting fishers to kill a monster ..... {closing_time - counter}')
             time.sleep(1)
 
         FishService.stop()

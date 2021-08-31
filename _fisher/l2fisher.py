@@ -205,20 +205,15 @@ class Fisher:
     def pause_fisher(self, delay=None):
         self.attack()
         if delay is None:
-            self.send_message('Check if monster is killed')
-            temp_delay = 7
-            for i in range(temp_delay):
-                self.send_message(f'{temp_delay - i} sec')
-                self.pause_thread(1)
             self.send_message(f'paused permanently')
-            self.current_state.append('paused')
+            self.current_state[0] = 'paused'
             inf_timer = 100000
             self.paused[0] = inf_timer
             while not self.exit_is_set[0]:
                 if self.paused[0] == 0:
                     break
                 self.pause_thread(1)
-            self.current_state.append('fishing')
+            self.current_state[0] = 'fishing'
             self.pause_thread(2*self.fisher_id)
         else:
             self.send_message(f'paused for {delay} sec')
@@ -949,15 +944,14 @@ class Fisher:
         self.pause_thread(2)
 
     def camera_top_zoom_in(self):
-        print('PIZDA ONLINE')
         window_center_pos = self.fishing_window.window_center_pos()
         [(x, y)] = window_center_pos
-        print(window_center_pos)
+
         self.q.new_task('mouse',
                         [[(x, y)], [(x, y + 100)], 'AutoHotPy', False, False, False],
                         self.fishing_window)
         #self.q.turn(x, y)
-        self.pause_thread(35 - self.fisher_id * 10)
+        self.pause_thread(5 + self.number_of_fishers*10 - self.fisher_id * 10)
 
     def register_nickname(self):
         self.q.new_task('mouse',
