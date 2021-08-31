@@ -412,7 +412,7 @@ class FishingService:
         for fisher in self.fishers:
             fisher_dict.update({fisher.fisher_id: fisher.current_state[0]})
             if fisher.fishers_request[0] == 'requests supplying':
-                print(f"fisher {fisher.fisher_id} requests supplying!!!!!!")
+                # print(f"fisher {fisher.fisher_id} requests supplying!!!!!!")
                 self.fishers_request = 'requests supplying'
                 self.fishers_who_request.add(fisher.fisher_id)
                 self.fishers_items.update({fisher.fisher_id: fisher.fishers_requested_supps[0]})
@@ -510,23 +510,27 @@ class FishingService:
                                         continue
                             time.sleep(2)
                             if self.machine_id == machine_id:
+                                print('own machine ===========')
                                 self.pause_fishers(fisher_id=fisher_id, except_param=True)
 
                                 awaiting_time = 50
                                 timer = time.time()
-                                fishers_are_paused = []
+                                fishers_list = []
                                 for fisher in self.fishers:
                                     if fisher.fisher_id != fisher_id:
-                                        fishers_are_paused.append(fisher.fisher_id)
-                                if fishers_are_paused:
+                                        fishers_list.append(fisher.fisher_id)
+
+                                fishers_list_paused = [False]*len(fishers_list)
+                                if fishers_list:
                                     while time.time() - timer < awaiting_time:
-                                        for i in range(len(fishers_are_paused)):
-                                            if not fishers_are_paused[i]:
+                                        for i in range(len(fishers_list)):
+                                            if not fishers_list_paused[i]:
                                                 if self.fishers[i].current_state[0] == 'paused':
-                                                    fishers_are_paused[i] = True
-                                        if all(fishers_are_paused):
+                                                    fishers_list_paused[i] = True
+                                        if all(fishers_list_paused):
                                             break
                             else:
+                                print('outer machine ===========')
                                 awating_time = 40
                                 timer = time.time()
                                 self.send_command(machine_id, '', -2, '', highpriority=1,

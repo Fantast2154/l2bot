@@ -506,29 +506,12 @@ class Fisher:
     def overweight_baits_soski_correction(self):
 
         self.send_message('overweight_baits_soski_correction')
-        if self.fisher_id == 0:
-            required_dbaits = 50
-            required_nbaits = 0
-            required_soski = 3000
-            required_alacrity = 50
-            required_soski_pet = 50
-            required_potion = 10
-
-        elif self.fisher_id == 1:
-            required_dbaits = 1
-            required_nbaits = 0
-            required_soski = 3000
-            required_alacrity = 1
-            required_soski_pet = 1
-            required_potion = 1
-
-        else:
-            required_dbaits = 40
-            required_nbaits = 0
-            required_soski = 5000
-            required_alacrity = 1
-            required_soski_pet = 1
-            required_potion = 1
+        required_dbaits = 10
+        required_nbaits = 0
+        required_soski = 22
+        required_alacrity = 0
+        required_soski_pet = 0
+        required_potion = 0
 
         if required_dbaits >= 1 or required_nbaits >= 1 or required_soski >= 1 or required_alacrity >= 1 or required_soski_pet >= 1 or required_potion >= 1:
             self.requested_items_to_supply.append(required_dbaits)  # dbaits
@@ -593,10 +576,10 @@ class Fisher:
             return False
 
         self.send_message('exchange_menu found')
-        self.pause_thread(10)
+        self.pause_thread(16)
         tim = time.time()
         self.send_fish_to_supplier(self.fishing_window.is_exchange_menu())
-        while time.time() - tim < 25:
+        while time.time() - tim < 15:
             self.pause_thread(1)
 
         self.smart_press_button('ok', self.fishing_window.is_exchange_menu, searching_time=5)
@@ -619,9 +602,9 @@ class Fisher:
         self.supplying_request[0] = False
         self.supply_request_proceed[0] = False
         self.trading_is_allowed[0] = False
-        self.requested_items_to_supply.pop()
-        self.requested_items_to_supply.pop()
-        self.requested_items_to_supply.pop()
+        # self.requested_items_to_supply.pop()
+        # self.requested_items_to_supply.pop()
+        # self.requested_items_to_supply.pop()
 
         self.requested_items_to_supply_d['dbaits'] = 0
         self.requested_items_to_supply_d['nbaits'] = 0
