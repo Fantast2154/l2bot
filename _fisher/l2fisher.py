@@ -593,7 +593,7 @@ class Fisher:
             return False
 
         self.send_message('exchange_menu found')
-
+        self.pause_thread(10)
         tim = time.time()
         self.send_fish_to_supplier(self.fishing_window.is_exchange_menu())
         while time.time() - tim < 25:

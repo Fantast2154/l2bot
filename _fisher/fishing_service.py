@@ -5,11 +5,15 @@ import numpy
 from _fisher.l2fisher import Fisher
 from _fisher.l2supplier import Supplier
 from _fisher.l2buffer import Buffer
+from _fisher.l2traderA import TraderA
+from _fisher.l2traderB import TraderB
 from system.action_queue import *
 import threading
 from _fisher.fishing_window_fisher import FishingWindow
 from _fisher.fishing_window_buffer import *
 from _fisher.fishing_window_supplier import *
+from _fisher.fishing_window_traderA import *
+from _fisher.fishing_window_traderB import *
 from multiprocessing import Process, Value, Manager
 from system.action_queue import ActionQueue
 from system.botnet import Client
@@ -24,15 +28,22 @@ class FishingService:
     fishers = []
     suppliers = []
     buffers = []
+    teleporters = []
+    tradersA = []
+    tradersB = []
     windows = []
     fishing_windows = []
     supplier_windows = []
     buffer_windows = []
     teleporter_windows = []
+    traderA_windows = []
+    traderB_windows = []
 
     process_fishers = []
     process_buffer = []
     process_supplier = []
+    process_traderA = []
+    process_traderB = []
     raised_error = False
     fishing_service_client = {}
     sg_gui = None
@@ -55,25 +66,35 @@ class FishingService:
         self.window_buffers = user_input[1]
         self.window_suppliers = user_input[2]
         self.window_teleporters = user_input[3]
+        self.window_tradersA = user_input[4]
+        self.window_tradersB = user_input[5]
 
         self.number_of_fishers = len(user_input[0])
-
         self.number_of_buffers = len(user_input[1])
         self.number_of_suppliers = len(user_input[2])
         self.number_of_teleporters = len(user_input[3])
+        self.number_of_tradersA = len(user_input[4])
+        self.number_of_tradersB = len(user_input[5])
 
         self.fishers = []
         self.buffers = []
         self.suppliers = []
         self.teleporters = []
+        self.tradersA = []
+        self.tradersB = []
+
         self.fishing_windows = []
         self.supplier_windows = []
         self.buffer_windows = []
         self.teleporter_windows = []
+        self.traderA_windows = []
+        self.traderB_windows = []
 
         # self.process_fishers = list(range(self.number_of_fishers))
         self.process_suppliers = list(range(self.number_of_suppliers))
         self.process_buffers = list(range(self.number_of_buffers))
+        self.process_traderA = list(range(self.number_of_tradersA))
+        self.process_traderB = list(range(self.number_of_tradersB))
 
         self.fishers_request = ''
         self.suppliers_request = ''
@@ -115,6 +136,7 @@ class FishingService:
         self.data_to_receive.append(0)
 
         self.has_supplier = False
+        self.paused_during_supplying = []
 
         self.fishing_service_client = Client(self.machine_id, self.data_to_transmit, self.data_to_receive)
 
@@ -189,6 +211,17 @@ class FishingService:
             temp_supplier = Supplier(temp_supplier_window, supplier_id, self.number_of_suppliers, q)
             self.suppliers.append(temp_supplier)
 
+        for traderA_id in range(self.number_of_tradersA):
+            win_capture = self.window_tradersA[traderA_id].wincap
+            window_name = self.window_tradersA[traderA_id].window_name
+            hwnd = self.window_tradersA[traderA_id].hwnd
+            screenshot = self.window_tradersA[traderA_id].screenshot
+            temp_traderA_window = FishingSupplierWindow(traderA_id, win_capture, window_name, hwnd, screenshot)
+            temp_traderA_window.window_id = self.window_tradersA[traderA_id].window_id
+            self.traderA_windows.append(temp_traderA_window)
+
+            temp_traderA = TraderA(temp_traderA_window, traderA_id, self.number_of_suppliers, q)
+            self.tradersA.append(temp_traderA)
         # wincap
         self.win_capture = self.windows[0].wincap
 
@@ -465,17 +498,43 @@ class FishingService:
 
                             while not pinged:
                                 time.sleep(0.1)
-                                print('PING...')
-                                print('self.pinged_fishers[0]', self.pinged_fishers[0])
+                                # print('PING...')
+                                # print('self.pinged_fishers[0]', self.pinged_fishers[0])
                                 if self.pinged_fishers[0].get(machine_id) is not None:
                                     # print('self.pinged_fishers[0]', self.pinged_fishers[0])
-                                    print('machine_id', machine_id)
-                                    print('fisher_id', fisher_id)
+                                    # print('machine_id', machine_id)
+                                    # print('fisher_id', fisher_id)
                                     if fisher_id in self.pinged_fishers[0][machine_id].keys():
                                         pinged = self.pinged_fishers[0][machine_id][fisher_id]
                                     else:
                                         continue
                             time.sleep(2)
+                            if self.machine_id == machine_id:
+                                self.pause_fishers(fisher_id=fisher_id, except_param=True)
+
+                                awaiting_time = 50
+                                timer = time.time()
+                                fishers_are_paused = []
+                                for fisher in self.fishers:
+                                    if fisher.fisher_id != fisher_id:
+                                        fishers_are_paused.append(fisher.fisher_id)
+                                if fishers_are_paused:
+                                    while time.time() - timer < awaiting_time:
+                                        for i in range(len(fishers_are_paused)):
+                                            if not fishers_are_paused[i]:
+                                                if self.fishers[i].current_state[0] == 'paused':
+                                                    fishers_are_paused[i] = True
+                                        if all(fishers_are_paused):
+                                            break
+                            else:
+                                awating_time = 40
+                                timer = time.time()
+                                self.send_command(machine_id, '', -2, '', highpriority=1,
+                                                  highpriority_command=f'self.pause_fishers(fisher_id={fisher_id}, except_param=True)')
+                                time.sleep(awating_time)
+
+                            self.paused_during_supplying.append([machine_id, fisher_id])
+                            print('self.paused_during_supplying', self.paused_during_supplying)
                             self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
                             time.sleep(2)
                             self.send_command(machine_id, 'fisher', fisher_id, 'allow_to_trade')
@@ -516,8 +575,8 @@ class FishingService:
     def change(self, recipient, fisher_id):
         print('Changing...')
         self.pinged_fishers[0] = {recipient: {fisher_id: True}}
-        print(self.pinged_fishers[0])
-        print('@@@@@@@@ PINGED FISHERS HAVE BEEN CHANGED!!!!!! @@@@@@@@')
+        # print(self.pinged_fishers[0])
+        # print('@@@@@@@@ PINGED FISHERS HAVE BEEN CHANGED!!!!!! @@@@@@@@')
 
     def response(self, recipient, fisher_id):
         self.send_command(recipient, '', -2, '', highpriority=1,
@@ -534,34 +593,34 @@ class FishingService:
             recipient = command_sentence[0]
             current_command_id = command_sentence[1]
             if recipient == self.machine_id and current_command_id != self.previous_command_id:
-                print('!!!!!!!!!command_sentence', command_sentence)
+                # print('!!!!!!!!!command_sentence', command_sentence)
                 if not command_sentence[5]:
                     bot = command_sentence[2]
                     bot_id = command_sentence[3]
                     what_to_do = command_sentence[4]
 
                     s = 'self.' + bot + 's' + f'[{bot_id}]' + f'.{what_to_do}()'
-                    print('S', s)
+                    # print('S', s)
                     eval(s)
                     # self.fishers[0].allow_to_trade()
-                    print('EVALUATED!!!!!')
+                    # print('EVALUATED!!!!!')
                     self.previous_command_id = current_command_id
                 else:
                     s_ = command_sentence[6]
                     for _ in range(2):
                         time.sleep(0.2)
-                        print('ВНИМАНИЕ! ПОЛУЧЕНА КОМАНДА ВЫСШЕГО ПРИОРИТЕТА', s_)
+                        # print('ВНИМАНИЕ! ПОЛУЧЕНА КОМАНДА ВЫСШЕГО ПРИОРИТЕТА', s_)
                     eval(s_)
                     self.previous_command_id = current_command_id
 
     def send_command(self, recipient, bot, bot_id, what_to_do, highpriority=0, highpriority_command=''):
         r = random.randint(0, 100000000)
         self.command[0] = [recipient, r, bot, bot_id, what_to_do, highpriority, highpriority_command]
-        print('+++++++++++++SELF COMMAND IS', self.command[0])
+        # print('+++++++++++++SELF COMMAND IS', self.command[0])
         self.command_was_sent = True
 
     def process_commands(self):
-        print('PROCESSING COMMANDS THREAD')
+        # print('PROCESSING COMMANDS THREAD')
         while not self.exit_is_set:
             time.sleep(0.1)
             self.fishing_service_client.client_receive_message()
@@ -609,10 +668,11 @@ class FishingService:
                     else:
                         pass
 
-                    if not self.any_supp_is_available:
-                        for supp_status in data_['status']['suppliers'].values():
-                            if supp_status == 'available':
-                                self.any_supp_is_available = True
+                    for supplier in self.suppliers:
+                        if supplier.current_state[0] == 'available' and self.paused_during_supplying:
+                            temp_machine_id, temp_fisher_id = self.paused_during_supplying.pop()
+                            self.send_command(temp_machine_id, '', -2, '', highpriority=1,
+                                              highpriority_command=f'self.resume_fishers()')
 
             # print('self.has_supplier and anyone_is_requesting', self.has_supplier, anyone_is_requesting)
             if self.has_supplier and who_requests_supplying_new:
@@ -648,9 +708,9 @@ class FishingService:
         while not self.exit_is_set:
             # if time.time() - timer_fishing_service_start > self.number_of_fishers * 9:
             #     self.antiphase_fishing('on')
-            #print('server_update_process1.is_alive()', self.server_update_process1.is_alive())
-            #print('server_update_process2.is_alive()', self.server_update_process2.is_alive())
-            #print('server_update_process3.is_alive()', self.server_update_process3.is_alive())
+            # print('server_update_process1.is_alive()', self.server_update_process1.is_alive())
+            # print('server_update_process2.is_alive()', self.server_update_process2.is_alive())
+            # print('server_update_process3.is_alive()', self.server_update_process3.is_alive())
             time.sleep(1)
 
     def stop(self):

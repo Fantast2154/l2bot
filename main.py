@@ -169,6 +169,7 @@ if __name__ == '__main__':
                 temp_window.hwnd = rect_windows_list[i][1]
                 if log:
                     temp_window.enum_handler()
+
                 windows.append(temp_window)
 
             # setting created windows to screenshot maker

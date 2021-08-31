@@ -17,6 +17,8 @@ class Gui_interface:
         self.windows_b = []
         self.windows_s = []
         self.windows_t = []
+        self.windows_trA = []
+        self.windows_trB = []
 
         self.windows = windows
         self.L2_total_height = 0
@@ -63,7 +65,7 @@ class Gui_interface:
     def gui_window(self):
 
         window_input_msg_box = ['choose fisher windows', 'choose buffer windows', 'choose supplier windows',
-                                'choose teleporter windows']
+                                'choose teleporter windows', 'choose traderA windows', 'choose traderB windows']
 
         windows_left = len(self.windows)
 
@@ -113,6 +115,16 @@ class Gui_interface:
                             self.l2window_workers[i].Update('teleporter')
                             self.workers[i] = 'teleporter'
                             windows_left -= 1
+                        if out_msg == 'choose traderA windows':
+                            self.windows_trA.append(self.windows[i])
+                            self.l2window_workers[i].Update('traderA')
+                            self.workers[i] = 'traderA'
+                            windows_left -= 1
+                        if out_msg == 'choose traderB windows':
+                            self.windows_trB.append(self.windows[i])
+                            self.l2window_workers[i].Update('traderB')
+                            self.workers[i] = 'traderB'
+                            windows_left -= 1
 
                         if self.workers[i] != 'fisher':
                             self.l2window_workers[i] = sg.Text(f'{self.workers[i]}', size=(self.l2button_width, 1),
@@ -156,6 +168,8 @@ class Gui_interface:
         user_input.append(self.windows_b)
         user_input.append(self.windows_s)
         user_input.append(self.windows_t)
+        user_input.append(self.windows_trA)
+        user_input.append(self.windows_trB)
         return user_input
 
     def update_window(self, param, *args):
