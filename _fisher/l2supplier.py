@@ -217,7 +217,7 @@ class Supplier:
         self.click(confirm_button_pos)
         self.pause_thread(0.55)
 
-        if dbaits_pos:
+        if dbaits_pos and request_dbaits:
             pyperclip.copy(request_dbaits)
             if len(dbaits_pos) > 1:
                 self.trade_item(dbaits_pos[0])
@@ -229,7 +229,7 @@ class Supplier:
             self.click(confirm_button_pos)
             self.pause_thread(0.55)
 
-        if alacrity_pos:
+        if alacrity_pos and request_alacrity:
             pyperclip.copy(request_alacrity)
             if len(alacrity_pos) > 1:
                 self.trade_item(alacrity_pos[0])
@@ -241,7 +241,7 @@ class Supplier:
             self.click(confirm_button_pos)
             self.pause_thread(0.55)
 
-        if soski_pet_pos:
+        if soski_pet_pos and request_soski_pet:
             pyperclip.copy(request_soski_pet)
             if len(soski_pet_pos) > 1:
                 self.trade_item(soski_pet_pos[0])
@@ -253,7 +253,7 @@ class Supplier:
             self.click(confirm_button_pos)
             self.pause_thread(0.55)
 
-        if potion_pos:
+        if potion_pos and request_potion:
             pyperclip.copy(request_potion)
             if len(potion_pos) > 1:
                 self.trade_item(potion_pos[0])
