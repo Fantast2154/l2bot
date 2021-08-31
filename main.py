@@ -116,9 +116,8 @@ if __name__ == '__main__':
 
     gui_window = None
     user_input = None
-    relaunch_time = None
     global_program_timing = time.time()
-    running_max_time = 9
+    running_max_time = 7
 
     server_restart_module_activated = False
 
@@ -140,7 +139,7 @@ if __name__ == '__main__':
 
             for i in range(custom_personal_data.number_of_windows):
                 os.startfile(custom_personal_data.launcher_path)
-                time.sleep(14)
+                time.sleep(16)
 
             name_list, hash_list = get_l2windows_param()
             n = len(name_list)
@@ -230,8 +229,8 @@ if __name__ == '__main__':
         # creating gui class
         if gui_window is None:
             gui_window = Gui_interface(windows)
-            user_input, relaunch_time = gui_window.gui_window()
-            print('relaunch_time ', relaunch_time / 3600, 'hours')
+            user_input = gui_window.gui_window()
+            print('custom_personal_data.relaunch_windows_time ', custom_personal_data.relaunch_windows_time / 3600, 'hours')
         else:
             user_input = gui_window.reinit_windows(windows)
 
@@ -253,7 +252,7 @@ if __name__ == '__main__':
 
             event, values = gui_window.sg_gui.Read(timeout=2)
 
-            if time.time() - relaunch_timer > relaunch_time:
+            if time.time() - relaunch_timer > custom_personal_data.relaunch_windows_time:
                 event = 'Relaunch windows'
 
             if time.time() - global_program_timing > running_max_time * 3600:
@@ -261,7 +260,7 @@ if __name__ == '__main__':
 
             if time.time() - relaunch_timer > time_between_msg * counter:
                 counter += 1
-                print('main: Time to windows relaunch', (relaunch_time - (time.time() - relaunch_timer)) // 60,
+                print('main: Time to windows relaunch', (custom_personal_data.relaunch_windows_time - (time.time() - relaunch_timer)) // 60,
                       'minutes')
                 print('main: Time to server restart',
                       (server_restart_time_adjusted - (time.time() - global_program_timing)) // 60, 'minutes')
@@ -325,7 +324,7 @@ if __name__ == '__main__':
                 break
             time.sleep(1)
 
-        closing_time = 7
+        closing_time = 10
         timer = time.time()
         counter = 0
         while time.time() - timer < closing_time:
