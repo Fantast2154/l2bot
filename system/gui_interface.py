@@ -7,7 +7,7 @@ import threading
 
 class Gui_interface:
 
-    def __init__(self, windows):
+    def __init__(self, windows, roles=None):
         manager = Manager()
         self.index = []
         self.l2window_workers = []
@@ -19,7 +19,7 @@ class Gui_interface:
         self.windows_t = []
         self.windows_trA = []
         self.windows_trB = []
-
+        self.roles = roles
         self.windows = windows
         self.L2_total_height = 0
         self.L2_min_x = 10000
@@ -72,75 +72,109 @@ class Gui_interface:
         self.sg_gui.Read(timeout=0)
 
         counter = 0
+        if self.roles is None:
+            for out_msg in window_input_msg_box:
+                self.sg_gui['1_txt_field'].Update(out_msg)
+                while True:
+                    if windows_left <= 0:
+                        break
+                    event, values = self.sg_gui.Read()
+                    if event == sg.WIN_CLOSED or event == 'Exit':
+                        self.sg_gui.Close()
+                        return False
+                    if event == 'Relaunch windows':
+                        self.sg_gui.Close()
+                        return False
+                    for i in range(len(self.windows)):
+                        temp = f'{i}'
+                        if event == temp:
+                            if out_msg == 'choose fisher windows':
+                                self.windows_f.append(self.windows[i])
+                                self.l2window_workers[i].Update(f'fisher_{counter}')
+                                self.workers[i] = f'fisher'
+                                self.index.append(i)
+                                windows_left -= 1
 
-        for out_msg in window_input_msg_box:
-            self.sg_gui['1_txt_field'].Update(out_msg)
-            while True:
-                if windows_left <= 0:
-                    break
-                event, values = self.sg_gui.Read()
-                if event == sg.WIN_CLOSED or event == 'Exit':
-                    self.sg_gui.Close()
-                    return False
-                if event == 'Relaunch windows':
-                    self.sg_gui.Close()
-                    return False
-                for i in range(len(self.windows)):
-                    temp = f'{i}'
-                    if event == temp:
-                        if out_msg == 'choose fisher windows':
-                            self.windows_f.append(self.windows[i])
-                            self.l2window_workers[i].Update(f'fisher_{counter}')
-                            self.workers[i] = f'fisher'
-                            self.index.append(i)
-                            windows_left -= 1
+                                self.l2window_workers[i] = sg.Text(f'{self.workers[i]}_{counter}',
+                                                                   size=(self.l2button_width, 1),
+                                                                   justification='center')
+                                self.sg_gui[f'attempt_counter_{i}'].update()
 
-                            self.l2window_workers[i] = sg.Text(f'{self.workers[i]}_{counter}',
-                                                               size=(self.l2button_width, 1), justification='center')
-                            self.sg_gui[f'attempt_counter_{i}'].update()
+                                counter += 1
+                            if out_msg == 'choose buffer windows':
+                                self.windows_b.append(self.windows[i])
+                                self.l2window_workers[i].Update('buffer')
+                                self.workers[i] = 'buffer'
+                                windows_left -= 1
+                            if out_msg == 'choose supplier windows':
+                                self.windows_s.append(self.windows[i])
+                                self.l2window_workers[i].Update('supplier')
+                                self.workers[i] = 'supplier'
+                                windows_left -= 1
+                            if out_msg == 'choose teleporter windows':
+                                self.windows_t.append(self.windows[i])
+                                self.l2window_workers[i].Update('teleporter')
+                                self.workers[i] = 'teleporter'
+                                windows_left -= 1
+                            if out_msg == 'choose traderA windows':
+                                self.windows_trA.append(self.windows[i])
+                                self.l2window_workers[i].Update('traderA')
+                                self.workers[i] = 'traderA'
+                                windows_left -= 1
+                            if out_msg == 'choose traderB windows':
+                                self.windows_trB.append(self.windows[i])
+                                self.l2window_workers[i].Update('traderB')
+                                self.workers[i] = 'traderB'
+                                windows_left -= 1
 
-                            counter += 1
-                        if out_msg == 'choose buffer windows':
-                            self.windows_b.append(self.windows[i])
-                            self.l2window_workers[i].Update('buffer')
-                            self.workers[i] = 'buffer'
-                            windows_left -= 1
-                        if out_msg == 'choose supplier windows':
-                            self.windows_s.append(self.windows[i])
-                            self.l2window_workers[i].Update('supplier')
-                            self.workers[i] = 'supplier'
-                            windows_left -= 1
-                        if out_msg == 'choose teleporter windows':
-                            self.windows_t.append(self.windows[i])
-                            self.l2window_workers[i].Update('teleporter')
-                            self.workers[i] = 'teleporter'
-                            windows_left -= 1
-                        if out_msg == 'choose traderA windows':
-                            self.windows_trA.append(self.windows[i])
-                            self.l2window_workers[i].Update('traderA')
-                            self.workers[i] = 'traderA'
-                            windows_left -= 1
-                        if out_msg == 'choose traderB windows':
-                            self.windows_trB.append(self.windows[i])
-                            self.l2window_workers[i].Update('traderB')
-                            self.workers[i] = 'traderB'
-                            windows_left -= 1
+                            if self.workers[i] != 'fisher':
+                                self.l2window_workers[i] = sg.Text(f'{self.workers[i]}', size=(self.l2button_width, 1),
+                                                                   justification='center')
+                                self.l2attempt_counter[i] = sg.Text(f'', size=(self.l2button_width, 1),
+                                                                    justification='center')
 
-                        if self.workers[i] != 'fisher':
-                            self.l2window_workers[i] = sg.Text(f'{self.workers[i]}', size=(self.l2button_width, 1),
-                                                               justification='center')
-                            self.l2attempt_counter[i] = sg.Text(f'', size=(self.l2button_width, 1),
-                                                                justification='center')
+                            self.sg_gui['2_txt_field'].Update(f'number of unresolved windows: {windows_left}')
+                            self.sg_gui[temp].Update(disabled=True)
 
-                        self.sg_gui['2_txt_field'].Update(f'number of unresolved windows: {windows_left}')
-                        self.sg_gui[temp].Update(disabled=True)
-
-                        self.sg_gui.Read(timeout=10)
-                        if windows_left <= 0:
-                            break
-                if event == 'OK':
-                    break
-
+                            self.sg_gui.Read(timeout=10)
+                            if windows_left <= 0:
+                                break
+                    if event == 'OK':
+                        break
+        else:
+            counter = 0
+            for i in range(len(self.windows)):
+                self.workers[i] = self.roles[i]
+                self.l2window_workers[i].Update(self.roles[i])
+                if self.roles[i] == 'fisher':
+                    self.l2window_workers[i].Update(f'fisher_{counter}')
+                    self.windows_f.append(self.windows[i])
+                    self.l2window_workers[i] = sg.Text(f'fisher_{counter}',
+                                                       size=(self.l2button_width, 1),
+                                                       justification='center')
+                    self.sg_gui[f'attempt_counter_{i}'].update()
+                    self.index.append(i)
+                    counter += 1
+                if self.roles[i] == 'buffer':
+                    self.l2window_workers[i].Update('buffer')
+                    self.windows_b.append(self.windows[i])
+                if self.roles[i] == 'supplier':
+                    self.l2window_workers[i].Update('supplier')
+                    self.windows_s.append(self.windows[i])
+                if self.roles[i] == 'teleporter':
+                    self.l2window_workers[i].Update('teleporter')
+                    self.windows_t.append(self.windows[i])
+                if self.roles[i] == 'traderA':
+                    self.l2window_workers[i].Update('traderA')
+                    self.windows_trB.append(self.windows[i])
+                if self.roles[i] == 'traderB':
+                    self.l2window_workers[i].Update('traderB')
+                    self.windows_trB.append(self.windows[i])
+                if self.workers[i] != 'fisher':
+                    self.l2window_workers[i] = sg.Text(f'{self.workers[i]}', size=(self.l2button_width, 1),
+                                                       justification='center')
+                    self.l2attempt_counter[i] = sg.Text(f'', size=(self.l2button_width, 1),
+                                                        justification='center')
 
         self.sg_gui['1_txt_field'].Update('L2 bot "Boy & co"')
         # self.sg_gui.Read(timeout=10)
@@ -158,7 +192,8 @@ class Gui_interface:
         #
         # time.sleep(0.8)
         self.sg_gui['Relaunch windows'].Update(visible=True)
-        self.sg_gui['2_txt_field'].Update(f'To stop the programm press "Ctrl+alt+q"', font=("Helvetica", 13), visible=True)
+        self.sg_gui['2_txt_field'].Update(f'To stop the programm press "Ctrl+alt+q"', font=("Helvetica", 13),
+                                          visible=True)
         self.sg_gui['3_txt_field'].Update(f'To pause/resume fishers press "Ctrl+alt+w"', font=("Helvetica", 13),
                                           visible=True)
         self.sg_gui.Read(timeout=10)

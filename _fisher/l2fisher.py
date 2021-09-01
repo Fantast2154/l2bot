@@ -441,7 +441,7 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.send_counter or self.attempt_counter[0] == 150:
+        if self.attempt_counter[0] == self.send_counter:
             self.attack()
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
@@ -508,7 +508,7 @@ class Fisher:
         required_nbaits = 0
         required_soski = 5000
         required_alacrity = 0
-        required_soski_pet = 300
+        required_soski_pet = 400
         required_potion = 0
 
         if required_dbaits >= 1 or required_nbaits >= 1 or required_soski >= 1 or required_alacrity >= 1 or required_soski_pet >= 1 or required_potion >= 1:

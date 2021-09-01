@@ -231,7 +231,7 @@ if __name__ == '__main__':
 
         # creating gui class
         if gui_window is None:
-            gui_window = Gui_interface(windows)
+            gui_window = Gui_interface(windows, custom_personal_data.roles)
             user_input = gui_window.gui_window()
             print('custom_personal_data.relaunch_windows_time ', custom_personal_data.relaunch_windows_time / 3600, 'hours')
         else:
@@ -309,7 +309,6 @@ if __name__ == '__main__':
             # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
             for fisher in FishService.fishers:
                 temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
-
                 gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
             if event == 'Relaunch windows':
