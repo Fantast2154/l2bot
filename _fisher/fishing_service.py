@@ -331,6 +331,13 @@ class FishingService:
                 self.process_suppliers[supplier_id].start()
                 self.process_suppliers[supplier_id] = None
 
+    def stop_suppliers(self, supplier_id=None):
+        self.send_message(f'STOP FISHING EVENT')
+        if supplier_id is None:
+            for supplier in self.suppliers:
+                supplier.stop_supplier()
+                self.process_suppliers[supplier.supplier_id].join()
+
     def start_buffers(self, buffer_id=None):
         time.sleep(1)
         if len(self.buffers) == 0:
@@ -537,6 +544,15 @@ class FishingService:
                                         time.sleep(1)
                             else:
                                 print('outer machine ===========')
+                                delay = 40
+                                timer = time.time()
+                                while time.time() - timer < delay:
+                                    for fisher in self.fishers:
+                                        if fisher.current_state[0] == 'not fishing':
+                                            continue
+                                    time.sleep(0.3)
+                                    break
+
                                 print('waiting for fishers to stop fishing')
                                 awating_time = 30
                                 timer = time.time()
@@ -567,9 +583,10 @@ class FishingService:
                             else:
                                 who_has_been_supplied[machine_id] = fishers_and_stuff
 
+                            print('WAITING FOR FINISHING TRADING')
                             while True:
 
-                                print('WAITING FOR FINISHING TRADING')
+
                                 if self.suppliers[0].current_state[0] == 'available':
                                     if self.paused_during_supplying:
                                         (temp_machine_id, temp_fisher_id) = self.paused_during_supplying
@@ -582,6 +599,7 @@ class FishingService:
                                         self.resume_fishers()
                                     break
                                 time.sleep(0.5)
+                            print('leaving supply function')
 
                     return who_has_been_supplied
                     # exit_ = True
@@ -701,6 +719,8 @@ class FishingService:
                             who_requests_supplying_new = {}
                     else:
                         pass
+
+
 
             # print('self.has_supplier and anyone_is_requesting', self.has_supplier, anyone_is_requesting)
             if self.has_supplier and who_requests_supplying_new:

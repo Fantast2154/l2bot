@@ -59,7 +59,8 @@ class Supplier:
         # connection params
         self.bot_is_connected = True
         self.it_is_almost_server_restart_time = False
-        self.exit_is_set = False
+        self.exit_is_set = manager.list()
+        self.exit_is_set.append(False)
         self.paused = None  # force pause the fisher
 
     def supply(self, machine_id, bot_id, goods):
@@ -94,15 +95,21 @@ class Supplier:
         else:
             self.pause_thread(delay)
 
+    def stop_supplier(self):
+        self.exit_is_set[0] = True
+
     def run(self):
 
         if not self.start_supplier():
             self.stop_supplier()
             self.send_message('ERROR start_supplier()')
         self.current_state[0] = 'available'
-        while not self.exit_is_set:
+        while not self.exit_is_set[0]:
 
             self.wait_for_supply_request()
+
+            if self.exit_is_set[0]:
+                break
 
             if not self.wait_for_trade():
                 self.send_message('error exchange menu')
@@ -114,7 +121,7 @@ class Supplier:
             self.send_message('ERROR stop_supplier()')
 
     def wait_for_supply_request(self):
-        while not self.supply_request[0]:
+        while not self.supply_request[0] or not self.exit_is_set[0]:
             self.pause_thread(0.1)
         self.send_message('SUPPLY REQUEST RECEIVED')
 

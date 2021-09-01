@@ -392,6 +392,9 @@ class ActionQueue:
             self.mouse.move(4, 4)
             time.sleep(0.03)
 
+        if 'no click' in params:
+            return
+
         if 'double' in params:
             self.mouse.press(Button.left)
             time.sleep(0.07)
@@ -455,7 +458,7 @@ class ActionQueue:
                 keyboard.send(params[5])
                 time.sleep(1)
             keyboard.send(params[5])
-            time.sleep(0.1)
+            time.sleep(0.5)
             return
         self.mouse.press(Button.left)
         time.sleep(0.07)

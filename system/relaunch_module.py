@@ -46,7 +46,7 @@ class Login:
             ['terms', 'images/login/stages/terms.jpg', 0.6],
             ['character', 'images/login/stages/character.jpg', 0.6],
             ['loading', 'images/login/stages/loading_icon.jpg', 0.6],
-            ['menu', 'images/login/stages/menu.jpg', 0.91],
+            ['menu', 'images/login/stages/menu_quests.jpg', 0.91],
             ['cancel', 'images/login/stages/cancel.jpg', 0.91],
             ['relogin', 'images/login/stages/relogin.jpg', 0.92],
             ['disagree', 'images/login/stages/disagree.jpg', 0.92]]
@@ -180,22 +180,22 @@ class Login:
 
                 self.login(window, login_field, pass_field)
                 print(window.hwnd, 'Авторизация прошла успешно. Вроде...')
-                time.sleep(4)
+                time.sleep(3)
 
             elif stage == 'terms_of_conditions':
                 print(window.hwnd, 'Принятие пользовательского соглашения. БОТЫ ЗАПРЕЩЕНЫ!!!')
                 keyboard.send('enter')
-                time.sleep(4)
+                time.sleep(3)
 
             elif stage == 'select_server':
                 print(window.hwnd, 'Стадия выбора сервера')
                 keyboard.send('enter')
-                time.sleep(4)
+                time.sleep(3)
 
             elif stage == 'select_character':
                 print(window.hwnd, 'Стадия выбора персонажа')
                 keyboard.send('enter')
-                time.sleep(4)
+                time.sleep(3)
 
             elif stage == 'loading':
                 continue

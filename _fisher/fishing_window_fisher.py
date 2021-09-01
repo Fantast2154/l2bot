@@ -26,6 +26,7 @@ class FishingWindow(L2window):
             ['reeling', 'images/fishing/reeling.jpg', 0.77],
             ['attack', 'images/fishing/attack.jpg', 0.87],
             ['move_to_supplier', 'images/fishing/move_to_supplier.jpg', 0.6],
+            ['a_sign', 'images/login/a_sign.jpg', 0.9],
             ['trade_supplier', 'images/trade/trade_icon.jpg', 0.7]]
 
         self.extended_image_database = [
@@ -44,8 +45,8 @@ class FishingWindow(L2window):
             ['clock', 'images/fishing/clock2.jpg', 0.87],
             ['map_button', 'images/map.jpg', 0.9],
             ['equipment_bag', 'images/equipment_bag.jpg', 0.6],
-            ['menu', 'images/menu.jpg', 0.6],
-            ['fishing_window', 'images/fishing/fishing_window.jpg', 0.7],
+            ['menu', 'images/login/stages/menu_quests.jpg', 0.91],
+            ['fishing_window', 'images/fishing/fishing_window.jpg', 0.65],
             ['red_bar', 'images/fishing/red_bar3.jpg', 0.8],
             ['buff', 'images/fishing/cdbuff.jpg', 0.87],
             ['fishing_potion_white', 'images/fishing/fishing_potion_white.jpg', 0.6],

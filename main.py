@@ -118,7 +118,7 @@ if __name__ == '__main__':
     gui_window = None
     user_input = None
     global_program_timing = time.time()
-    running_max_time = 7
+    running_max_time = custom_personal_data.program_timer
     fisher_attempts = [0]*custom_personal_data.number_of_fishers
 
     server_restart_module_activated = False

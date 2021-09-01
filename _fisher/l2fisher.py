@@ -59,7 +59,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 350
+        self.send_counter = 970
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -121,7 +121,7 @@ class Fisher:
         self.send_message(f'=destroyed=')
 
     def send_message(self, message):
-        temp = '\t' * 11 * (self.fisher_id+1) + 'Fisher ' + f'{self.fisher_id}: {message}'
+        temp = '\t' * 11 * (self.fisher_id + 1) + 'Fisher ' + f'{self.fisher_id}: {message}'
         print(temp)
 
     def test_action(self, count):
@@ -146,7 +146,7 @@ class Fisher:
                 self.pause_fisher(self.paused[0])
 
         self.send_message(f'has finished fishing\n')
-        self.current_state[0] = 'not working'
+        self.current_state[0] = 'not fishing'
 
     def start_fishing(self):
         # function:
@@ -157,13 +157,10 @@ class Fisher:
         # recording game time
         # soski activation
         # trial rod case
-
+        self.current_state[0] = 'not fishing'
         delay = 1
         delay_correction = delay + 17 * self.fisher_id
         self.pause_thread(delay_correction)
-
-        if not self.fishing_window.init_search():
-            self.stop_fisher()
 
         self.send_message(f'starts fishing')
 
@@ -199,7 +196,7 @@ class Fisher:
         #     self.send_message('overweight_baits_soski_correction FAILURE')
         #     self.stop_fisher()
 
-        self.current_state[0] = 'Fishing'
+        self.current_state[0] = 'fishing'
         self.run()
 
     def pause_fisher(self, delay=None):
@@ -215,7 +212,7 @@ class Fisher:
                 self.pause_thread(1)
             self.send_message('unpaused')
             self.current_state[0] = 'fishing'
-            self.pause_thread(2*self.fisher_id)
+            self.pause_thread(2 * self.fisher_id)
         else:
             self.send_message(f'paused for {delay} sec')
             if delay is None or delay == 0:
@@ -241,7 +238,7 @@ class Fisher:
                                              self.fishing_window.get_object('fishing', False), 18, 4, 'fishing_window',
                                              True):
             return False
-
+        self.pause_thread(0.1)
         if self.fishing_window.record_fishing_window():
             self.fishing()
         else:
@@ -444,7 +441,7 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.send_counter or self.attempt_counter[0] == 9:
+        if self.attempt_counter[0] == self.send_counter:
             self.attack()
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
@@ -507,11 +504,11 @@ class Fisher:
     def overweight_baits_soski_correction(self):
 
         self.send_message('overweight_baits_soski_correction')
-        required_dbaits = 350
+        required_dbaits = 1200
         required_nbaits = 0
-        required_soski = 1300
+        required_soski = 5000
         required_alacrity = 0
-        required_soski_pet = 200
+        required_soski_pet = 300
         required_potion = 0
 
         if required_dbaits >= 1 or required_nbaits >= 1 or required_soski >= 1 or required_alacrity >= 1 or required_soski_pet >= 1 or required_potion >= 1:
@@ -615,7 +612,7 @@ class Fisher:
         self.requested_items_to_supply_d['potion'] = 0
 
         self.current_state[0] = 'fishing'
-        self.send_counter = 9999
+        self.send_counter += self.send_counter
 
         # self.send_counter += 3
 
@@ -921,9 +918,10 @@ class Fisher:
                             self.fishing_window)
             self.pause_thread(0.4)
 
-    def move_to_supplier(self):
+    def move_to_supplier(self, search=False):
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, False],
+                        [self.fishing_window.get_object('move_to_supplier', search), False, 'LEFT', False, False,
+                         False],
                         self.fishing_window)
         self.pause_thread(2)
 
@@ -934,8 +932,8 @@ class Fisher:
         self.q.new_task('mouse',
                         [[(x, y)], [(x, y + 100)], 'AutoHotPy', False, False, False],
                         self.fishing_window)
-        #self.q.turn(x, y)
-        self.pause_thread(5 + self.number_of_fishers*10 - self.fisher_id * 10)
+        # self.q.turn(x, y)
+        self.pause_thread(5 + self.number_of_fishers * 10 - self.fisher_id * 10)
 
     def register_nickname(self):
         self.q.new_task('mouse',
@@ -950,22 +948,38 @@ class Fisher:
             self.send_message('Error registering nickname')
         self.q.new_task('mouse',
                         [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+N'],
+
                         self.fishing_window)
+
+    def hide_mouse(self):
+        self.q.new_task('mouse',
+                        [self.fishing_window.get_object('a_sign'), False, 'LEFT', 'no click', False, False], self.fishing_window)
+        self.pause_thread(0.5)
+
+    def activate_window(self):
+        self.q.new_task('mouse',
+                        [self.fishing_window.get_object('a_sign', search=True), False, 'LEFT', False, False, False], self.fishing_window)
+        self.pause_thread(0.5)
+        self.q.new_task('mouse',
+                        [self.fishing_window.get_object('a_sign'), False, 'LEFT', False, False, False], self.fishing_window)
+        self.pause_thread(0.7)
 
     def init_setup(self):
         self.send_message('initializing setup...')
-        self.move_to_supplier()
-        self.move_to_supplier()
+        self.activate_window()
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+N'],
+                        [self.fishing_window.get_object('a_sign'), False, 'LEFT', False, False, 'Alt+L'],
+                        self.fishing_window)
+        self.pause_thread(1.5)
+        self.hide_mouse()
+        if not self.fishing_window.init_search():
+            self.stop_fisher()
+            return False
+        self.pause_thread(1.5)
+        self.q.new_task('mouse',
+                        [self.fishing_window.get_object('a_sign'), False, 'LEFT', False, False, 'Alt+1'],
                         self.fishing_window)
         self.pause_thread(0.5)
-
-        self.q.new_task('mouse',
-                        [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', False, False, 'Alt+1'],
-                        self.fishing_window)
-        self.pause_thread(0.7)
-
         # self.register_nickname()
         self.camera_top_zoom_in()
 
