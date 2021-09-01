@@ -136,7 +136,7 @@ class FishingService:
         self.data_to_receive.append(0)
 
         self.has_supplier = False
-        self.paused_during_supplying = []
+        self.paused_during_supplying = (False, False)
 
         self.fishing_service_client = Client(self.machine_id, self.data_to_transmit, self.data_to_receive)
 
@@ -497,6 +497,7 @@ class FishingService:
                             self.ping(machine_id, fisher_id)
 
                             while not pinged:
+                                print('TEST PINGED')
                                 time.sleep(0.1)
                                 # print('PING...')
                                 # print('self.pinged_fishers[0]', self.pinged_fishers[0])
@@ -511,33 +512,45 @@ class FishingService:
                             time.sleep(2)
                             if self.machine_id == machine_id:
                                 print('own machine ===========')
+                                print('LOCAL FISHERS ARE PAUSED')
                                 self.pause_fishers(fisher_id=fisher_id, except_param=True)
-
-                                awaiting_time = 50
+                                print('waiting for fishers to stop fishing')
+                                awaiting_time = 40
                                 timer = time.time()
                                 fishers_list = []
+                                counter = 0
                                 for fisher in self.fishers:
                                     if fisher.fisher_id != fisher_id:
                                         fishers_list.append(fisher.fisher_id)
 
-                                fishers_list_paused = [False]*len(fishers_list)
+                                fishers_list_paused = [False] * len(fishers_list)
                                 if fishers_list:
                                     while time.time() - timer < awaiting_time:
+                                        counter += 1
+                                        self.send_message(f'Awaiting fisher ..... {awaiting_time - counter}')
                                         for i in range(len(fishers_list)):
                                             if not fishers_list_paused[i]:
                                                 if self.fishers[i].current_state[0] == 'paused':
                                                     fishers_list_paused[i] = True
                                         if all(fishers_list_paused):
                                             break
+                                        time.sleep(1)
                             else:
                                 print('outer machine ===========')
-                                awating_time = 40
+                                print('waiting for fishers to stop fishing')
+                                awating_time = 30
                                 timer = time.time()
+                                counter = 0
+                                while time.time() - timer < awating_time:
+                                    counter += 1
+                                    self.send_message(f'Awaiting fisher ..... {awating_time - counter}')
+                                    time.sleep(1)
+                                self.pause_fishers()
                                 self.send_command(machine_id, '', -2, '', highpriority=1,
                                                   highpriority_command=f'self.pause_fishers(fisher_id={fisher_id}, except_param=True)')
                                 time.sleep(awating_time)
 
-                            self.paused_during_supplying.append([machine_id, fisher_id])
+                            self.paused_during_supplying =  (machine_id, fisher_id)
                             print('self.paused_during_supplying', self.paused_during_supplying)
                             self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
                             time.sleep(2)
@@ -555,14 +568,21 @@ class FishingService:
                                 who_has_been_supplied[machine_id] = fishers_and_stuff
 
                             while True:
-                                if self.paused_during_supplying or self.suppliers[0].current_state[0] == 'available':
-                                    temp_machine_id, temp_fisher_id = self.paused_during_supplying.pop()
-                                    if self.machine_id == temp_machine_id:
+
+                                print('WAITING FOR FINISHING TRADING')
+                                if self.suppliers[0].current_state[0] == 'available':
+                                    if self.paused_during_supplying:
+                                        (temp_machine_id, temp_fisher_id) = self.paused_during_supplying
+                                        if self.machine_id != temp_machine_id:
+
+                                            self.send_command(temp_machine_id, '', -2, '', highpriority=1,
+                                                              highpriority_command=f'self.resume_fishers()')
+                                            time.sleep(2)
+                                            self.paused_during_supplying = (False, False)
                                         self.resume_fishers()
-                                    else:
-                                        self.send_command(temp_machine_id, '', -2, '', highpriority=1,
-                                                      highpriority_command=f'self.resume_fishers()')
                                     break
+                                time.sleep(0.5)
+
                     return who_has_been_supplied
                     # exit_ = True
                 else:
@@ -691,6 +711,10 @@ class FishingService:
                 # print('////who_to_supply', who_to_supply)
                 if who_to_supply:
                     who_has_been_supplied = self.start_supply(who_to_supply)
+
+                # for fisher in self.fishers:
+                #     if fisher.current_state[0] == 'paused':
+                #         self.resume_fishers()
                 # who_has_been_supplied = {machine_id: [fisher_id, ...]}
 
     def is_in(self, supplied, to_supply):

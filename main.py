@@ -119,6 +119,7 @@ if __name__ == '__main__':
     user_input = None
     global_program_timing = time.time()
     running_max_time = 7
+    fisher_attempts = [0]*custom_personal_data.number_of_fishers
 
     server_restart_module_activated = False
 
@@ -235,9 +236,12 @@ if __name__ == '__main__':
             print('custom_personal_data.relaunch_windows_time ', custom_personal_data.relaunch_windows_time / 3600, 'hours')
         else:
             user_input = gui_window.reinit_windows(windows)
-
         # creating fishing manager
         FishService = FishingService(windows, user_input, queue)
+        if log:
+            time.sleep(6)
+            for fisher in FishService.fishers:
+                fisher.attempt_counter[0] = fisher_attempts[fisher.fisher_id]
 
         # gui window loop
         process_fishingService = threading.Thread(target=FishService.run)
@@ -303,7 +307,8 @@ if __name__ == '__main__':
             # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
             for fisher in FishService.fishers:
                 temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
-                gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')  # FIXME
+                fisher_attempts[fisher.fisher_id] += fisher.attempt_counter[0]
+                gui_window.sg_gui[temp].update(f'{fisher_attempts[fisher.fisher_id]}')  # FIXME
 
             if event == 'Relaunch windows':
                 print('main: RELAUNCHING WINDOWS ===========================================')

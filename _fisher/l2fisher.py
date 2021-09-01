@@ -59,7 +59,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 6
+        self.send_counter = 5
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -444,7 +444,7 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.send_counter:
+        if self.attempt_counter[0] == self.send_counter or self.attempt_counter[0] == 9:
             self.attack()
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
