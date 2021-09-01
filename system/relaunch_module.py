@@ -167,7 +167,7 @@ class Login:
             if stage == 'login_password':
                 print(window.hwnd, 'Стадия ввода логина и пароля')
                 print(window.hwnd, 'Расчитываю...')
-                time.sleep(1)
+                time.sleep(0.5)
                 print(window.hwnd, 'Вычисляю...')
 
                 if fisrt_time:
@@ -180,17 +180,17 @@ class Login:
 
                 self.login(window, login_field, pass_field)
                 print(window.hwnd, 'Авторизация прошла успешно. Вроде...')
-                time.sleep(3)
+                time.sleep(2)
 
             elif stage == 'terms_of_conditions':
                 print(window.hwnd, 'Принятие пользовательского соглашения. БОТЫ ЗАПРЕЩЕНЫ!!!')
                 keyboard.send('enter')
-                time.sleep(3)
+                time.sleep(2)
 
             elif stage == 'select_server':
                 print(window.hwnd, 'Стадия выбора сервера')
                 keyboard.send('enter')
-                time.sleep(3)
+                time.sleep(2)
 
             elif stage == 'select_character':
                 print(window.hwnd, 'Стадия выбора персонажа')

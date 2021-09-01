@@ -95,11 +95,9 @@ class Supplier:
         else:
             self.pause_thread(delay)
 
-    def stop_supplier(self):
-        self.exit_is_set[0] = True
 
     def run(self):
-
+        self.init_setup()
         if not self.start_supplier():
             self.stop_supplier()
             self.send_message('ERROR start_supplier()')
@@ -375,3 +373,19 @@ class Supplier:
         self.q.new_task('mouse',
                         [self.supplier_window.get_object('map_button', search), True, 'RIGHT', False, False, False],
                         self.supplier_window)
+
+    def activate_window(self):
+        self.q.new_task('mouse',
+                        [self.supplier_window.get_object('a_sign', search=True), False, 'LEFT', False, False, False], self.supplier_window)
+        self.pause_thread(0.5)
+        self.q.new_task('mouse',
+                        [self.supplier_window.get_object('a_sign'), False, 'LEFT', False, False, False], self.supplier_window)
+        self.pause_thread(0.7)
+
+    def init_setup(self):
+        self.send_message('initializing setup...')
+        self.activate_window()
+        self.q.new_task('mouse',
+                        [self.supplier_window.get_object('a_sign'), False, 'LEFT', False, False, 'Alt+L'],
+                        self.supplier_window)
+        self.pause_thread(0.1)

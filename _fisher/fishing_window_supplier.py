@@ -18,7 +18,7 @@ class FishingSupplierWindow(L2window):
         self.accurate_search = False
         self.screenshot_accurate = None
         self.init_image_database = [
-            ['trade', 'images/trade/trade_icon.jpg', 0.87]]
+            ['a_sign', 'images/login/a_sign.jpg', 0.9]]
 
         self.extended_image_database = [
             ['map_button', 'images/map.jpg', 0.9],

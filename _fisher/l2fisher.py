@@ -158,11 +158,11 @@ class Fisher:
         # soski activation
         # trial rod case
         self.current_state[0] = 'not fishing'
-        delay = 1
+        delay = 7
         delay_correction = delay + 17 * self.fisher_id
         self.pause_thread(delay_correction)
+        self.send_message(f'fisher will start in ...{delay_correction}')
 
-        self.send_message(f'starts fishing')
 
         self.init_setup()
 
@@ -195,7 +195,7 @@ class Fisher:
         # if not self.overweight_baits_soski_correction():
         #     self.send_message('overweight_baits_soski_correction FAILURE')
         #     self.stop_fisher()
-
+        self.send_message(f'starts fishing')
         self.current_state[0] = 'fishing'
         self.run()
 
@@ -441,7 +441,7 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.send_counter:
+        if self.attempt_counter[0] == self.send_counter or self.attempt_counter[0] == 150:
             self.attack()
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
