@@ -238,14 +238,16 @@ if __name__ == '__main__':
             user_input = gui_window.reinit_windows(windows)
         # creating fishing manager
         FishService = FishingService(windows, user_input, queue)
-        if log:
-            time.sleep(6)
-            for fisher in FishService.fishers:
-                fisher.attempt_counter[0] = fisher_attempts[fisher.fisher_id]
+
 
         # gui window loop
         process_fishingService = threading.Thread(target=FishService.run)
         process_fishingService.start()
+
+        if log:
+            time.sleep(10)
+            for fisher in FishService.fishers:
+                fisher.attempt_counter[0] = fisher_attempts[fisher.fisher_id]
 
         relaunch_timer = time.time()
         pause_switch = True
@@ -307,12 +309,16 @@ if __name__ == '__main__':
             # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
             for fisher in FishService.fishers:
                 temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
+
                 gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
             if event == 'Relaunch windows':
                 print('main: RELAUNCHING WINDOWS ===========================================')
                 relaunch_windows = True
                 break
+
+        for fisher in FishService.fishers:
+            fisher_attempts[fisher.fisher_id] += fisher.attempt_counter[0]
 
         FishService.pause_fishers()
 

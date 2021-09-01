@@ -59,7 +59,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 999999
+        self.send_counter = 350
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -507,11 +507,11 @@ class Fisher:
     def overweight_baits_soski_correction(self):
 
         self.send_message('overweight_baits_soski_correction')
-        required_dbaits = 10
+        required_dbaits = 350
         required_nbaits = 0
-        required_soski = 22
+        required_soski = 1300
         required_alacrity = 0
-        required_soski_pet = 0
+        required_soski_pet = 200
         required_potion = 0
 
         if required_dbaits >= 1 or required_nbaits >= 1 or required_soski >= 1 or required_alacrity >= 1 or required_soski_pet >= 1 or required_potion >= 1:
