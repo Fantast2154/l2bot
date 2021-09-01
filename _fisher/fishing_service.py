@@ -66,15 +66,15 @@ class FishingService:
         self.window_buffers = user_input[1]
         self.window_suppliers = user_input[2]
         self.window_teleporters = user_input[3]
-        self.window_tradersA = user_input[4]
-        self.window_tradersB = user_input[5]
+        # self.window_tradersA = user_input[4]
+        # self.window_tradersB = user_input[5]
 
         self.number_of_fishers = len(user_input[0])
         self.number_of_buffers = len(user_input[1])
         self.number_of_suppliers = len(user_input[2])
         self.number_of_teleporters = len(user_input[3])
-        self.number_of_tradersA = len(user_input[4])
-        self.number_of_tradersB = len(user_input[5])
+        # self.number_of_tradersA = len(user_input[4])
+        # self.number_of_tradersB = len(user_input[5])
 
         self.fishers = []
         self.buffers = []
@@ -93,8 +93,8 @@ class FishingService:
         # self.process_fishers = list(range(self.number_of_fishers))
         self.process_suppliers = list(range(self.number_of_suppliers))
         self.process_buffers = list(range(self.number_of_buffers))
-        self.process_traderA = list(range(self.number_of_tradersA))
-        self.process_traderB = list(range(self.number_of_tradersB))
+        # self.process_traderA = list(range(self.number_of_tradersA))
+        # self.process_traderB = list(range(self.number_of_tradersB))
 
         self.fishers_request = ''
         self.suppliers_request = ''
@@ -211,17 +211,17 @@ class FishingService:
             temp_supplier = Supplier(temp_supplier_window, supplier_id, self.number_of_suppliers, q)
             self.suppliers.append(temp_supplier)
 
-        for traderA_id in range(self.number_of_tradersA):
-            win_capture = self.window_tradersA[traderA_id].wincap
-            window_name = self.window_tradersA[traderA_id].window_name
-            hwnd = self.window_tradersA[traderA_id].hwnd
-            screenshot = self.window_tradersA[traderA_id].screenshot
-            temp_traderA_window = FishingSupplierWindow(traderA_id, win_capture, window_name, hwnd, screenshot)
-            temp_traderA_window.window_id = self.window_tradersA[traderA_id].window_id
-            self.traderA_windows.append(temp_traderA_window)
-
-            temp_traderA = TraderA(temp_traderA_window, traderA_id, self.number_of_suppliers, q)
-            self.tradersA.append(temp_traderA)
+        # for traderA_id in range(self.number_of_tradersA):
+        #     win_capture = self.window_tradersA[traderA_id].wincap
+        #     window_name = self.window_tradersA[traderA_id].window_name
+        #     hwnd = self.window_tradersA[traderA_id].hwnd
+        #     screenshot = self.window_tradersA[traderA_id].screenshot
+        #     temp_traderA_window = FishingSupplierWindow(traderA_id, win_capture, window_name, hwnd, screenshot)
+        #     temp_traderA_window.window_id = self.window_tradersA[traderA_id].window_id
+        #     self.traderA_windows.append(temp_traderA_window)
+        #
+        #     temp_traderA = TraderA(temp_traderA_window, traderA_id, self.number_of_suppliers, q)
+        #     self.tradersA.append(temp_traderA)
         # wincap
         self.win_capture = self.windows[0].wincap
 

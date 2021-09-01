@@ -307,8 +307,7 @@ if __name__ == '__main__':
             # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
             for fisher in FishService.fishers:
                 temp = f'attempt_counter_{gui_window.index[fisher.fisher_id]}'
-                fisher_attempts[fisher.fisher_id] += fisher.attempt_counter[0]
-                gui_window.sg_gui[temp].update(f'{fisher_attempts[fisher.fisher_id]}')  # FIXME
+                gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
             if event == 'Relaunch windows':
                 print('main: RELAUNCHING WINDOWS ===========================================')
