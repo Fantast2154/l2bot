@@ -114,6 +114,8 @@ class Supplier:
             if not self.wait_for_trade():
                 self.send_message('error exchange menu')
                 continue
+
+            self.pause_thread(2)
             if not self.supply_goods():
                 continue
 
