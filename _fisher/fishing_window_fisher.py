@@ -4,6 +4,7 @@ from system.screen_analyzer import *
 from system.l2window import L2window
 import cv2
 import time
+from system.item_calcs import *
 
 
 class FishingWindow(L2window):
@@ -38,6 +39,7 @@ class FishingWindow(L2window):
             ['fenrir_party', 'images/party/fenrir_party.jpg', 0.63],
             ['pet_menu_name_button', 'images/party/pet_menu_name_button.jpg', 0.67],
             ['mini_map', 'images/mini_map.jpg', 0.7],
+            ['baits', 'images/fishing/baits_hot_sptings.jpg', 0.8],
             ['status_bar', 'images/status_bar.jpg', 0.65],
             ['blue_bar', 'images/fishing/blue_bar2.jpg', 0.75],
             ['colored', 'images/fishing/colored_2.jpg', 0.94],
@@ -290,6 +292,18 @@ class FishingWindow(L2window):
             return temp
         else:
             return False
+
+    def recognize_number(self, coordinates):
+        [(temp_x, temp_y)] = coordinates
+        cords = [(temp_x-26, temp_y-36)]
+        w = 40
+        d = 19
+        DR = DigitsRecognition()
+        cv2.imshow('2', self.update_screenshot_rectangle(coordinates=cords, w=w, d=d))
+        cv2.waitKey(1)
+        number, _, _ = DR.digit_finder(self.update_screenshot_rectangle(coordinates=cords, w=w, d=d))
+        return number
+
 
     def is_move_to_supplier(self):
         if self.library['move_to_supplier'][1]:

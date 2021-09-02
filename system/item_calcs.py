@@ -1,5 +1,5 @@
 # from window_capture import WindowCapture
-from screen_analyzer import Vision
+from system.screen_analyzer import Vision
 import cv2 as cv
 import keyboard
 import time
@@ -9,8 +9,6 @@ from operator import itemgetter
 
 class DigitsRecognition:
     def __init__(self):
-        self.vision_fishing = Vision('fishing.jpg', 0.87)
-
         self.digits = [0] * 10
         self.digits[0] = Vision('images/digits/0.jpg', 0.9)
         self.digits[1] = Vision('images/digits/1.jpg', 0.9)
@@ -23,10 +21,10 @@ class DigitsRecognition:
         self.digits[8] = Vision('images/digits/8.jpg', 0.9)
         self.digits[9] = Vision('images/digits/9.jpg', 0.9)
 
-        self.left_bracket = Vision('digits/(.jpg', 0.98)
-        self.right_bracket = Vision('digits/)_4.jpg', 0.98)
-        self.left_sq_bracket = Vision('digits/[.jpg', 0.97)
-        self.right_sq_bracket = Vision('digits/].jpg', 0.97)
+        self.left_bracket = Vision('images/digits/(.jpg', 0.98)
+        self.right_bracket = Vision('images/digits/)_4.jpg', 0.98)
+        self.left_sq_bracket = Vision('images/digits/[.jpg', 0.97)
+        self.right_sq_bracket = Vision('images/digits/].jpg', 0.97)
 
         self.weight_icon = Vision('weight.jpg', 0.9)
 

@@ -1,7 +1,6 @@
 import random
 
 import keyboard
-
 from system.action_service import ActionService
 import time
 import threading
@@ -394,6 +393,9 @@ class ActionQueue:
 
         if 'no click' in params:
             return
+
+        if 'recognize' in params:
+            time.sleep(2)
 
         if 'double' in params:
             self.mouse.press(Button.left)

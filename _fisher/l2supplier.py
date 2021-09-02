@@ -166,12 +166,12 @@ class Supplier:
         request_soski_pet = self.requested_items_to_supply_d['soski_pet']
         request_potion = self.requested_items_to_supply_d['potion']
 
-        print('dbaits', request_dbaits)
-        print('nbaits', request_nbaits)
-        print('soski', request_soski)
-        print('dbaits', request_alacrity)
-        print('nbaits', request_soski_pet)
-        print('soski', request_potion)
+        # print('dbaits', request_dbaits)
+        # print('nbaits', request_nbaits)
+        # print('soski', request_soski)
+        # print('dbaits', request_alacrity)
+        # print('nbaits', request_soski_pet)
+        # print('soski', request_potion)
 
         self.send_message('dbaits')
         self.send_message(f'{request_dbaits}')

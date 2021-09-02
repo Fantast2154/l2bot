@@ -96,12 +96,12 @@ class Fisher:
         self.current_baits = None
         self.max_weight = 0
         self.used_weight = 0
-        self.baits_colored = 0
-        self.baits_luminous = 0
+        self.baits_max = 1300
+        self.soski_max = 5000
+        self.soski_pet_max = 1000
         self.soski = 0
-        self.baits_colored_max = 0
-        self.baits_luminous_max = 0
-        self.soski_max = 0
+        self.baits = 0
+        self.soski_pet = 0
 
         self.game_time = None
 
@@ -176,14 +176,15 @@ class Fisher:
             self.stop_fisher()
 
         self.if_rebuff_time()
-        self.fishing_window.start_accurate_search()
+
         # if self.number_of_fishers > 1:
         #     delay = 17 * (self.number_of_fishers - self.fisher_id - 1) + self.fisher_id * 2
         #     self.send_message(f'will start fishing in .... {delay} sec')
         #     self.pause_thread(delay)
 
-        self.pause_thread(1)
+        self.pause_thread(2)
 
+        self.fishing_window.start_accurate_search()
         # if not self.record_game_time():
         #     self.send_message(f'record_game_time FAILURE')
         #     self.stop_fisher()
@@ -443,7 +444,7 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.send_counter or self.supply_now[0]:
+        if self.attempt_counter[0] == self.send_counter or self.supply_now[0] or self.attempt_counter[0] == 2:
             self.supply_now[0] = False
             self.attack()
             if not self.overweight_baits_soski_correction():
@@ -505,13 +506,24 @@ class Fisher:
         self.bar_length = self.bar_limit_right - self.bar_limit_left
 
     def overweight_baits_soski_correction(self):
-
         self.send_message('overweight_baits_soski_correction')
-        required_dbaits = 1200
+
+        self.baits_max = 1300
+        self.soski_max = 5000
+        self.soski_pet_max = 1000
+        self.soski = 0
+        self.baits = 0
+        self.soski_pet = 0
+
+        soski = self.recognize_number(self.fishing_window.get_object('soski'))
+        baits = self.recognize_number(self.fishing_window.get_object('baits'))
+        soski_pet = self.recognize_number(self.fishing_window.get_object('soski_pet'))
+
+        required_dbaits = self.soski - baits
         required_nbaits = 0
-        required_soski = 5000
+        required_soski = self.soski_max - soski
         required_alacrity = 0
-        required_soski_pet = 400
+        required_soski_pet = self.soski_pet_max - soski_pet
         required_potion = 0
 
         if required_dbaits >= 1 or required_nbaits >= 1 or required_soski >= 1 or required_alacrity >= 1 or required_soski_pet >= 1 or required_potion >= 1:
@@ -652,7 +664,8 @@ class Fisher:
                                 break
                         if apnd:
                             list_pos.append(catched_fish_pos)
-
+        if not list_pos:
+            return
         # self.send_message(f'original {list_pos}')
         decorated = [(tup[1], tup) for tup in list_pos]
         decorated.sort(reverse=True)
@@ -943,7 +956,7 @@ class Fisher:
                         [[(x, y)], [(x, y + 100)], 'AutoHotPy', False, False, False],
                         self.fishing_window)
         # self.q.turn(x, y)
-        self.pause_thread(5 + self.number_of_fishers * 10 - self.fisher_id * 10)
+        self.pause_thread(1 + self.number_of_fishers * 7 - self.fisher_id * 7)
 
     def register_nickname(self):
         self.q.new_task('mouse',
@@ -990,6 +1003,7 @@ class Fisher:
                         [self.fishing_window.get_object('a_sign'), False, 'LEFT', False, False, 'Alt+1'],
                         self.fishing_window)
         self.pause_thread(0.5)
+
         # self.register_nickname()
         self.camera_top_zoom_in()
 
@@ -1013,6 +1027,13 @@ class Fisher:
             # self.send_message('soski_pet recorded')
         else:
             self.send_message('Error soski_pet search')
+
+        baits = self.fishing_window.get_object('baits', search=True)
+        if baits:
+            pass
+            # self.send_message('baits recorded')
+        else:
+            self.send_message('Error baits search')
 
         status_bar = self.fishing_window.get_object('status_bar', search=True)
         if status_bar:
@@ -1049,3 +1070,15 @@ class Fisher:
 
     def init_buff(self):
         pass
+
+    def recognize_number(self, coordinates):
+        self.q.new_task('mouse',
+                        [coordinates, False, 'LEFT', 'no click', False, False], self.fishing_window)
+        recognition_time = 4
+        timer = time.time()
+        result = False
+        while time.time() - timer < recognition_time or result:
+            result = self.fishing_window.recognize_number(coordinates)
+            print(result)
+            self.pause_thread(2)
+        return result
