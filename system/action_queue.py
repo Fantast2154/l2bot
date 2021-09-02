@@ -332,12 +332,20 @@ class ActionQueue:
 
     def new_task(self, action, action_param, window, priority='Normal', action_rate='High'):
         # print(action_param)
-        self.queue_list.append(1)
-        self.actions.append(action)
-        self.action_params.append(action_param)
-        self.windows.append(window)
-        self.priority_list.append(priority)
-        self.action_rate_list.append(action_rate)
+        if priority == 'High':
+            self.queue_list.insert(0, 1)
+            self.actions.insert(0, action)
+            self.action_params.insert(0, action_param)
+            self.windows.insert(0, window)
+            self.priority_list.insert(0, priority)
+            self.action_rate_list.insert(0, action_rate)
+        else:
+            self.queue_list.append(1)
+            self.actions.append(action)
+            self.action_params.append(action_param)
+            self.windows.append(window)
+            self.priority_list.append(priority)
+            self.action_rate_list.append(action_rate)
         # self.action_rate_list.insert(0, action_rate)
 
     def keyboard_button_press(self, x, y, k, param):
@@ -395,7 +403,7 @@ class ActionQueue:
             return
 
         if 'recognize' in params:
-            time.sleep(3)
+            time.sleep(2)
 
         if 'double' in params:
             self.mouse.press(Button.left)

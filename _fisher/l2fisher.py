@@ -517,7 +517,9 @@ class Fisher:
         self.soski_pet = 0
 
         soski = self.recognize_number(self.fishing_window.get_object('soski'))
+        time.sleep(1.5)
         baits = self.recognize_number(self.fishing_window.get_object('baits'))
+        time.sleep(1.5)
         soski_pet = self.recognize_number(self.fishing_window.get_object('soski_pet'))
 
         self.fishing_window.start_accurate_search()
@@ -1085,15 +1087,14 @@ class Fisher:
 
     def recognize_number(self, coordinates):
         self.q.new_task('mouse',
-                        [coordinates, False, 'LEFT', 'no click', False, False], self.fishing_window)
-        time.sleep(.2)
-        recognition_time = 5
-        timer = time.time()
-        result = False
-        while time.time() - timer < recognition_time:
-            result = self.fishing_window.recognize_number(coordinates)
-            if result is not None:
-                print(result)
-                return result
-            self.pause_thread(2)
-        return 0
+                        [coordinates, False, 'LEFT', 'no click', False, False], self.fishing_window, priority='High')
+        time.sleep(0.6)
+
+        result = self.fishing_window.recognize_number(coordinates)
+
+        if result is not None:
+            print(result)
+            return result
+        else:
+            print('ahtung', 0)
+            return 0
