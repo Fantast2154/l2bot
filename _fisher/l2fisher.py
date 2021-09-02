@@ -1093,7 +1093,7 @@ class Fisher:
         while time.time() - timer < recognition_time:
             result = self.fishing_window.recognize_number(coordinates)
             print(result)
-            if result:
+            if result is not None:
                 return result
             self.pause_thread(2)
         return 0
