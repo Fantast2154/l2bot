@@ -815,6 +815,7 @@ class FishingService:
     def run(self):
         self.send_message('run loop started')
         flag = False
+        available_time = time.time()
         timer_fishing_service_start = time.time()
         self.server_update_process1, self.server_update_process2, self.server_update_process3 = self.server_update_start()
 
@@ -831,13 +832,31 @@ class FishingService:
 
                 for supp in self.suppliers:
                     if supp.current_state[0] == 'is_going_to_supp':
-                        self.pause_fishers()
-                        time.sleep(45)
+                        for fisher in self.fishers:
+                            if fisher.current_state[0] == 'fishing':
+                                self.pause_fishers(fisher_ids=[fisher.fisher_id])
+                        #self.pause_fishers()
+                        paused_fishers = []
+                        while len(paused_fishers) < len(self.fishers):
+                            paused_fishers = []
+                            for fisher in self.fishers:
+                                if fisher.current_state[0] != 'fishing':
+                                    paused_fishers.append(fisher)
+
+                        #time.sleep(45)
                         supp.current_state[0] = 'busy'
                         self.rest_of_fishers_is_paused = True
 
                     elif supp.current_state[0] == 'available' and self.rest_of_fishers_is_paused:
-                        self.resume_fishers()
+                        if not flag:
+                            available_time = time.time()
+                            flag = True
+                        if time.time() - available_time >= 15:
+                            flag = False
+                            for fisher in self.fishers:
+                                if fisher.current_state[0] != 'fishing':
+                                    self.resume_fishers()
+                                    break
 
             if self.someone_wants_to_supply and not self.rest_of_fishers_is_paused:
                 self.someone_wants_to_supply = False
@@ -850,7 +869,13 @@ class FishingService:
 
                 if fishers_to_pause:
                     self.pause_fishers(fisher_ids=fishers_to_pause)
-                    time.sleep(45)
+                    paused_fishers = []
+                    while len(paused_fishers) < len(self.fishers):
+                        paused_fishers = []
+                        for fisher in self.fishers:
+                            if fisher.current_state[0] != 'fishing':
+                                paused_fishers.append(fisher)
+                    #time.sleep(45)
                     self.rest_of_fishers_is_paused = True
 
                 for fisher_id in self.fishers_who_supplying:
