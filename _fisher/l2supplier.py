@@ -66,6 +66,11 @@ class Supplier:
     def supply(self, machine_id, bot_id, goods):
         print('goods', goods)
         self.supply_request[0] = True
+        self.current_state[0] = 'is_going_to_supp'
+
+        while self.current_state[0] == 'is_going_to_supp':
+            self.pause_thread(1)
+
         self.current_state[0] = 'busy'
         self.supplied_clients.append(bot_id)
         # self.requested_items_to_supply.append(goods['dbaits'])

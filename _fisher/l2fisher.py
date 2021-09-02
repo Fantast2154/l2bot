@@ -61,7 +61,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 970
+        self.send_counter = 850
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -553,6 +553,13 @@ class Fisher:
         while not self.supply_request_proceed[0]:
             time.sleep(0.5)
         self.send_message('request has been proceed')
+
+        self.current_state[0] = 'wants_to_supply'
+        self.send_message('wants_to_supply')
+
+        while self.current_state[0] == 'wants_to_supply':
+            time.sleep(0.5)
+
         self.current_state[0] = 'busy'
         self.fishers_request[0] = ''
 
