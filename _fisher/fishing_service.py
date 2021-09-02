@@ -852,6 +852,10 @@ class FishingService:
                 for fisher_id in self.fishers_who_supplying:
                     self.fishers[fisher_id].current_state[0] = 'busy'
 
+                if self.has_supplier and not self.someone_wants_to_supply:
+                    for supp in self.suppliers:
+                        if supp.current_state[0] == 'is_going_to_supp':
+                            supp.current_state[0] = 'busy'
                 self.rest_of_fishers_is_paused = True
 
             fishers_to_delete = set()
