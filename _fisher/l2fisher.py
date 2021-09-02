@@ -554,11 +554,11 @@ class Fisher:
             time.sleep(0.5)
         self.send_message('request has been proceed')
 
-        self.current_state[0] = 'wants_to_supply'
-        self.send_message('wants_to_supply')
+        #self.current_state[0] = 'wants_to_supply'
+        #self.send_message('wants_to_supply')
 
-        while self.current_state[0] == 'wants_to_supply':
-            time.sleep(0.5)
+        # while self.current_state[0] == 'wants_to_supply':
+        #     time.sleep(0.5)
 
         self.current_state[0] = 'busy'
         self.fishers_request[0] = ''
