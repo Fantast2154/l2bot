@@ -60,8 +60,8 @@ class Supplier:
         self.bot_is_connected = True
         self.it_is_almost_server_restart_time = False
         self.exit_is_set = False
-        #self.exit_is_set = manager.list()
-        #self.exit_is_set.append(False)
+        # self.exit_is_set = manager.list()
+        # self.exit_is_set.append(False)
         self.paused = None  # force pause the fisher
 
     def supply(self, machine_id, bot_id, goods):
@@ -127,7 +127,7 @@ class Supplier:
 
     def wait_for_trade(self):
         self.send_message('waiting for trade')
-        waiting_time = 20
+        waiting_time = 55
         temp_timer = time.time()
         while time.time() - temp_timer < waiting_time:
             self.pause_thread(0.1)
@@ -203,11 +203,11 @@ class Supplier:
         # if not ok_button_pos:
         #     return False
 
-        pyperclip.copy(request_soski)
         while not self.supplier_window.is_input_field() or not self.supplier_window.is_confirm_button():
             print('HERE!SUKI')
-
-            self.trade_item(soski_pos)
+            if soski_pos is not None:
+                pyperclip.copy(request_soski)
+                self.trade_item(soski_pos)
             self.pause_thread(0.6)
 
         input_field_pos = self.supplier_window.is_input_field()
@@ -224,7 +224,7 @@ class Supplier:
         self.click(confirm_button_pos)
         self.pause_thread(0.55)
 
-        if dbaits_pos and request_dbaits:
+        if dbaits_pos is not None and request_dbaits:
             pyperclip.copy(request_dbaits)
             if len(dbaits_pos) > 1:
                 self.trade_item(dbaits_pos[0])
@@ -236,7 +236,7 @@ class Supplier:
             self.click(confirm_button_pos)
             self.pause_thread(0.55)
 
-        if alacrity_pos and request_alacrity:
+        if alacrity_pos is not None and request_alacrity:
             pyperclip.copy(request_alacrity)
             if len(alacrity_pos) > 1:
                 self.trade_item(alacrity_pos[0])
@@ -248,7 +248,7 @@ class Supplier:
             self.click(confirm_button_pos)
             self.pause_thread(0.55)
 
-        if soski_pet_pos and request_soski_pet:
+        if soski_pet_pos is not None and request_soski_pet:
             pyperclip.copy(request_soski_pet)
             if len(soski_pet_pos) > 1:
                 self.trade_item(soski_pet_pos[0])
@@ -260,7 +260,7 @@ class Supplier:
             self.click(confirm_button_pos)
             self.pause_thread(0.55)
 
-        if potion_pos and request_potion:
+        if potion_pos is not None and request_potion:
             pyperclip.copy(request_potion)
             if len(potion_pos) > 1:
                 self.trade_item(potion_pos[0])

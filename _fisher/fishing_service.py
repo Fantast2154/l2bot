@@ -821,8 +821,11 @@ class FishingService:
         while not self.exit_is_set:
 
             for fisher in self.fishers:
-                if fisher.current_state[0] == 'requests supplying':
+                if fisher.current_state[0] == 'requests supplying' or fisher.current_state[0] == 'wants_to_supply':
                     self.someone_wants_to_supply = True
+
+                elif fisher.current_state[0] == 'fishing':
+                    self.rest_of_fishers_is_paused = False
 
             if self.has_supplier and not self.someone_wants_to_supply:
 
@@ -848,15 +851,15 @@ class FishingService:
                 if fishers_to_pause:
                     self.pause_fishers(fisher_ids=fishers_to_pause)
                     time.sleep(45)
+                    self.rest_of_fishers_is_paused = True
 
                 for fisher_id in self.fishers_who_supplying:
                     self.fishers[fisher_id].current_state[0] = 'busy'
 
-                if self.has_supplier and not self.someone_wants_to_supply:
+                if self.has_supplier:
                     for supp in self.suppliers:
                         if supp.current_state[0] == 'is_going_to_supp':
                             supp.current_state[0] = 'busy'
-                self.rest_of_fishers_is_paused = True
 
             fishers_to_delete = set()
             for fisher_id in self.fishers_who_supplying:
@@ -874,7 +877,7 @@ class FishingService:
             # print('server_update_process1.is_alive()', self.server_update_process1.is_alive())
             # print('server_update_process2.is_alive()', self.server_update_process2.is_alive())
             # print('server_update_process3.is_alive()', self.server_update_process3.is_alive())
-            time.sleep(1)
+            time.sleep(0.1)
 
     def stop(self):
         self.exit_is_set = True
