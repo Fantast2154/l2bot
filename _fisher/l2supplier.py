@@ -67,10 +67,10 @@ class Supplier:
     def supply(self, machine_id, bot_id, goods):
         print('goods', goods)
         self.supply_request[0] = True
-        self.current_state[0] = 'is_going_to_supp'
+        #self.current_state[0] = 'is_going_to_supp'
 
-        while self.current_state[0] == 'is_going_to_supp':
-            self.pause_thread(1)
+        #while self.current_state[0] == 'is_going_to_supp':
+            #self.pause_thread(1)
 
         self.current_state[0] = 'busy'
         self.supplied_clients.append(bot_id)
@@ -115,7 +115,7 @@ class Supplier:
                 self.send_message('error exchange menu')
                 continue
 
-            self.pause_thread(2)
+            #self.pause_thread(2)
             if not self.supply_goods():
                 continue
 
@@ -129,7 +129,7 @@ class Supplier:
 
     def wait_for_trade(self):
         self.send_message('waiting for trade')
-        waiting_time = 80
+        waiting_time = 20
         temp_timer = time.time()
         while time.time() - temp_timer < waiting_time:
             self.pause_thread(0.1)
