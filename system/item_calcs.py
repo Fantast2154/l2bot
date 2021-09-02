@@ -122,4 +122,5 @@ class DigitsRecognition:
 
 
 if __name__ == '__main__':
-    number, number2, number3 = digit_finder(ваш_скриншот)
+    pass
+    #number, number2, number3 = digit_finder(ваш_скриншот)
