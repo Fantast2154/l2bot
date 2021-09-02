@@ -26,7 +26,7 @@ class DigitsRecognition:
         self.left_sq_bracket = Vision('images/digits/[.jpg', 0.97)
         self.right_sq_bracket = Vision('images/digits/].jpg', 0.97)
 
-        self.weight_icon = Vision('weight.jpg', 0.9)
+        self.weight_icon = Vision('images/digits/weight.jpg', 0.9)
 
     def digit_finder(self, image):
         m1 = time.time()
