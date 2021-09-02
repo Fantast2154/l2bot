@@ -59,8 +59,9 @@ class Supplier:
         # connection params
         self.bot_is_connected = True
         self.it_is_almost_server_restart_time = False
-        self.exit_is_set = manager.list()
-        self.exit_is_set.append(False)
+        self.exit_is_set = False
+        #self.exit_is_set = manager.list()
+        #self.exit_is_set.append(False)
         self.paused = None  # force pause the fisher
 
     def supply(self, machine_id, bot_id, goods):
@@ -100,19 +101,15 @@ class Supplier:
         else:
             self.pause_thread(delay)
 
-
     def run(self):
         self.init_setup()
         if not self.start_supplier():
             self.stop_supplier()
             self.send_message('ERROR start_supplier()')
         self.current_state[0] = 'available'
-        while not self.exit_is_set[0]:
+        while not self.exit_is_set:
 
             self.wait_for_supply_request()
-
-            if self.exit_is_set[0]:
-                break
 
             if not self.wait_for_trade():
                 self.send_message('error exchange menu')
@@ -124,7 +121,7 @@ class Supplier:
             self.send_message('ERROR stop_supplier()')
 
     def wait_for_supply_request(self):
-        while not self.supply_request[0] or not self.exit_is_set[0]:
+        while not self.supply_request[0]:
             self.pause_thread(0.1)
         self.send_message('SUPPLY REQUEST RECEIVED')
 
@@ -381,10 +378,12 @@ class Supplier:
 
     def activate_window(self):
         self.q.new_task('mouse',
-                        [self.supplier_window.get_object('a_sign', search=True), False, 'LEFT', False, False, False], self.supplier_window)
+                        [self.supplier_window.get_object('a_sign', search=True), False, 'LEFT', False, False, False],
+                        self.supplier_window)
         self.pause_thread(0.5)
         self.q.new_task('mouse',
-                        [self.supplier_window.get_object('a_sign'), False, 'LEFT', False, False, False], self.supplier_window)
+                        [self.supplier_window.get_object('a_sign'), False, 'LEFT', False, False, False],
+                        self.supplier_window)
         self.pause_thread(0.7)
 
     def init_setup(self):
