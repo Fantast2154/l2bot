@@ -151,6 +151,7 @@ class Supplier:
 
     def supply_goods(self):
         self.send_message('chlen BAGANCA')
+        supplying_timer = time.time()
         if not self.search_loop_without_click(self.supplier_window.is_exchange_menu, 15):
             return False
 
@@ -207,7 +208,7 @@ class Supplier:
 
         while not self.supplier_window.is_input_field() or not self.supplier_window.is_confirm_button():
             print('HERE!SUKI')
-            if soski_pos is not None and request_soski:
+            if soski_pos is not None:
                 pyperclip.copy(request_soski)
                 self.trade_item(soski_pos)
             self.pause_thread(0.6)
