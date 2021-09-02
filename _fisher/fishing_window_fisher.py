@@ -31,8 +31,8 @@ class FishingWindow(L2window):
 
         self.extended_image_database = [
             ['bait', 'images/fishing/bait.jpg', 0.90],
-            ['soski', 'images/items/soski.jpg', 0.7],
-            ['soski_pet', 'images/items/soski_pet2.jpg', 0.7],
+            ['soski', 'images/items/soski.jpg', 0.85],
+            ['soski_pet', 'images/items/soski_pet2.jpg', 0.85],
             ['hp_window', 'images/farming/hp_window.jpg', 0.77],
             ['hawk_buff', 'images/fishing/hawk_buff.jpg', 0.77],
             ['fenrir_party', 'images/party/fenrir_party.jpg', 0.63],
