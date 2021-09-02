@@ -1087,7 +1087,7 @@ class Fisher:
         self.q.new_task('mouse',
                         [coordinates, False, 'LEFT', 'no click', False, False], self.fishing_window)
         time.sleep(.2)
-        recognition_time = 4
+        recognition_time = 5
         timer = time.time()
         result = False
         while time.time() - timer < recognition_time:
@@ -1095,5 +1095,5 @@ class Fisher:
             print(result)
             if result:
                 return result
-            self.pause_thread(1.7)
+            self.pause_thread(2)
         return 0

@@ -207,7 +207,7 @@ class Supplier:
 
         while not self.supplier_window.is_input_field() or not self.supplier_window.is_confirm_button():
             print('HERE!SUKI')
-            if soski_pos is not None:
+            if soski_pos is not None and request_soski:
                 pyperclip.copy(request_soski)
                 self.trade_item(soski_pos)
             self.pause_thread(0.6)
