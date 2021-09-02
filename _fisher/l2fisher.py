@@ -522,11 +522,20 @@ class Fisher:
 
         self.fishing_window.start_accurate_search()
         self.pause_thread(1)
-        required_dbaits = self.baits_max - baits
+        if self.baits_max - baits > 0:
+            required_dbaits = self.baits_max - baits
+        else:
+            required_dbaits = 0
         required_nbaits = 0
-        required_soski = self.soski_max - soski
+        if self.soski_max - soski > 0:
+            required_soski = self.soski_max - soski
+        else:
+            required_soski = 0
         required_alacrity = 0
-        required_soski_pet = self.soski_pet_max - soski_pet
+        if self.soski_pet_max - soski_pet > 0:
+            required_soski_pet = self.soski_pet_max - soski_pet
+        else:
+            required_soski_pet = 0
         required_potion = 0
 
         if required_dbaits >= 1 or required_nbaits >= 1 or required_soski >= 1 or required_alacrity >= 1 or required_soski_pet >= 1 or required_potion >= 1:
