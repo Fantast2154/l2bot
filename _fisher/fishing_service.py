@@ -861,7 +861,7 @@ class FishingService:
 
             self.fishers_who_supplying.difference(fishers_to_delete)
 
-            if not self.fishers_who_supplying:
+            if not self.fishers_who_supplying and self.rest_of_fishers_is_paused:
                 self.resume_fishers()
                 self.fishers_who_supplying.clear()
 
