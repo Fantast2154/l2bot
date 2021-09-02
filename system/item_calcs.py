@@ -44,7 +44,7 @@ class DigitsRecognition:
             right_bracket_pos = right_bracket_pos_sq
             weight = True
 
-        print('l, r', left_bracket_pos, right_bracket_pos)
+        # print('l, r', left_bracket_pos, right_bracket_pos)
         # print('l, r', left_bracket_pos[-1][1], left_bracket_pos[-1][1])
         # print('l, r', left_bracket_pos[-1][0], right_bracket_pos[-1][0])
         # print('l, r', left_bracket_pos[-1][1], left_bracket_pos[-1][1])
@@ -114,7 +114,7 @@ class DigitsRecognition:
             # print(f'{number3}%')
 
         m2 = time.time()
-        print(f's = {s}, s_w = {s_w}, number3 = {number3}%')
+        # print(f's = {s}, s_w = {s_w}, number3 = {number3}%')
         # print(f'number = {number}, number2 = {number2}, number3 = {number3}%')
         return number, number2, number3
 

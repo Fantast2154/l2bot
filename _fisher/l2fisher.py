@@ -507,7 +507,8 @@ class Fisher:
 
     def overweight_baits_soski_correction(self):
         self.send_message('overweight_baits_soski_correction')
-
+        self.fishing_window.stop_accurate_search()
+        self.pause_thread(1)
         self.baits_max = 1300
         self.soski_max = 5000
         self.soski_pet_max = 1000
@@ -519,7 +520,9 @@ class Fisher:
         baits = self.recognize_number(self.fishing_window.get_object('baits'))
         soski_pet = self.recognize_number(self.fishing_window.get_object('soski_pet'))
 
-        required_dbaits = self.soski - baits
+        self.fishing_window.start_accurate_search()
+        self.pause_thread(1)
+        required_dbaits = self.baits_max - baits
         required_nbaits = 0
         required_soski = self.soski_max - soski
         required_alacrity = 0
@@ -1074,11 +1077,14 @@ class Fisher:
     def recognize_number(self, coordinates):
         self.q.new_task('mouse',
                         [coordinates, False, 'LEFT', 'no click', False, False], self.fishing_window)
+        time.sleep(.2)
         recognition_time = 4
         timer = time.time()
         result = False
-        while time.time() - timer < recognition_time or result:
+        while time.time() - timer < recognition_time:
             result = self.fishing_window.recognize_number(coordinates)
             print(result)
-            self.pause_thread(2)
-        return result
+            if result:
+                return result
+            self.pause_thread(1.7)
+        return 0
