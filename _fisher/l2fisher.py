@@ -32,6 +32,8 @@ class Fisher:
         self.fishers_request.append('')
         self.fishers_requested_supps = manager.list()
         self.fishers_requested_supps.append(0)
+        self.supply_now = manager.list()
+        self.supply_now.append(False)
         # current_state params
         # 'not fishing'
         # 'fishing'
@@ -441,7 +443,8 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.send_counter:
+        if self.attempt_counter[0] == self.send_counter or self.supply_now[0]:
+            self.supply_now[0] = False
             self.attack()
             if not self.overweight_baits_soski_correction():
                 self.send_message('overweight_baits_soski_correction FAILURE')
@@ -1033,6 +1036,9 @@ class Fisher:
             self.buff_hawkeye_rebufftime = time.time() + 999999
 
         self.pause_thread(0.5)
+
+    def supply_now_function(self):
+        self.supply_now[0] = True
 
     def init_buff(self):
         pass

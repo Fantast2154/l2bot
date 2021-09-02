@@ -119,7 +119,7 @@ if __name__ == '__main__':
     user_input = None
     global_program_timing = time.time()
     running_max_time = custom_personal_data.program_timer
-    fisher_attempts = [0]*custom_personal_data.number_of_fishers
+    fisher_attempts = [0] * custom_personal_data.number_of_fishers
 
     server_restart_module_activated = False
 
@@ -233,12 +233,12 @@ if __name__ == '__main__':
         if gui_window is None:
             gui_window = Gui_interface(windows, custom_personal_data.roles)
             user_input = gui_window.gui_window()
-            print('custom_personal_data.relaunch_windows_time ', custom_personal_data.relaunch_windows_time / 3600, 'hours')
+            print('custom_personal_data.relaunch_windows_time ', custom_personal_data.relaunch_windows_time / 3600,
+                  'hours')
         else:
             user_input = gui_window.reinit_windows(windows)
         # creating fishing manager
         FishService = FishingService(windows, user_input, queue)
-
 
         # gui window loop
         process_fishingService = threading.Thread(target=FishService.run)
@@ -256,6 +256,8 @@ if __name__ == '__main__':
         time_between_msg = 60
         program_exit = False
 
+        visible_true = False
+        visible_true_timer = 60
         while True:  # Event Loop
 
             event, values = gui_window.sg_gui.Read(timeout=2)
@@ -268,7 +270,8 @@ if __name__ == '__main__':
 
             if time.time() - relaunch_timer > time_between_msg * counter:
                 counter += 1
-                print('main: Time to windows relaunch', (custom_personal_data.relaunch_windows_time - (time.time() - relaunch_timer)) // 60,
+                print('main: Time to windows relaunch',
+                      (custom_personal_data.relaunch_windows_time - (time.time() - relaunch_timer)) // 60,
                       'minutes')
                 print('main: Time to server restart',
                       (server_restart_time_adjusted - (time.time() - global_program_timing)) // 60, 'minutes')
@@ -279,6 +282,11 @@ if __name__ == '__main__':
                 server_restart_module_activated = True
 
                 break
+
+            if not visible_true:
+                if time.time() - global_program_timing > visible_true_timer:
+                    visible_true = True
+                    gui_window.sg_gui['supply NOW'].Update(visible=True)
 
             try:  # used try so that if user pressed other than the given key error will not be shown
 
@@ -316,6 +324,11 @@ if __name__ == '__main__':
                 relaunch_windows = True
                 break
 
+            if event == 'supply NOW':
+                print('main: SUPPLY NOW EVENT DETECTED')
+                for fisher in FishService.fishers:
+                    fisher.supply_now_function()
+
         for fisher in FishService.fishers:
             fisher_attempts[fisher.fisher_id] += fisher.attempt_counter[0]
 
@@ -324,7 +337,7 @@ if __name__ == '__main__':
         closing_time = 50  # awaiting fishers to stop 50 sec is recommended
         timer = time.time()
         counter = 0
-        fishers_are_paused = [False]*FishService.number_of_fishers
+        fishers_are_paused = [False] * FishService.number_of_fishers
         while time.time() - timer < closing_time:
             counter += 1
             for i in range(FishService.number_of_fishers):

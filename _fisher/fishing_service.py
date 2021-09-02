@@ -518,11 +518,11 @@ class FishingService:
                                         continue
                             time.sleep(2)
                             if self.machine_id == machine_id:
-                                print('own machine ===========')
+                                print('================================= LOCAL MACHINE REQUESTS SUPPLYING ================================= ')
                                 print('LOCAL FISHERS ARE PAUSED')
                                 self.pause_fishers(fisher_id=fisher_id, except_param=True)
                                 print('waiting for fishers to stop fishing')
-                                awaiting_time = 40
+                                awaiting_time = 10
                                 timer = time.time()
                                 fishers_list = []
                                 counter = 0
@@ -543,15 +543,15 @@ class FishingService:
                                             break
                                         time.sleep(1)
                             else:
-                                print('outer machine ===========')
-                                delay = 40
-                                timer = time.time()
-                                while time.time() - timer < delay:
-                                    for fisher in self.fishers:
-                                        if fisher.current_state[0] == 'not fishing':
-                                            continue
-                                    time.sleep(0.3)
-                                    break
+                                print('================================= OUTER MACHINE REQUESTS SUPPLYING ================================= ')
+                                # delay = 40
+                                # timer = time.time()
+                                # while time.time() - timer < delay:
+                                #     for fisher in self.fishers:
+                                #         if fisher.current_state[0] == 'not fishing':
+                                #             continue
+                                #     time.sleep(0.3)
+                                #     break
 
                                 print('waiting for fishers to stop fishing')
                                 awating_time = 30
@@ -564,14 +564,15 @@ class FishingService:
                                 self.pause_fishers()
                                 self.send_command(machine_id, '', -2, '', highpriority=1,
                                                   highpriority_command=f'self.pause_fishers(fisher_id={fisher_id}, except_param=True)')
-                                time.sleep(awating_time)
+                                time.sleep(1)
+                                # time.sleep(awating_time)
 
-                            self.paused_during_supplying =  (machine_id, fisher_id)
+                            self.paused_during_supplying = (machine_id, fisher_id)
                             print('self.paused_during_supplying', self.paused_during_supplying)
                             self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
                             time.sleep(2)
                             self.send_command(machine_id, 'fisher', fisher_id, 'allow_to_trade')
-                            time.sleep(2)
+                            time.sleep(1)
                             print('COMMANDS WAS SENT')
 
                             print('Fisher has responded!!!!')
