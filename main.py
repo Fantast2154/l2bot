@@ -300,6 +300,7 @@ if __name__ == '__main__':
                     print('main: SUPPLY NOW EVENT DETECTED')
                     for fisher in FishService.fishers:
                         fisher.supply_now_function()
+                    time.sleep(2)
 
                 if keyboard.is_pressed('alt+w'):  # if key 'q' is pressed
 
