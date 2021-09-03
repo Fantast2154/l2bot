@@ -295,6 +295,12 @@ if __name__ == '__main__':
                     program_exit = True
                     time.sleep(2)
                     break  # finishing the loop
+                if keyboard.is_pressed('alt+e'):  # if key 'q' is pressed
+
+                    print('main: SUPPLY NOW EVENT DETECTED')
+                    for fisher in FishService.fishers:
+                        fisher.supply_now_function()
+
                 if keyboard.is_pressed('alt+w'):  # if key 'q' is pressed
 
                     if pause_switch:
