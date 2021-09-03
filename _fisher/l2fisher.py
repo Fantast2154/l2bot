@@ -678,6 +678,7 @@ class Fisher:
         self.fishing_window.start_accurate_search()
 
         self.pause_thread(1)
+        self.current_state[0] = 'fishing'
 
     def send_fish_to_supplier(self, exchange_menu_pos):
         self.send_message('send_fish_to_supplier')

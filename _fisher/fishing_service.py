@@ -140,6 +140,7 @@ class FishingService:
         self.none_command[0] = [-1, -2, '', -3, '', 0, '']
         self.command[0] = [-1, -2, '', -3, '', 0, '']
         self.previous_command_id = -1
+        self.command_dict = {}
         self.command_was_sent = False
 
         self.data_to_transmit = manager.list()
@@ -635,7 +636,14 @@ class FishingService:
             # print('AFTER command_sentence', command_sentence)
             recipient = command_sentence[0]
             current_command_id = command_sentence[1]
-            if recipient == self.machine_id and current_command_id != self.previous_command_id:
+
+            if self.command_dict.get(sender) is not None:
+                previous_command = self.command_dict[sender]
+            else:
+                previous_command = self.previous_command_id
+
+            #if recipient == self.machine_id and current_command_id != self.previous_command_id:
+            if recipient == self.machine_id and current_command_id != previous_command:
                 # print('!!!!!!!!!command_sentence', command_sentence)
                 if not command_sentence[5]:
                     bot = command_sentence[2]
@@ -648,6 +656,7 @@ class FishingService:
                     # self.fishers[0].allow_to_trade()
                     # print('EVALUATED!!!!!')
                     self.previous_command_id = current_command_id
+                    self.command_dict[sender] = current_command_id
                 else:
                     s_ = command_sentence[6]
                     for _ in range(2):
