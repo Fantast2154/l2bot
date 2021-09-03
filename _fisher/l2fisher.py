@@ -947,7 +947,7 @@ class Fisher:
         pass
 
     def rebuff_hawkeye(self):
-
+        time.sleep(.1)
         self.buff_hawkeye_timer = time.time()
         temp = self.fishing_window.is_hawk_buff()
         if temp:
@@ -955,7 +955,7 @@ class Fisher:
             self.reeling_skill_CD = 1.9
             self.pumping_skill_CD = 1.9
             self.q.new_task('mouse', [temp, False, 'LEFT', False, False, False], self.fishing_window)
-            self.pause_thread(2.5)
+            self.pause_thread(2.7)
         else:
             self.buff_hawkeye_rebufftime = 10000000
 

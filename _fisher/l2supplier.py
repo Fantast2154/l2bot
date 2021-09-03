@@ -87,7 +87,7 @@ class Supplier:
         self.requested_items_to_supply_d['potion'] = goods['potion']
 
         # print('111111111', self.requested_items_to_supply)
-        # print('111111111', self.requested_items_to_supply_d)
+        print('gooooods', self.requested_items_to_supply_d)
 
     def __del__(self):
         self.send_message(f"destroyed")

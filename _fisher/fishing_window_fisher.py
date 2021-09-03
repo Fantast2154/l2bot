@@ -295,12 +295,12 @@ class FishingWindow(L2window):
 
     def recognize_number(self, coordinates):
         [(temp_x, temp_y)] = coordinates
-        cords = [(temp_x-40, temp_y-36)]
-        w = 40
-        d = 19
+        cords = [(temp_x-40, temp_y-45)]
+        w = 60
+        d = 60
         DR = DigitsRecognition()
-        # img = self.update_screenshot_rectangle(coordinates=cords, w=w, d=d)
-        img = self.update_screenshot()
+        img = self.update_screenshot_rectangle(coordinates=cords, w=w, d=d)
+        # img2 = self.update_screenshot()
         number, _, _ = DR.digit_finder(img)
         return number
 

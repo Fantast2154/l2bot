@@ -577,7 +577,7 @@ class FishingService:
                             else:
                                 who_has_been_supplied[machine_id] = fishers_and_stuff
                             self.send_message('BOYKOVSKOE AWAITING')
-                            emergency_exit_time = 60
+                            emergency_exit_time = 70
                             emergency_exit_timer = time.time()
                             while time.time() - emergency_exit_timer < emergency_exit_time and not \
                                     self.suppliers[0].current_state[0] == 'available':
