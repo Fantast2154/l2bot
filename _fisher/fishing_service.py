@@ -534,6 +534,12 @@ class FishingService:
                             time.sleep(1)
                             if machine_id != self.machine_id:
                                 self.send_message('OUTER MACHINE SUPPLYING REQUEST')
+                                self.pause_fishers()
+                                waiting_time = 40
+                                for i in range(waiting_time):
+                                    self.send_message(f'{waiting_time - i} sec')
+                                    time.sleep(1)
+
                             self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
                             time.sleep(2)
                             self.send_command(machine_id, 'fisher', fisher_id, 'allow_to_trade')
@@ -720,7 +726,9 @@ class FishingService:
         list = [False]*(self.number_of_fishers)
         while not self.exit_is_set:
             for fisher in self.fishers:
-
+                for fisher in self.fishers:
+                    if fisher.current_state[0] == 'busy':
+                        continue
                 if fisher.current_state[0] == 'requests overweight check':
                     self.suppliers[0].current_state = 'busy'
                     self.pause_fishers(fisher.fisher_id, except_param=True)
@@ -742,9 +750,9 @@ class FishingService:
                             break
 
                     self.fishers[fisher_id].process_overweight_request()
-
-                    time.sleep(2)
                     self.suppliers[0].current_state = 'available'
+                    time.sleep(7)
+
             time.sleep(1)
 
     def stop(self):
