@@ -767,7 +767,7 @@ class FishingService:
                             if fisher.fisher_id == fisher_id:
                                 continue
                             if fisher.current_state[0] == 'paused' or fisher.current_state[
-                                0] == 'requests overweight' or fisher.current_state[0] == 'requests supplying check':
+                                0] == 'requests overweight check' or fisher.current_state[0] == 'requests supplying':
                                 list[fisher.fisher_id] = True
                         if sum(list) == (self.number_of_fishers - 1):
                             self.send_message(f'all fishers has been paused exept fisher_{fisher_id}')
