@@ -567,6 +567,8 @@ class Fisher:
             # self.supply_request_proceed[0] = True
             # self.current_state[0] = 'busy'
             # self.trading_is_allowed[0] = True
+        else:
+            return False
         return True
 
     def allow_to_trade(self):
@@ -592,10 +594,11 @@ class Fisher:
 
         if not self.overweight_baits_soski_correction():
             self.send_message('overweight_baits_soski_correction FAILURE')
+            return
 
         self.send_message('requests supplying')
         self.fishers_request[0] = 'requests supplying'
-        self.current_state[0] = 'requests supplying'
+        # self.current_state[0] = 'requests supplying'
 
         while not self.supply_request_proceed[0]:
             time.sleep(0.5)

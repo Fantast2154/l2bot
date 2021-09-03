@@ -744,12 +744,14 @@ class FishingService:
         list = [False]*(self.number_of_fishers)
         while not self.exit_is_set:
             for fisher in self.fishers:
-                for fisher2 in self.fishers:
-                    if fisher2.current_state[0] == 'busy':
-                        continue
+
+                if fisher.current_state == 'busy':
+                    continue
+
                 if fisher.current_state[0] == 'requests overweight check':
                     if self.has_supplier:
                         self.suppliers[0].current_state = 'busy'
+                    time.sleep(2)
                     self.pause_fishers(fisher.fisher_id, except_param=True)
 
                     timer = time.time()
@@ -773,7 +775,8 @@ class FishingService:
                     time.sleep(2)
                     if self.has_supplier:
                         self.suppliers[0].current_state = 'available'
-                    time.sleep(7)
+
+                    fisher.current_state[0] = 'busy'
 
             time.sleep(1)
 
