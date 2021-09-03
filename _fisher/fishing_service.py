@@ -434,7 +434,8 @@ class FishingService:
         for fisher in self.fishers:
             fisher_dict.update({fisher.fisher_id: fisher.current_state[0]})
             if fisher.fishers_request[0] == 'requests supplying':
-                # print(f"fisher {fisher.fisher_id} requests supplying!!!!!!")
+                print(f"fisher {fisher.fisher_id} requests supplying!!!!!!")
+                print(f"GOODS {self.fishers_items} ")
                 self.fishers_request = 'requests supplying'
                 self.fishers_who_request.add(fisher.fisher_id)
                 self.fishers_items.update({fisher.fisher_id: fisher.fishers_requested_supps[0]})
