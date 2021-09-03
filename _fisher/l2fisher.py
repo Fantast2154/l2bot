@@ -172,7 +172,6 @@ class Fisher:
         self.pause_thread(delay_correction)
         self.send_message(f'fisher will start in ...{delay_correction}')
 
-
         self.init_setup()
 
         self.activate_soski()
@@ -313,6 +312,7 @@ class Fisher:
         pump_timer_was_set = False
         pumping_time = time.time()
         reeling_time = time.time()
+        delta_pumping_skill = time.time()
         reel_count = 0
         reel_timer_was_set = False
         extra_attack_check = False
@@ -349,13 +349,11 @@ class Fisher:
                     x_border = x_temp
                     clock_time_without_bars = time.time()
                 else:
-                    # if not clock_is_checked:
-
-                    # clock_is_checked = True
 
                     if time.time() - clock_time_without_bars > threshold_time_without_any_bar:
-                        # clock_is_checked = False
-                        self.pumping()
+                        if time.time() - delta_pumping_skill >= self.pumping_skill_CD:
+                            delta_pumping_skill = time.time()
+                            self.pumping()
 
                 # delta_pump_skill = time.time() - pump_skill_cast_time
                 # if delta_pump_skill >= self.pumping_skill_CD:
@@ -576,7 +574,6 @@ class Fisher:
         self.overweight_request_proceed[0] = True
         self.send_message('OVERWEIGHT REQUEST IS PROCEED BOY BOY BOY')
 
-
     def trading(self):
         self.send_message('requests overweight check')
         self.current_state[0] = 'requests overweight check'
@@ -587,7 +584,7 @@ class Fisher:
         self.send_message('requests overweight check has been proceed')
 
         if not self.overweight_baits_soski_correction():
-                self.send_message('overweight_baits_soski_correction FAILURE')
+            self.send_message('overweight_baits_soski_correction FAILURE')
 
         self.send_message('requests supplying')
         self.fishers_request[0] = 'requests supplying'
@@ -1005,15 +1002,18 @@ class Fisher:
 
     def hide_mouse(self):
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('a_sign'), False, 'LEFT', 'no click', False, False], self.fishing_window)
+                        [self.fishing_window.get_object('a_sign'), False, 'LEFT', 'no click', False, False],
+                        self.fishing_window)
         self.pause_thread(0.5)
 
     def activate_window(self):
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('a_sign', search=True), False, 'LEFT', False, False, False], self.fishing_window)
+                        [self.fishing_window.get_object('a_sign', search=True), False, 'LEFT', False, False, False],
+                        self.fishing_window)
         self.pause_thread(0.5)
         self.q.new_task('mouse',
-                        [self.fishing_window.get_object('a_sign'), False, 'LEFT', False, False, False], self.fishing_window)
+                        [self.fishing_window.get_object('a_sign'), False, 'LEFT', False, False, False],
+                        self.fishing_window)
         self.pause_thread(0.7)
 
     def init_setup(self):

@@ -730,7 +730,8 @@ class FishingService:
                     if fisher2.current_state[0] == 'busy':
                         continue
                 if fisher.current_state[0] == 'requests overweight check':
-                    self.suppliers[0].current_state = 'busy'
+                    if self.has_supplier:
+                        self.suppliers[0].current_state = 'busy'
                     self.pause_fishers(fisher.fisher_id, except_param=True)
 
                     timer = time.time()
@@ -750,6 +751,10 @@ class FishingService:
                             break
 
                     self.fishers[fisher_id].process_overweight_request()
+
+                    time.sleep(2)
+                    if self.has_supplier:
+                        self.suppliers[0].current_state = 'available'
                     self.suppliers[0].current_state = 'available'
                     time.sleep(7)
 
