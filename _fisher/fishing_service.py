@@ -739,12 +739,11 @@ class FishingService:
                                 list[fisher.fisher_id] = True
                         if sum(list) == (self.number_of_fishers-1):
                             self.send_message(f'all fishers has been paused exept fisher_{fisher_id}')
-                            self.fishers[fisher_id].process_overweight_request()
-
-                            fisher_id = False
-                            time.sleep(2)
                             break
-                        time.sleep(1)
+
+                    self.fishers[fisher_id].process_overweight_request()
+
+                    time.sleep(2)
                     self.suppliers[0].current_state = 'available'
             time.sleep(1)
 
