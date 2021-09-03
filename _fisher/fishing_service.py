@@ -434,8 +434,6 @@ class FishingService:
         for fisher in self.fishers:
             fisher_dict.update({fisher.fisher_id: fisher.current_state[0]})
             if fisher.fishers_request[0] == 'requests supplying':
-                print(f"fisher {fisher.fisher_id} requests supplying!!!!!!")
-                print(f"GOODS {self.fishers_items} ")
                 self.fishers_request = 'requests supplying'
                 self.fishers_who_request.add(fisher.fisher_id)
                 self.fishers_items.update({fisher.fisher_id: fisher.fishers_requested_supps[0]})
@@ -764,12 +762,10 @@ class FishingService:
 
                     while time.time() - timer < waiting_time:
                         for fisher in self.fishers:
-                            if fisher.fisher_id == fisher_id:
-                                continue
                             if fisher.current_state[0] == 'paused' or fisher.current_state[
                                 0] == 'requests overweight check' or fisher.current_state[0] == 'requests supplying':
                                 list[fisher.fisher_id] = True
-                        if sum(list) == (self.number_of_fishers - 1):
+                        if sum(list) == self.number_of_fishers:
                             self.send_message(f'all fishers has been paused exept fisher_{fisher_id}')
                             break
 

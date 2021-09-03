@@ -220,7 +220,6 @@ class Fisher:
                     break
                 self.pause_thread(1)
             self.send_message('unpaused')
-            self.current_state[0] = 'fishing'
             self.pause_thread(2 * self.fisher_id)
         else:
             self.send_message(f'paused for {delay} sec')
@@ -259,6 +258,7 @@ class Fisher:
         return True
 
     def actions_while_fishing(self):
+        self.current_state[0] = 'fishing'
         # function:
         # fishing algorithm
 
