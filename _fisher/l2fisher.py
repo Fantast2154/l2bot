@@ -578,6 +578,17 @@ class Fisher:
 
 
     def trading(self):
+        self.send_message('requests overweight check')
+        self.current_state[0] = 'requests overweight check'
+
+        while not self.overweight_request_proceed[0] and self.paused[0] is not None:
+            time.sleep(0.5)
+
+        self.send_message('requests overweight check has been proceed')
+
+        if not self.overweight_baits_soski_correction():
+                self.send_message('overweight_baits_soski_correction FAILURE')
+
         self.send_message('requests supplying')
         self.fishers_request[0] = 'requests supplying'
         self.current_state[0] = 'requests supplying'
@@ -587,18 +598,6 @@ class Fisher:
 
         self.send_message('request has been proceed')
         self.fishers_request[0] = ''
-
-        self.send_message('requests overweight check')
-        self.current_state[0] = 'requests overweight check'
-
-        while not self.overweight_request_proceed[0] and self.paused[0] is not None:
-            time.sleep(0.5)
-
-        self.send_message('requests overweight check has been proceed')
-        self.current_state[0] = 'requests supplying'
-
-        if not self.overweight_baits_soski_correction():
-                self.send_message('overweight_baits_soski_correction FAILURE')
 
         self.current_state[0] = 'busy'
         self.send_message('waiting for trade permission')

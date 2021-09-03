@@ -726,8 +726,8 @@ class FishingService:
         list = [False]*(self.number_of_fishers)
         while not self.exit_is_set:
             for fisher in self.fishers:
-                for fisher in self.fishers:
-                    if fisher.current_state[0] == 'busy':
+                for fisher2 in self.fishers:
+                    if fisher2.current_state[0] == 'busy':
                         continue
                 if fisher.current_state[0] == 'requests overweight check':
                     self.suppliers[0].current_state = 'busy'
