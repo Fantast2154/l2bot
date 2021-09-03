@@ -64,10 +64,10 @@ class Fisher:
 
         # send/receive counters
         self.send_counter = 700
-        if self.fisher_id == 0:
-            self.send_counter = 4
-        if self.fisher_id == 1:
-            self.send_counter = 6
+        # if self.fisher_id == 0:
+        #     self.send_counter = 4
+        # if self.fisher_id == 1:
+        #     self.send_counter = 6
         self.next_supplying_counter = self.send_counter
         self.receive_counter = 0
         self.attempt_counter = manager.list()
@@ -578,26 +578,27 @@ class Fisher:
 
 
     def trading(self):
-        self.send_message('requests overweight check')
-        self.current_state[0] = 'requests overweight check'
-
-        while not self.overweight_request_proceed[0] and self.paused[0] is not None:
-            time.sleep(0.5)
-
-        self.current_state[0] = 'requests supplying'
-
-        if not self.overweight_baits_soski_correction():
-                self.send_message('overweight_baits_soski_correction FAILURE')
-
-        self.fishers_request[0] = 'requests supplying'
-        # self.current_state[0] = 'requests supplying'
         self.send_message('requests supplying')
+        self.fishers_request[0] = 'requests supplying'
+        self.current_state[0] = 'requests supplying'
 
         while not self.supply_request_proceed[0]:
             time.sleep(0.5)
 
         self.send_message('request has been proceed')
         self.fishers_request[0] = ''
+
+        self.send_message('requests overweight check')
+        self.current_state[0] = 'requests overweight check'
+
+        while not self.overweight_request_proceed[0] and self.paused[0] is not None:
+            time.sleep(0.5)
+
+        self.send_message('requests overweight check has been proceed')
+        self.current_state[0] = 'requests supplying'
+
+        if not self.overweight_baits_soski_correction():
+                self.send_message('overweight_baits_soski_correction FAILURE')
 
         self.current_state[0] = 'busy'
         self.send_message('waiting for trade permission')

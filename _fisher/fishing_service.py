@@ -534,8 +534,22 @@ class FishingService:
                             time.sleep(1)
                             if machine_id != self.machine_id:
                                 self.send_message('OUTER MACHINE SUPPLYING REQUEST')
+                                self.pause_fishers()
+                                self.send_command(machine_id, '', -2, '', highpriority=1,
+                                                  highpriority_command=f'self.pause_fishers(fisher_ids={fisher_id}, except_param=True)')
+                                waiting_time = 40
+                                for i in range(waiting_time):
+                                    self.send_message(f'{waiting_time - i} sec')
+                                    time.sleep(1)
+                            else:
+                                self.pause_fishers(fisher_ids=fisher_id, except_param=True)
+                                waiting_time = 40
+                                for i in range(waiting_time):
+                                    self.send_message(f'{waiting_time - i} sec')
+                                    time.sleep(1)
+
                             self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
-                            time.sleep(2)
+                            time.sleep(15)
                             self.send_command(machine_id, 'fisher', fisher_id, 'allow_to_trade')
                             time.sleep(2)
                             # print('COMMANDS WAS SENT')
@@ -551,7 +565,8 @@ class FishingService:
                             self.send_message('BOYKOVSKOE AWAITING')
                             emergency_exit_time = 120
                             emergency_exit_timer = time.time()
-                            while time.time() - emergency_exit_timer < emergency_exit_time and not self.suppliers[0].current_state[0] == 'available':
+                            while time.time() - emergency_exit_timer < emergency_exit_time and not \
+                            self.suppliers[0].current_state[0] == 'available':
                                 time.sleep(.2)
                             self.resume_fishers()
                             self.send_message('BOYKOVSKOE FINISHED')
@@ -717,7 +732,7 @@ class FishingService:
         fisher_id = False
         timer = time.time()
         waiting_time = 50
-        list = [False]*(self.number_of_fishers)
+        list = [False] * (self.number_of_fishers)
         while not self.exit_is_set:
             for fisher in self.fishers:
 
@@ -727,19 +742,26 @@ class FishingService:
 
                     timer = time.time()
                     fisher_id = fisher.fisher_id
-                    list = [False]*(self.number_of_fishers)
+                    list = [False] * (self.number_of_fishers)
 
-                    while time.time() - timer < waiting_time:
-                        for fisher in self.fishers:
-                            if fisher.fisher_id == fisher_id:
-                                continue
-                            if fisher.current_state[0] == 'paused' or fisher.current_state[0] == 'requests overweight ' \
-                                                                                                 'check' or \
-                                    fisher.current_state[0] == 'requests supplying':
-                                list[fisher.fisher_id] = True
-                        if sum(list) == (self.number_of_fishers-1):
-                            self.send_message(f'all fishers has been paused exept fisher_{fisher_id}')
-                            break
+                    for i in range(waiting_time):
+                        self.send_message(f'{waiting_time - i} sec')
+                        time.sleep(1)
+                    # while time.time() - timer < waiting_time:
+                    #
+                    #     for fisher in self.fishers:
+                    #         if fisher.fisher_id == fisher_id:
+                    #             continue
+                    #         if fisher.current_state[0] == 'paused' or fisher.current_state[0] == 'requests overweight ' \
+                    #                                                                              'check' or \
+                    #                 fisher.current_state[0] == 'requests supplying':
+                    #             list[fisher.fisher_id] = True
+                    #         for fisher in self.fishers:
+                    #             print('state', fisher.current_state[0])
+                    #     if sum(list) == (self.number_of_fishers-1):
+                    #         self.send_message(f'all fishers has been paused exept fisher_{fisher_id}')
+                    #         break
+                    #     time.sleep(1)
 
                     self.fishers[fisher_id].process_overweight_request()
 
