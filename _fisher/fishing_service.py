@@ -721,29 +721,31 @@ class FishingService:
         while not self.exit_is_set:
             for fisher in self.fishers:
 
-                    if fisher.current_state[0] == 'requests overweight check':
-                        self.pause_fishers(fisher.fisher_id, except_param=True)
+                if fisher.current_state[0] == 'requests overweight check':
+                    self.suppliers[0].current_state = 'busy'
+                    self.pause_fishers(fisher.fisher_id, except_param=True)
 
-                        timer = time.time()
-                        fisher_id = fisher.fisher_id
-                        list = [False]*(self.number_of_fishers)
+                    timer = time.time()
+                    fisher_id = fisher.fisher_id
+                    list = [False]*(self.number_of_fishers)
 
-                        while time.time() - timer < waiting_time:
-                            for fisher in self.fishers:
-                                if fisher.fisher_id == fisher_id:
-                                    continue
-                                if fisher.current_state[0] == 'paused' or fisher.current_state[0] == 'requests overweight ' \
-                                                                                                     'check' or \
-                                        fisher.current_state[0] == 'requests supplying':
-                                    list[fisher.fisher_id] = True
-                            if sum(list) == (self.number_of_fishers-1):
-                                self.send_message(f'all fishers has been paused exept fisher_{fisher_id}')
-                                self.fishers[fisher_id].process_overweight_request()
+                    while time.time() - timer < waiting_time:
+                        for fisher in self.fishers:
+                            if fisher.fisher_id == fisher_id:
+                                continue
+                            if fisher.current_state[0] == 'paused' or fisher.current_state[0] == 'requests overweight ' \
+                                                                                                 'check' or \
+                                    fisher.current_state[0] == 'requests supplying':
+                                list[fisher.fisher_id] = True
+                        if sum(list) == (self.number_of_fishers-1):
+                            self.send_message(f'all fishers has been paused exept fisher_{fisher_id}')
+                            self.fishers[fisher_id].process_overweight_request()
 
-                                fisher_id = False
-                                time.sleep(2)
-                                break
-                            time.sleep(1)
+                            fisher_id = False
+                            time.sleep(2)
+                            break
+                        time.sleep(1)
+                    self.suppliers[0].current_state = 'available'
             time.sleep(1)
 
     def stop(self):

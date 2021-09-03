@@ -581,9 +581,8 @@ class Fisher:
         self.send_message('requests overweight check')
         self.current_state[0] = 'requests overweight check'
 
-        while not self.overweight_request_proceed[0]:
+        while not self.overweight_request_proceed[0] and self.paused[0] is not None:
             time.sleep(0.5)
-
 
         self.current_state[0] = 'requests supplying'
 
