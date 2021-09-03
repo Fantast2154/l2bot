@@ -534,11 +534,6 @@ class FishingService:
                             time.sleep(1)
                             if machine_id != self.machine_id:
                                 self.send_message('OUTER MACHINE SUPPLYING REQUEST')
-                                self.send_command(machine_id, '', -2, '', highpriority=1,
-                                                  highpriority_command=f'self.pause_fishers(fisher_ids={fisher_id}, '
-                                                                       f'except_param=True)')
-                                self.send_message('loooooong sleeeep')
-                                time.sleep(40)
                             self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
                             time.sleep(2)
                             self.send_command(machine_id, 'fisher', fisher_id, 'allow_to_trade')
@@ -721,7 +716,7 @@ class FishingService:
         flag = False
         fisher_id = False
         timer = time.time()
-        waiting_time = 40
+        waiting_time = 50
         list = [False]*(self.number_of_fishers)
         while not self.exit_is_set:
             for fisher in self.fishers:

@@ -125,11 +125,11 @@ class Supplier:
     def wait_for_supply_request(self):
         while not self.supply_request[0]:
             self.pause_thread(0.1)
-        self.send_message('SUPPLY REQUEST RECEIVED')
+        # self.send_message('SUPPLY REQUEST RECEIVED')
 
     def wait_for_trade(self):
-        self.send_message('waiting for trade')
-        waiting_time = 20
+        # self.send_message('waiting for trade')
+        waiting_time = 40
         temp_timer = time.time()
         while time.time() - temp_timer < waiting_time:
             self.pause_thread(0.1)
@@ -150,7 +150,7 @@ class Supplier:
         return False
 
     def supply_goods(self):
-        self.send_message('chlen BAGANCA')
+
         supplying_timer = time.time()
         if not self.search_loop_without_click(self.supplier_window.is_exchange_menu, 15):
             return False
@@ -174,8 +174,8 @@ class Supplier:
         # print('nbaits', request_soski_pet)
         # print('soski', request_potion)
 
-        self.send_message('dbaits')
-        self.send_message(f'{request_dbaits}')
+        # self.send_message('dbaits')
+        # self.send_message(f'{request_dbaits}')
         soski_pos = self.supplier_window.is_soski()
         # print('soski_pos', soski_pos)
         # if not soski_pos:
@@ -207,7 +207,6 @@ class Supplier:
         #     return False
 
         while not self.supplier_window.is_input_field() or not self.supplier_window.is_confirm_button():
-            print('HERE!SUKI')
             if soski_pos is not None:
                 pyperclip.copy(request_soski)
                 self.trade_item(soski_pos)
@@ -335,7 +334,6 @@ class Supplier:
                         self.supplier_window)
 
     def trade_item(self, coordinates):
-        print('trade item')
         self.q.new_task('mouse',
                         [coordinates, True, 'LEFT', False, 'double', False],
                         self.supplier_window)
