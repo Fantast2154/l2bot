@@ -725,14 +725,14 @@ class FishingService:
             # print('self.has_supplier and anyone_is_requesting', self.has_supplier, anyone_is_requesting)
             if self.has_supplier and who_requests_supplying_new:
                 self.pinged_fishers[0].clear()
-                # print('/////////////who_requests_supplying_new', who_requests_supplying_new)
-                # print('////////who_has_been_supplied', who_has_been_supplied)
+                print('/////////////who_requests_supplying_new', who_requests_supplying_new)
+                print('////////who_has_been_supplied', who_has_been_supplied)
                 who_to_supply = self.is_in2(who_has_been_supplied, who_requests_supplying_new)
-                # print('////who_to_supply', who_to_supply)
+                print('////who_to_supply', who_to_supply)
                 if who_to_supply:
                     # who_has_been_supplied = self.start_supply(who_to_supply)
                     who_has_been_supplied = self.start_supply_boykovskoe_svetloe(who_to_supply)
-                    who_requests_supplying_new = {}
+                    #who_requests_supplying_new = {}
 
                 # for fisher in self.fishers:
                 #     if fisher.current_state[0] == 'paused':
