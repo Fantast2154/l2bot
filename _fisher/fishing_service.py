@@ -786,7 +786,7 @@ class FishingService:
                     while not list2 and time.time() - emergency_exit_timer < emergency_exit_time:
                         list2 = []
                         for fisher in self.fishers:
-                            if fisher.current_state[0] == 'busy':
+                            if fisher.current_state[0] != 'busy':
                                 list2.append(fisher.fisher_id)
                     print('---------------------------EXIT IS HERE')
             time.sleep(1)
