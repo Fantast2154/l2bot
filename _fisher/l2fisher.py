@@ -556,6 +556,7 @@ class Fisher:
             self.requested_items_to_supply_d['potion'] = required_potion
 
             self.fishers_requested_supps[0] = self.requested_items_to_supply_d
+            time.sleep(2)
             # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
             # self.supply_request_proceed[0] = True
             # self.current_state[0] = 'busy'
