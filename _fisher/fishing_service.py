@@ -732,6 +732,7 @@ class FishingService:
                 if who_to_supply:
                     # who_has_been_supplied = self.start_supply(who_to_supply)
                     who_has_been_supplied = self.start_supply_boykovskoe_svetloe(who_to_supply)
+                    who_requests_supplying_new = {}
 
                 # for fisher in self.fishers:
                 #     if fisher.current_state[0] == 'paused':
