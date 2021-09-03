@@ -593,6 +593,7 @@ class Fisher:
 
         self.send_message('requests overweight check has been proceed')
 
+
         if not self.overweight_baits_soski_correction():
             self.send_message('overweight_baits_soski_correction FAILURE')
             return
@@ -606,6 +607,7 @@ class Fisher:
 
         self.send_message('request has been proceed')
         self.fishers_request[0] = ''
+        self.fishers_requested_supps[0] = {}
 
         self.current_state[0] = 'busy'
         self.send_message('waiting for trade permission')
@@ -668,7 +670,7 @@ class Fisher:
         self.requested_items_to_supply_d['alacrity'] = 0
         self.requested_items_to_supply_d['soski_pet'] = 0
         self.requested_items_to_supply_d['potion'] = 0
-        self.fishers_requested_supps[0] = {}
+
 
         self.next_supplying_counter = self.attempt_counter[0] + self.send_counter
         self.send_message(f'NEXT SUPPLYING ATTEMPT {self.next_supplying_counter}')

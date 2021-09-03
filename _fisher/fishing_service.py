@@ -549,7 +549,7 @@ class FishingService:
                                 timer = time.time()
                                 list = [False] * (self.number_of_fishers)
                                 self.pause_fishers()
-                                waiting_time = 20
+                                waiting_time = 40
                                 while time.time() - timer < waiting_time:
                                     for fisher_temp in self.fishers:
                                         if fisher_temp.current_state[0] == 'paused' or fisher_temp.current_state[

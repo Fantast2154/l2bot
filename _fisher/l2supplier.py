@@ -160,7 +160,8 @@ class Supplier:
         # request_soski = self.requested_items_to_supply.pop(2)
         # request_nbaits = self.requested_items_to_supply.pop(1)
         # request_dbaits = self.requested_items_to_supply.pop(0)
-
+        pyperclip.copy(0)
+        time.sleep(.1)
         request_dbaits = self.requested_items_to_supply_d['dbaits']
         request_nbaits = self.requested_items_to_supply_d['nbaits']
         request_soski = self.requested_items_to_supply_d['soski']
@@ -171,9 +172,9 @@ class Supplier:
         # print('dbaits', request_dbaits)
         # print('nbaits', request_nbaits)
         # print('soski', request_soski)
-        # print('dbaits', request_alacrity)
-        # print('nbaits', request_soski_pet)
-        # print('soski', request_potion)
+        # print('request_alacrity', request_alacrity)
+        # print('request_soski_pet', request_soski_pet)
+        # print('request_potion', request_potion)
 
         # self.send_message('dbaits')
         # self.send_message(f'{request_dbaits}')
@@ -210,6 +211,7 @@ class Supplier:
         while not self.supplier_window.is_input_field() or not self.supplier_window.is_confirm_button():
             if soski_pos is not None:
                 pyperclip.copy(request_soski)
+                self.pause_thread(0.1)
                 self.trade_item(soski_pos)
             self.pause_thread(0.6)
 
@@ -229,6 +231,7 @@ class Supplier:
 
         if dbaits_pos is not None and request_dbaits:
             pyperclip.copy(request_dbaits)
+            self.pause_thread(.1)
             if len(dbaits_pos) > 1:
                 self.trade_item(dbaits_pos[0])
             else:
@@ -241,6 +244,7 @@ class Supplier:
 
         if alacrity_pos is not None and request_alacrity:
             pyperclip.copy(request_alacrity)
+            self.pause_thread(.1)
             if len(alacrity_pos) > 1:
                 self.trade_item(alacrity_pos[0])
             else:
@@ -253,9 +257,11 @@ class Supplier:
 
         if soski_pet_pos is not None and request_soski_pet:
             pyperclip.copy(request_soski_pet)
+            self.pause_thread(.1)
             if len(soski_pet_pos) > 1:
                 self.trade_item(soski_pet_pos[0])
             else:
+                # print('pet')
                 self.trade_item(soski_pet_pos)
             self.pause_thread(0.55)
             self.enter_number(input_field_pos)
@@ -265,6 +271,7 @@ class Supplier:
 
         if potion_pos is not None and request_potion:
             pyperclip.copy(request_potion)
+            self.pause_thread(.1)
             if len(potion_pos) > 1:
                 self.trade_item(potion_pos[0])
             else:
