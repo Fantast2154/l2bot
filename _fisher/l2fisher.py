@@ -667,6 +667,7 @@ class Fisher:
         self.requested_items_to_supply_d['alacrity'] = 0
         self.requested_items_to_supply_d['soski_pet'] = 0
         self.requested_items_to_supply_d['potion'] = 0
+        self.fishers_requested_supps[0] = {}
 
         self.current_state[0] = 'fishing'
         self.next_supplying_counter += self.send_counter
