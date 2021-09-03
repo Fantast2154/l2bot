@@ -450,6 +450,7 @@ class Fisher:
         self.if_rebuff_time()
 
         if self.attempt_counter[0] == self.next_supplying_counter or self.supply_now[0]:
+            print('supply now')
             self.supply_now[0] = False
             self.attack()
             self.trading()
@@ -669,8 +670,7 @@ class Fisher:
         self.requested_items_to_supply_d['potion'] = 0
         self.fishers_requested_supps[0] = {}
 
-        self.current_state[0] = 'fishing'
-        self.next_supplying_counter += self.send_counter
+        self.next_supplying_counter = self.attempt_counter[0] + self.send_counter
         self.send_message(f'NEXT SUPPLYING ATTEMPT {self.next_supplying_counter}')
 
         # self.send_counter += 3

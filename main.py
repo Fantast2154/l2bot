@@ -270,13 +270,13 @@ if __name__ == '__main__':
 
             if time.time() - relaunch_timer > time_between_msg * counter:
                 counter += 1
-                print('main: Time to windows relaunch',
-                      (custom_personal_data.relaunch_windows_time - (time.time() - relaunch_timer)) // 60,
-                      'minutes')
-                print('main: Time to server restart',
-                      (server_restart_time_adjusted - (time.time() - global_program_timing)) // 60, 'minutes')
-                print('main: Time to ending the program',
-                      (running_max_time * 3600 - (time.time() - global_program_timing)) // 60, 'minutes')
+                # print('main: Time to windows relaunch',
+                #       (custom_personal_data.relaunch_windows_time - (time.time() - relaunch_timer)) // 60,
+                #       'minutes')
+                # print('main: Time to server restart',
+                #       (server_restart_time_adjusted - (time.time() - global_program_timing)) // 60, 'minutes')
+                # print('main: Time to ending the program',
+                #       (running_max_time * 3600 - (time.time() - global_program_timing)) // 60, 'minutes')
 
             if time.time() - global_program_timing > server_restart_time_adjusted:
                 server_restart_module_activated = True
