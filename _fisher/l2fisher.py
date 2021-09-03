@@ -68,6 +68,7 @@ class Fisher:
             self.send_counter = 4
         if self.fisher_id == 1:
             self.send_counter = 6
+        self.next_supplying_counter = self.send_counter
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -147,11 +148,11 @@ class Fisher:
                 pass
                 # print('self.actions_while_fishing()')
 
-            if not self.actions_between_fishing_rod_casts():
-                self.send_message('actions_between_fishing_rod_casts FAILED')
-
             if self.paused[0] != 0:
                 self.pause_fisher(self.paused[0])
+
+            if not self.actions_between_fishing_rod_casts():
+                self.send_message('actions_between_fishing_rod_casts FAILED')
 
         self.send_message(f'has finished fishing\n')
         self.current_state[0] = 'not fishing'
@@ -450,7 +451,7 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.send_counter or self.supply_now[0]:
+        if self.attempt_counter[0] == self.next_supplying_counter or self.supply_now[0]:
             self.supply_now[0] = False
             self.attack()
             self.trading()
@@ -526,7 +527,6 @@ class Fisher:
         time.sleep(5)
         soski_pet = self.recognize_number(self.fishing_window.get_object('soski_pet'))
 
-        self.fishing_window.start_accurate_search()
         self.pause_thread(1)
         if self.baits_max - baits > 0:
             required_dbaits = self.baits_max - baits
@@ -608,7 +608,7 @@ class Fisher:
 
         self.send_message('trading is allowed')
         self.move_to_supplier()
-        self.fishing_window.stop_accurate_search()
+
         self.pause_thread(1)
 
         # waiting_time2 = 15
@@ -663,7 +663,8 @@ class Fisher:
         self.requested_items_to_supply_d['potion'] = 0
 
         self.current_state[0] = 'fishing'
-        self.send_counter += self.send_counter
+        self.next_supplying_counter += self.send_counter
+        self.send_message(f'NEXT SUPPLYING ATTEMPT {self.next_supplying_counter}')
 
         # self.send_counter += 3
 
