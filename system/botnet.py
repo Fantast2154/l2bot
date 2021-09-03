@@ -1,4 +1,5 @@
 import datetime
+import pprint
 import threading
 import socket
 import pickle
@@ -43,6 +44,7 @@ class Server:
             if data_:
                 decoded_data = pickle.loads(data_)
                 print(datetime.datetime.now().time(), decoded_data)
+                #pprint.pprint(decoded_data, width=1)
                 self.bots_data_collection.append(decoded_data)
                 self.send_data(data_)
                 self.bots_processing_list.remove(b)

@@ -727,7 +727,7 @@ class FishingService:
                 self.pinged_fishers[0].clear()
                 # print('/////////////who_requests_supplying_new', who_requests_supplying_new)
                 # print('////////who_has_been_supplied', who_has_been_supplied)
-                who_to_supply = self.is_in(who_has_been_supplied, who_requests_supplying_new)
+                who_to_supply = self.is_in2(who_has_been_supplied, who_requests_supplying_new)
                 # print('////who_to_supply', who_to_supply)
                 if who_to_supply:
                     # who_has_been_supplied = self.start_supply(who_to_supply)
@@ -738,17 +738,46 @@ class FishingService:
                 #         self.resume_fishers()
                 # who_has_been_supplied = {machine_id: [fisher_id, ...]}
 
-    def is_in(self, supplied, to_supply):
+    # def is_in(self, supplied, to_supply):
+    #     who_to_supply_ = {}
+    #     for machine_id1, fishers_and_stuff1 in to_supply.items():
+    #         if machine_id1 in supplied.keys():
+    #             for fisher_id, stuff in fishers_and_stuff1.items():
+    #                 for sup_val in supplied.values():
+    #                     if fisher_id not in sup_val.keys():
+    #                         if who_to_supply_.get(machine_id1, None) is not None:
+    #                             who_to_supply_[machine_id1].update({fisher_id: stuff})
+    #                         else:
+    #                             who_to_supply_[machine_id1] = {fisher_id: stuff}
+    #         else:
+    #             who_to_supply_[machine_id1] = fishers_and_stuff1
+    #     return who_to_supply_
+
+    def is_in2(self, supplied, to_supply):
         who_to_supply_ = {}
         for machine_id1, fishers_and_stuff1 in to_supply.items():
             if machine_id1 in supplied.keys():
-                for fisher_id, stuff in fishers_and_stuff1.items():
-                    for sup_val in supplied.values():
-                        if fisher_id not in sup_val.keys():
-                            if who_to_supply_.get(machine_id1, None) is not None:
-                                who_to_supply_[machine_id1].update({fisher_id: stuff})
+                for fisher_id_to_supply, stuff_to_supply in fishers_and_stuff1.items():
+                    for supped_machine, supped_stuff in supplied.items():
+                        if supped_machine == machine_id1:
+                            if fisher_id_to_supply in supped_stuff.keys():
+                                for supped_fisher_id, supplied_stuff in supped_stuff.items():
+                                    if supped_fisher_id == fisher_id_to_supply:
+                                        if stuff_to_supply != supplied_stuff:
+                                            if who_to_supply_.get(machine_id1, None) is not None:
+                                                who_to_supply_[machine_id1].update({fisher_id_to_supply: stuff_to_supply})
+                                            else:
+                                                who_to_supply_[machine_id1] = {fisher_id_to_supply: stuff_to_supply}
+                                        else:
+                                            pass
+                                    else:
+                                        pass
                             else:
-                                who_to_supply_[machine_id1] = {fisher_id: stuff}
+                                if who_to_supply_.get(machine_id1, None) is not None:
+                                    who_to_supply_[machine_id1].update({fisher_id_to_supply: stuff_to_supply})
+                                else:
+                                    who_to_supply_[machine_id1] = {fisher_id_to_supply: stuff_to_supply}
+
             else:
                 who_to_supply_[machine_id1] = fishers_and_stuff1
         return who_to_supply_
