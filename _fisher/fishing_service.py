@@ -538,6 +538,11 @@ class FishingService:
                             #     for i in range(waiting_time):
                             #         self.send_message(f'{waiting_time - i} sec')
                             #         time.sleep(1)
+                            if machine_id != self.machine_id:
+                                self.send_message('OUTER MACHINE SUPPLYING REQUEST')
+                            else:
+                                self.send_message('LOCAL MACHINE SUPPLYING REQUEST')
+
 
                             if machine_id != self.machine_id:
                                 timer = time.time()
@@ -571,17 +576,20 @@ class FishingService:
                             else:
                                 who_has_been_supplied[machine_id] = fishers_and_stuff
                             self.send_message('BOYKOVSKOE AWAITING')
-                            emergency_exit_time = 120
+                            emergency_exit_time = 60
                             emergency_exit_timer = time.time()
                             while time.time() - emergency_exit_timer < emergency_exit_time and not \
                                     self.suppliers[0].current_state[0] == 'available':
                                 time.sleep(.2)
+
                             self.resume_fishers()
+                            time.sleep(.1)
                             if machine_id != self.machine_id:
                                 self.send_command(machine_id, '', -2, '', highpriority=1,
                                                   highpriority_command=f'self.resume_fishers()')
                                 time.sleep(2)
                             self.send_message('BOYKOVSKOE FINISHED')
+                            self.suppliers[0].current_state[0] = 'available'
                             time.sleep(2)
 
                     return who_has_been_supplied
@@ -744,8 +752,6 @@ class FishingService:
         flag = False
         fisher_id = False
 
-
-
         while not self.exit_is_set:
             for fisher in self.fishers:
 
@@ -768,8 +774,6 @@ class FishingService:
                             self.send_message(f'all fishers has been paused exept fisher_{fisher_id}')
                             break
                         time.sleep(1)
-                        print(sum(list))
-
 
                     self.fishers[fisher_id].process_overweight_request()
 
@@ -781,7 +785,8 @@ class FishingService:
                     list2 = []
                     emergency_exit_time = 100
                     emergency_exit_timer = time.time()
-                    while fisher.current_state[0] == 'busy' and time.time() - emergency_exit_timer < emergency_exit_time:
+                    while fisher.current_state[
+                        0] == 'busy' and time.time() - emergency_exit_timer < emergency_exit_time:
                         continue
                     print('---------------------------EXIT IS HERE')
             time.sleep(1)

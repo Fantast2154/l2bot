@@ -65,7 +65,8 @@ class Supplier:
         self.paused = None  # force pause the fisher
 
     def supply(self, machine_id, bot_id, goods):
-        print('goods', goods)
+        self.send_message('SUPPLYING GOODS IS READY')
+        # print('goods', goods)
         self.supply_request[0] = True
         #self.current_state[0] = 'is_going_to_supp'
 
@@ -86,7 +87,7 @@ class Supplier:
         self.requested_items_to_supply_d['potion'] = goods['potion']
 
         # print('111111111', self.requested_items_to_supply)
-        print('111111111', self.requested_items_to_supply_d)
+        # print('111111111', self.requested_items_to_supply_d)
 
     def __del__(self):
         self.send_message(f"destroyed")

@@ -555,12 +555,12 @@ class Fisher:
             self.requested_items_to_supply_d['alacrity'] = required_alacrity
             self.requested_items_to_supply_d['soski_pet'] = required_soski_pet
             self.requested_items_to_supply_d['potion'] = required_potion
-            print('required_dbaits', required_dbaits)
-            print('required_nbaits', required_nbaits)
-            print('required_soski', required_soski)
-            print('required_alacrity', required_alacrity)
-            print('required_soski_pet', required_soski_pet)
-            print('required_potion', required_potion)
+            # print('required_dbaits', required_dbaits)
+            # print('required_nbaits', required_nbaits)
+            # print('required_soski', required_soski)
+            # print('required_alacrity', required_alacrity)
+            # print('required_soski_pet', required_soski_pet)
+            # print('required_potion', required_potion)
             self.fishers_requested_supps[0] = self.requested_items_to_supply_d
             self.fishers_request[0] = 'requests supplying'
             time.sleep(2)
@@ -585,10 +585,10 @@ class Fisher:
         self.send_message('OVERWEIGHT REQUEST IS PROCEED BOY BOY BOY')
 
     def trading(self):
-        self.send_message('requests overweight check')
+        self.send_message('--------------TRADING -----------------')
         self.current_state[0] = 'requests overweight check'
 
-        while not self.overweight_request_proceed[0] and self.paused[0] is not None:
+        while not self.overweight_request_proceed[0]:
             time.sleep(0.5)
 
         self.send_message('requests overweight check has been proceed')
