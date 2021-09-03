@@ -576,9 +576,13 @@ class FishingService:
                             emergency_exit_time = 120
                             emergency_exit_timer = time.time()
                             while time.time() - emergency_exit_timer < emergency_exit_time and not \
-                            self.suppliers[0].current_state[0] == 'available':
+                                    self.suppliers[0].current_state[0] == 'available':
                                 time.sleep(.2)
                             self.resume_fishers()
+                            if machine_id != self.machine_id:
+                                self.send_command(machine_id, '', -2, '', highpriority=1,
+                                                  highpriority_command=f'self.resume_fishers()')
+                                time.sleep(2)
                             self.send_message('BOYKOVSKOE FINISHED')
                             time.sleep(2)
 
@@ -762,7 +766,8 @@ class FishingService:
                         for fisher in self.fishers:
                             if fisher.fisher_id == fisher_id:
                                 continue
-                            if fisher.current_state[0] == 'paused' or fisher.current_state[0] == 'requests overweight' or fisher.current_state[0] == 'requests supplying check':
+                            if fisher.current_state[0] == 'paused' or fisher.current_state[
+                                0] == 'requests overweight' or fisher.current_state[0] == 'requests supplying check':
                                 list[fisher.fisher_id] = True
                         if sum(list) == (self.number_of_fishers - 1):
                             self.send_message(f'all fishers has been paused exept fisher_{fisher_id}')
@@ -778,12 +783,12 @@ class FishingService:
                     list2 = []
                     emergency_exit_time = 100
                     emergency_exit_timer = time.time()
-                    while not list2 or time.time() - emergency_exit_timer < emergency_exit_time:
+                    while not list2 and time.time() - emergency_exit_timer < emergency_exit_time:
                         list2 = []
                         for fisher in self.fishers:
                             if fisher.current_state[0] == 'busy':
                                 list2.append(fisher.fisher_id)
-
+                    print('---------------------------EXIT IS HERE')
             time.sleep(1)
 
     def stop(self):
