@@ -664,6 +664,7 @@ class FishingService:
                         # print('ВНИМАНИЕ! ПОЛУЧЕНА КОМАНДА ВЫСШЕГО ПРИОРИТЕТА', s_)
                     eval(s_)
                     self.previous_command_id = current_command_id
+                    self.command_dict[sender] = current_command_id
 
     def send_command(self, recipient, bot, bot_id, what_to_do, highpriority=0, highpriority_command=''):
         r = random.randint(0, 100000000)
