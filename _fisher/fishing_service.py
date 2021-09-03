@@ -743,9 +743,8 @@ class FishingService:
         self.server_update_process1, self.server_update_process2, self.server_update_process3 = self.server_update_start()
         flag = False
         fisher_id = False
-        timer = time.time()
-        waiting_time = 50
-        list = [False] * (self.number_of_fishers)
+
+
 
         while not self.exit_is_set:
             for fisher in self.fishers:
@@ -759,7 +758,7 @@ class FishingService:
                     timer = time.time()
                     fisher_id = fisher.fisher_id
                     list = [False] * (self.number_of_fishers)
-
+                    waiting_time = 50
                     while time.time() - timer < waiting_time:
                         for fisher in self.fishers:
                             if fisher.current_state[0] == 'paused' or fisher.current_state[
@@ -768,6 +767,9 @@ class FishingService:
                         if sum(list) == self.number_of_fishers:
                             self.send_message(f'all fishers has been paused exept fisher_{fisher_id}')
                             break
+                        time.sleep(1)
+                        print(sum(list))
+
 
                     self.fishers[fisher_id].process_overweight_request()
 
