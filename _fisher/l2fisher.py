@@ -50,6 +50,8 @@ class Fisher:
         # self.supplying_request = False # fisher wants supplying. options: True, False
         self.supplying_request = manager.list()
         self.supplying_request.append(False)
+        self.overweight_request_proceed = manager.list()
+        self.overweight_request_proceed.append(False)
         self.supply_request_proceed = manager.list()
         self.supply_request_proceed.append(False)
         self.trading_is_allowed = manager.list()
@@ -61,7 +63,11 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 850
+        self.send_counter = 700
+        if self.fisher_id == 0:
+            self.send_counter = 4
+        if self.fisher_id == 1:
+            self.send_counter = 6
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -444,12 +450,10 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.send_counter or self.supply_now[0] or self.attempt_counter[0] == 2:
+        if self.attempt_counter[0] == self.send_counter or self.supply_now[0]:
             self.supply_now[0] = False
             self.attack()
-            if not self.overweight_baits_soski_correction():
-                self.send_message('overweight_baits_soski_correction FAILURE')
-
+            self.trading()
         self.fihser_position_correction()
 
         return True
@@ -517,9 +521,9 @@ class Fisher:
         self.soski_pet = 0
 
         soski = self.recognize_number(self.fishing_window.get_object('soski'))
-        time.sleep(1.5)
+        time.sleep(5)
         baits = self.recognize_number(self.fishing_window.get_object('baits'))
-        time.sleep(1.5)
+        time.sleep(5)
         soski_pet = self.recognize_number(self.fishing_window.get_object('soski_pet'))
 
         self.fishing_window.start_accurate_search()
@@ -554,14 +558,10 @@ class Fisher:
             self.requested_items_to_supply_d['potion'] = required_potion
 
             self.fishers_requested_supps[0] = self.requested_items_to_supply_d
-            self.fishers_request[0] = 'requests supplying'
             # print('++++++++++++++++FISHER IS requests supplying', self.fishing_service.fishers_request)
             # self.supply_request_proceed[0] = True
             # self.current_state[0] = 'busy'
             # self.trading_is_allowed[0] = True
-
-            self.trading()
-
         return True
 
     def allow_to_trade(self):
@@ -572,22 +572,36 @@ class Fisher:
         self.supply_request_proceed[0] = True
         self.send_message('SUPPLY REQUEST IS PROCEED BOY BOY BOY')
 
+    def process_overweight_request(self):
+        self.overweight_request_proceed[0] = True
+        self.send_message('OVERWEIGHT REQUEST IS PROCEED BOY BOY BOY')
+
+
     def trading(self):
-        self.send_message('requests supplying')
+        self.send_message('requests overweight check')
+        self.current_state[0] = 'requests overweight check'
+
+        while not self.overweight_request_proceed[0]:
+            time.sleep(0.5)
+
+
         self.current_state[0] = 'requests supplying'
+
+        if not self.overweight_baits_soski_correction():
+                self.send_message('overweight_baits_soski_correction FAILURE')
+
+        self.fishers_request[0] = 'requests supplying'
+        # self.current_state[0] = 'requests supplying'
+        self.send_message('requests supplying')
 
         while not self.supply_request_proceed[0]:
             time.sleep(0.5)
+
         self.send_message('request has been proceed')
-
-        #self.current_state[0] = 'wants_to_supply'
-        #self.send_message('wants_to_supply')
-
-        # while self.current_state[0] == 'wants_to_supply':
-        #     time.sleep(0.5)
+        self.fishers_request[0] = ''
 
         self.current_state[0] = 'busy'
-        self.fishers_request[0] = ''
+        self.send_message('waiting for trade permission')
 
         while not self.trading_is_allowed[0]:
             time.sleep(0.5)
@@ -636,6 +650,7 @@ class Fisher:
         self.supplying_request[0] = False
         self.supply_request_proceed[0] = False
         self.trading_is_allowed[0] = False
+        self.overweight_request_proceed[0] = False
         # self.requested_items_to_supply.pop()
         # self.requested_items_to_supply.pop()
         # self.requested_items_to_supply.pop()
@@ -1088,13 +1103,13 @@ class Fisher:
     def recognize_number(self, coordinates):
         self.q.new_task('mouse',
                         [coordinates, False, 'LEFT', 'no click', False, False], self.fishing_window, priority='High')
-        time.sleep(0.6)
-
-        result = self.fishing_window.recognize_number(coordinates)
-
-        if result is not None:
-            print(result)
-            return result
-        else:
-            print('ahtung', 0)
-            return 0
+        time.sleep(1.5)
+        recognition_time = 6
+        timer = time.time()
+        while time.time() - timer < recognition_time:
+            result = self.fishing_window.recognize_number(coordinates)
+            if result is not None:
+                print(result)
+                return result
+            self.pause_thread(2)
+        return 0

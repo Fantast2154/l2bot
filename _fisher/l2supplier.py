@@ -177,32 +177,32 @@ class Supplier:
         self.send_message('dbaits')
         self.send_message(f'{request_dbaits}')
         soski_pos = self.supplier_window.is_soski()
-        print('soski_pos', soski_pos)
+        # print('soski_pos', soski_pos)
         # if not soski_pos:
         #     return False
 
         dbaits_pos = self.supplier_window.is_baits()
-        print('dbaits_pos', dbaits_pos)
+        # print('dbaits_pos', dbaits_pos)
         # if not dbaits_pos:
         #     return False
 
         alacrity_pos = self.supplier_window.is_alacrity()
-        print('alacrity_pos', alacrity_pos)
+        # print('alacrity_pos', alacrity_pos)
         # if not alacrity_pos:
         #     return False
 
         soski_pet_pos = self.supplier_window.is_soski_pet()
-        print('soski_pet_pos', soski_pet_pos)
+        # print('soski_pet_pos', soski_pet_pos)
         # if not soski_pet_pos:
         #     return False
 
         potion_pos = self.supplier_window.is_potion()
-        print('potion_pos', potion_pos)
+        # print('potion_pos', potion_pos)
         # if not potion_pos:
         #     return False
 
         ok_button_pos = self.supplier_window.is_ok_button()
-        print('ok_button_pos', ok_button_pos)
+        # print('ok_button_pos', ok_button_pos)
         # if not ok_button_pos:
         #     return False
 
@@ -216,11 +216,11 @@ class Supplier:
         input_field_pos = self.supplier_window.is_input_field()
         if not input_field_pos:
             return False
-        print('input_field_pos')
+        # print('input_field_pos')
         confirm_button_pos = self.supplier_window.is_confirm_button()
         if not confirm_button_pos:
             return False
-        print('confirm_button_pos')
+        # print('confirm_button_pos')
         self.pause_thread(0.55)
         self.enter_number(input_field_pos)
         self.pause_thread(0.55)

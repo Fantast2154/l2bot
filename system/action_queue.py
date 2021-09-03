@@ -403,7 +403,7 @@ class ActionQueue:
             return
 
         if 'recognize' in params:
-            time.sleep(2)
+            time.sleep(4)
 
         if 'double' in params:
             self.mouse.press(Button.left)
