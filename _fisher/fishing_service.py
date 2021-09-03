@@ -755,7 +755,6 @@ class FishingService:
                     time.sleep(2)
                     if self.has_supplier:
                         self.suppliers[0].current_state = 'available'
-                    self.suppliers[0].current_state = 'available'
                     time.sleep(7)
 
             time.sleep(1)
