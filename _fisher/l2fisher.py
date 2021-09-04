@@ -63,7 +63,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 700
+        self.send_counter = 900
         # if self.fisher_id == 0:
         #     self.send_counter = 4
         # if self.fisher_id == 1:
@@ -169,7 +169,7 @@ class Fisher:
         # trial rod case
         self.current_state[0] = 'not fishing'
         delay = 7
-        delay_correction = delay + 17 * self.fisher_id
+        delay_correction = delay + 19 * self.fisher_id
         self.pause_thread(delay_correction)
         self.send_message(f'fisher will start in ...{delay_correction}')
 
@@ -603,7 +603,6 @@ class Fisher:
 
         self.send_message('requests overweight check has been proceed')
 
-
         if not self.overweight_baits_soski_correction():
             self.send_message('overweight_baits_soski_correction FAILURE')
             return
@@ -690,7 +689,6 @@ class Fisher:
         self.fishing_window.start_accurate_search()
 
         self.pause_thread(1)
-
 
     def send_fish_to_supplier(self, exchange_menu_pos):
         self.send_message('send_fish_to_supplier')
@@ -909,6 +907,7 @@ class Fisher:
     def update_current_attempt(self):
         self.attempt_counter[0] += 1
         self.send_message(f'Attempt # {self.attempt_counter[0]}')
+        self.send_message(f'Attempts to next supplying {self.next_supplying_counter[0] - self.attempt_counter[0]}')
 
     def send_mail(self):
         pass
@@ -1068,18 +1067,40 @@ class Fisher:
             self.fishing_potion_rebufftime = time.time() + 999999
 
         soski = self.fishing_window.get_object('soski', search=True)
-        if soski:
-            pass
-            # self.send_message('soski recorded')
-        else:
-            self.send_message('Error soski search')
+        self.pause_thread(.1)
+        if not soski:
+            waiting_time = 3
+            timer = time.time()
+            while not self.fishing_window.get_object('soski', search=True) and time.time() - timer < waiting_time:
+                [(x, y)] = self.fishing_window.get_object('move_to_supplier')
+                self.q.new_task('mouse',
+                                [[(x, y+40)], False, 'RIGHT', False, False, False],
+                                self.fishing_window)
+                self.pause_thread(0.5)
+                self.q.new_task('mouse',
+                            [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', 'no click', False, False],
+                            self.fishing_window)
+                self.pause_thread(0.3)
+
+        self.send_message(f'soski {soski}')
 
         soski_pet = self.fishing_window.get_object('soski_pet', search=True)
-        if soski_pet:
-            pass
-            # self.send_message('soski_pet recorded')
-        else:
-            self.send_message('Error soski_pet search')
+        self.pause_thread(.1)
+        if not soski_pet:
+            waiting_time = 3
+            timer = time.time()
+            while not self.fishing_window.get_object('soski_pet', search=True) and time.time() - timer < waiting_time:
+                [(x, y)] = self.fishing_window.get_object('move_to_supplier')
+                self.q.new_task('mouse',
+                                [[(x, y+80)], False, 'RIGHT', False, False, False],
+                                self.fishing_window)
+                self.pause_thread(0.5)
+                self.q.new_task('mouse',
+                            [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', 'no click', False, False],
+                            self.fishing_window)
+                self.pause_thread(0.3)
+
+        self.send_message(f'soski_pet {soski_pet}')
 
         baits = self.fishing_window.get_object('baits', search=True)
         if baits:
