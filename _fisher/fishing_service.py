@@ -798,10 +798,11 @@ class FishingService:
             for fisher in self.fishers:
 
                 if fisher.current_state[0] == 'requests overweight check':
+                    print(f'fisher_{fisher_id}', fisher.current_state[0])
+                    self.pause_fishers(fisher.fisher_id, except_param=True)
                     if self.has_supplier:
                         self.suppliers[0].current_state = 'busy'
                     time.sleep(2)
-                    self.pause_fishers(fisher.fisher_id, except_param=True)
 
                     timer = time.time()
                     fisher_id = fisher.fisher_id
@@ -829,7 +830,7 @@ class FishingService:
                     emergency_exit_timer = time.time()
                     while fisher.current_state[
                         0] == 'busy' and time.time() - emergency_exit_timer < emergency_exit_time:
-                        continue
+                        time.sleep(.1)
                     print('---------------------------EXIT IS HERE')
             time.sleep(1)
 

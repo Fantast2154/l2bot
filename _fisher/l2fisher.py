@@ -259,6 +259,7 @@ class Fisher:
 
     def actions_while_fishing(self):
         self.current_state[0] = 'fishing'
+
         # function:
         # fishing algorithm
 
@@ -430,6 +431,7 @@ class Fisher:
         return True
 
     def actions_between_fishing_rod_casts(self):
+        self.send_message(f'current_state5 {self.current_state[0]}')
         # function:
         # current attempts update
         # overweight and soski+baits correction if needed
@@ -604,12 +606,12 @@ class Fisher:
 
         while not self.supply_request_proceed[0]:
             time.sleep(0.5)
-
+        self.send_message(f'current_state {self.current_state[0]}')
         self.send_message('request has been proceed')
         self.fishers_request[0] = ''
         self.fishers_requested_supps[0] = {}
 
-        self.current_state[0] = 'busy'
+        # self.current_state[0] = 'busy'
         self.send_message('waiting for trade permission')
 
         while not self.trading_is_allowed[0]:
@@ -625,7 +627,7 @@ class Fisher:
         # while time.time() - temp_timer2 < waiting_time2 and not self.fishing_window.is_exchange_menu():
         #     self.send_trade_to_supplier()
         #     self.pause_thread(6)
-
+        self.send_message(f'current_state2 {self.current_state[0]}')
         if not self.search_object_with_click(self.fishing_window.is_exchange_menu,
                                              self.fishing_window.get_object('trade_supplier', False), 20, 4):
             self.fishing_window.start_accurate_search()
@@ -671,16 +673,16 @@ class Fisher:
         self.requested_items_to_supply_d['soski_pet'] = 0
         self.requested_items_to_supply_d['potion'] = 0
 
-
+        self.send_message(f'current_state3 {self.current_state[0]}')
         self.next_supplying_counter = self.attempt_counter[0] + self.send_counter
         self.send_message(f'NEXT SUPPLYING ATTEMPT {self.next_supplying_counter}')
 
         # self.send_counter += 3
-
+        self.current_state[0] = 'fishing'
         self.fishing_window.start_accurate_search()
 
         self.pause_thread(1)
-        self.current_state[0] = 'fishing'
+
 
     def send_fish_to_supplier(self, exchange_menu_pos):
         self.send_message('send_fish_to_supplier')
