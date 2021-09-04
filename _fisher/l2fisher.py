@@ -1068,43 +1068,19 @@ class Fisher:
 
         soski = self.fishing_window.get_object('soski', search=True)
         self.pause_thread(.1)
-        if not soski:
-            waiting_time = 3
-            timer = time.time()
-            while not soski and time.time() - timer < waiting_time:
-                [(x, y)] = self.fishing_window.get_object('move_to_supplier')
-                self.q.new_task('mouse',
-                                [[(x, y+40)], False, 'RIGHT', False, False, False],
-                                self.fishing_window)
-                self.pause_thread(0.6)
-                self.q.new_task('mouse',
-                            [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', 'no click', False, False],
-                            self.fishing_window)
-                self.pause_thread(0.4)
-                soski = self.fishing_window.get_object('soski', search=True)
-                self.pause_thread(0.1)
-
-        self.send_message(f'soski {soski}')
+        if soski:
+            pass
+            # self.send_message('soski recorded')
+        else:
+            self.send_message('Error soski search')
 
         soski_pet = self.fishing_window.get_object('soski_pet', search=True)
         self.pause_thread(.1)
-        if not soski_pet:
-            waiting_time = 3
-            timer = time.time()
-            while not soski_pet and time.time() - timer < waiting_time:
-                [(x, y)] = self.fishing_window.get_object('move_to_supplier')
-                self.q.new_task('mouse',
-                                [[(x, y+80)], False, 'RIGHT', False, False, False],
-                                self.fishing_window)
-                self.pause_thread(0.6)
-                self.q.new_task('mouse',
-                            [self.fishing_window.get_object('move_to_supplier'), False, 'LEFT', 'no click', False, False],
-                            self.fishing_window)
-                self.pause_thread(0.4)
-                soski_pet = self.fishing_window.get_object('soski_pet', search=True)
-                self.pause_thread(0.1)
-
-        self.send_message(f'soski_pet {soski_pet}')
+        if soski_pet:
+            pass
+            # self.send_message('soski_pet recorded')
+        else:
+            self.send_message('Error soski_pet search')
 
         baits = self.fishing_window.get_object('baits', search=True)
         if baits:
