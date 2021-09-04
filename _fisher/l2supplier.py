@@ -108,10 +108,10 @@ class Supplier:
             self.stop_supplier()
             self.send_message('ERROR start_supplier()')
 
-        waiting_time = 80
+        waiting_time = 60
         self.send_message(f'Supplier will start in ...{waiting_time}')
         time.sleep(waiting_time)
-
+        self.send_message(f'Supplier is AVAILABLE')
         self.current_state[0] = 'available'
         while not self.exit_is_set:
 

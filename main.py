@@ -341,6 +341,9 @@ if __name__ == '__main__':
             fisher_attempts[fisher.fisher_id] += fisher.attempt_counter[0]
             next_supplying_attempt[fisher.fisher_id] = fisher.next_supplying_counter[0]
 
+        if FishService.has_supplier:
+            FishService.suppliers[0].current_state[0] = 'busy'
+
         FishService.pause_fishers()
 
         closing_time = 50  # awaiting fishers to stop 50 sec is recommended

@@ -424,18 +424,18 @@ class ActionQueue:
             args.append('alt')
             for i in args:
                 win32api.keybd_event(VK_CODE[i], 0, 0, 0)
-                time.sleep(0.1)
+                time.sleep(0.13)
 
             [(temp_x, temp_y)] = params[1]
             self.mouse.position = (temp_x + delta_x, temp_y + delta_y)
-            time.sleep(0.1)
+            time.sleep(0.13)
 
             for i in args:
                 win32api.keybd_event(VK_CODE[i], 0, win32con.KEYEVENTF_KEYUP, 0)
-                time.sleep(0.1)
+                time.sleep(0.13)
 
             self.mouse.release(Button.left)
-            time.sleep(0.1)
+            time.sleep(0.13)
             return
 
         if params[1] and params[4] == 'drag_and_drop_right':

@@ -724,7 +724,6 @@ class Fisher:
             (x, y) = sorted[i]
             # print('temp_y_0', temp_y_0)
             if abs(y - temp_y_0) < 10 and y != temp_y_0:
-                print('abs(y - temp_y_0)', abs(y - temp_y_0))
                 sorted[i] = (x, temp_y_0)
             else:
                 temp_y_0 = y
