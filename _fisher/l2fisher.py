@@ -434,7 +434,7 @@ class Fisher:
         return True
 
     def actions_between_fishing_rod_casts(self):
-        self.send_message(f'current_state5 {self.current_state[0]}')
+        # self.send_message(f'current_state5 {self.current_state[0]}')
         # function:
         # current attempts update
         # overweight and soski+baits correction if needed
@@ -635,7 +635,7 @@ class Fisher:
         # while time.time() - temp_timer2 < waiting_time2 and not self.fishing_window.is_exchange_menu():
         #     self.send_trade_to_supplier()
         #     self.pause_thread(6)
-        self.send_message(f'current_state2 {self.current_state[0]}')
+        # self.send_message(f'current_state2 {self.current_state[0]}')
         if not self.search_object_with_click(self.fishing_window.is_exchange_menu,
                                              self.fishing_window.get_object('trade_supplier', False), 20, 4):
             self.fishing_window.start_accurate_search()
@@ -681,7 +681,7 @@ class Fisher:
         self.requested_items_to_supply_d['soski_pet'] = 0
         self.requested_items_to_supply_d['potion'] = 0
 
-        self.send_message(f'current_state3 {self.current_state[0]}')
+        # self.send_message(f'current_state3 {self.current_state[0]}')
         self.next_supplying_counter[0] = self.attempt_counter[0] + self.send_counter
         self.send_message(f'NEXT SUPPLYING ATTEMPT {self.next_supplying_counter[0]}')
 

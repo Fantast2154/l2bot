@@ -548,10 +548,17 @@ class FishingService:
                             #     for i in range(waiting_time):
                             #         self.send_message(f'{waiting_time - i} sec')
                             #         time.sleep(1)
+
+                            self.send_message('')
+                            self.send_message('=========================================')
                             if machine_id != self.machine_id:
                                 self.send_message(f'OUTER MACHINE SUPPLYING REQUEST  fisher_{fisher_id}')
+
                             else:
                                 self.send_message(f'LOCAL MACHINE SUPPLYING REQUEST.  fisher_{fisher_id}')
+
+                            self.send_message('=========================================')
+                            self.send_message('')
 
 
                             if machine_id != self.machine_id:

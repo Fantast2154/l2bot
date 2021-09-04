@@ -265,7 +265,7 @@ class ActionQueue:
             autohotpy.moveMouseToPosition(dot[0], dot[1])
 
     def turn(self, x, y):
-        print('WOLK DAN STRIT EN TORN KORNAR')
+        # print('WOLK DAN STRIT EN TORN KORNAR')
         # if not self.auto_py_started:
         auto_py = AutoHotPy()
         auto_py.registerExit(auto_py.ESC, auto_py.stop)
