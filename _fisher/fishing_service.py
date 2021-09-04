@@ -494,6 +494,8 @@ class FishingService:
         self.fishing_service_client.client_send()
 
         self.fishers_request = ''
+        self.fishers_items.clear()
+        self.fishers_who_request.clear()
         # if self.command_was_sent:
         # self.command[0] = self.none_command[0]
         # self.command_was_sent = False
