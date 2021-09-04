@@ -120,7 +120,7 @@ if __name__ == '__main__':
     global_program_timing = time.time()
     running_max_time = custom_personal_data.program_timer
     fisher_attempts = [0] * custom_personal_data.number_of_fishers
-
+    next_supplying_attempt = [0] * custom_personal_data.number_of_fishers
     server_restart_module_activated = False
 
     while True:
@@ -248,6 +248,7 @@ if __name__ == '__main__':
             time.sleep(10)
             for fisher in FishService.fishers:
                 fisher.attempt_counter[0] = fisher_attempts[fisher.fisher_id]
+                fisher.next_supplying_counter[0] = next_supplying_attempt[fisher.fisher_id]
 
         relaunch_timer = time.time()
         pause_switch = True
@@ -338,6 +339,7 @@ if __name__ == '__main__':
 
         for fisher in FishService.fishers:
             fisher_attempts[fisher.fisher_id] += fisher.attempt_counter[0]
+            next_supplying_attempt[fisher.fisher_id] = fisher.next_supplying_counter[0]
 
         FishService.pause_fishers()
 

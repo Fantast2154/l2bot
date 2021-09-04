@@ -68,7 +68,8 @@ class Fisher:
         #     self.send_counter = 4
         # if self.fisher_id == 1:
         #     self.send_counter = 6
-        self.next_supplying_counter = self.send_counter
+        self.next_supplying_counter = manager.list()
+        self.next_supplying_counter.append(self.send_counter)
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -219,6 +220,8 @@ class Fisher:
                 if self.paused[0] == 0:
                     break
                 self.pause_thread(1)
+
+            self.current_state[0] = 'fishing'
             self.send_message('unpaused')
             self.pause_thread(2 * self.fisher_id)
         else:
@@ -451,8 +454,8 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.next_supplying_counter or self.supply_now[0]:
-            print('supply now')
+        if self.attempt_counter[0] == self.next_supplying_counter[0] or self.supply_now[0]:
+            # print('supply now')
             self.supply_now[0] = False
             self.attack()
             self.trading()
@@ -523,12 +526,17 @@ class Fisher:
         self.soski_pet = 0
 
         soski = self.recognize_number(self.fishing_window.get_object('soski'))
+        self.send_message(f'soski {soski}')
         time.sleep(5)
-        baits = self.recognize_number(self.fishing_window.get_object('baits'))
-        time.sleep(5)
-        soski_pet = self.recognize_number(self.fishing_window.get_object('soski_pet'))
 
+        baits = self.recognize_number(self.fishing_window.get_object('baits'))
+        self.send_message(f'baits {baits}')
+        time.sleep(5)
+
+        soski_pet = self.recognize_number(self.fishing_window.get_object('soski_pet'))
+        self.send_message(f'soski_pet {soski_pet}')
         self.pause_thread(1)
+
         if self.baits_max - baits > 0:
             required_dbaits = self.baits_max - baits
         else:
@@ -674,8 +682,8 @@ class Fisher:
         self.requested_items_to_supply_d['potion'] = 0
 
         self.send_message(f'current_state3 {self.current_state[0]}')
-        self.next_supplying_counter = self.attempt_counter[0] + self.send_counter
-        self.send_message(f'NEXT SUPPLYING ATTEMPT {self.next_supplying_counter}')
+        self.next_supplying_counter[0] = self.attempt_counter[0] + self.send_counter
+        self.send_message(f'NEXT SUPPLYING ATTEMPT {self.next_supplying_counter[0]}')
 
         # self.send_counter += 3
         self.current_state[0] = 'fishing'
@@ -1125,7 +1133,6 @@ class Fisher:
         while time.time() - timer < recognition_time:
             result = self.fishing_window.recognize_number(coordinates)
             if result is not None:
-                print(result)
                 return result
             self.pause_thread(2)
         return 0
