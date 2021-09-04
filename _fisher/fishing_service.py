@@ -539,7 +539,8 @@ class FishingService:
                                         continue
 
                             for fisher_c in self.fishers:
-                                self.send_message(f'FISHER3 {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
+                                self.send_message(
+                                    f'FISHER3 {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
                             # time.sleep(1)
                             # if machine_id != self.machine_id:
                             #     self.send_message('OUTER MACHINE SUPPLYING REQUEST')
@@ -559,7 +560,6 @@ class FishingService:
 
                             self.send_message('=========================================')
                             self.send_message('')
-
 
                             if machine_id != self.machine_id:
                                 timer = time.time()
@@ -582,7 +582,8 @@ class FishingService:
                                     time.sleep(0.5)
 
                             for fisher_c in self.fishers:
-                                self.send_message(f'FISHER4 {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
+                                self.send_message(
+                                    f'FISHER4 {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
 
                             self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
                             time.sleep(2)
@@ -612,18 +613,24 @@ class FishingService:
                             time.sleep(.1)
                             if machine_id != self.machine_id:
                                 self.send_command(machine_id, '', -2, '', highpriority=1,
-                                                  highpriority_command=f'self.resume_fishers()')
+                                                  highpriority_command=f'self.resume_fishers_who_paused()')
                                 time.sleep(2)
                             self.send_message('BOYKOVSKOE FINISHED')
                             self.suppliers[0].current_state[0] = 'available'
                             time.sleep(2)
 
                             for fisher_c in self.fishers:
-                                self.send_message(f'FISHER5 {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
+                                self.send_message(
+                                    f'FISHER5 {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
                     return who_has_been_supplied
                     # exit_ = True
                 else:
                     continue
+
+    def resume_fishers_who_paused(self):
+        for fisher in self.fishers:
+            if fisher.current_state[0] == 'paused':
+                self.resume_fishers(fisher.fisher_id)
 
     def offline_supply(self):
         for fisher in self.fishers:
@@ -669,7 +676,7 @@ class FishingService:
             else:
                 previous_command = self.previous_command_id
 
-            #if recipient == self.machine_id and current_command_id != self.previous_command_id:
+            # if recipient == self.machine_id and current_command_id != self.previous_command_id:
             if recipient == self.machine_id and current_command_id != previous_command:
                 # print('!!!!!!!!!command_sentence', command_sentence)
                 if not command_sentence[5]:
@@ -759,7 +766,7 @@ class FishingService:
                 if who_to_supply:
                     # who_has_been_supplied = self.start_supply(who_to_supply)
                     who_has_been_supplied = self.start_supply_boykovskoe_svetloe(who_to_supply)
-                    #who_requests_supplying_new = {}
+                    # who_requests_supplying_new = {}
 
                 # for fisher in self.fishers:
                 #     if fisher.current_state[0] == 'paused':
@@ -793,7 +800,8 @@ class FishingService:
                                     if supped_fisher_id == fisher_id_to_supply:
                                         if stuff_to_supply != supplied_stuff:
                                             if who_to_supply_.get(machine_id1, None) is not None:
-                                                who_to_supply_[machine_id1].update({fisher_id_to_supply: stuff_to_supply})
+                                                who_to_supply_[machine_id1].update(
+                                                    {fisher_id_to_supply: stuff_to_supply})
                                             else:
                                                 who_to_supply_[machine_id1] = {fisher_id_to_supply: stuff_to_supply}
                                         else:
