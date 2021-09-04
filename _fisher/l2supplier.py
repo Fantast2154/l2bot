@@ -24,7 +24,7 @@ class Supplier:
 
         # communication with fisher service
         self.current_state = manager.list()
-        self.current_state.append('available')
+        self.current_state.append('busy')
         # current_state params
         # 'available'
         # 'busy'
@@ -107,6 +107,11 @@ class Supplier:
         if not self.start_supplier():
             self.stop_supplier()
             self.send_message('ERROR start_supplier()')
+
+        waiting_time = 80
+        self.send_message(f'Supplier will start in ...{waiting_time}')
+        time.sleep(waiting_time)
+
         self.current_state[0] = 'available'
         while not self.exit_is_set:
 
