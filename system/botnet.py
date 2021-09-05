@@ -21,10 +21,7 @@ class Server:
         self.server.listen(10)
 
         self.bots_list = []
-        self.bots_dict = {}
-        #self.bots_processing_list = []
-        self.bots_processing_dict = {}
-        self.bots_processing_set = set()
+        self.bots_processing_list = []
         self.bots_data_collection = []
         self.exit_is_set = False
 
@@ -34,23 +31,13 @@ class Server:
     def data_accepting(self):
         message_time = time.time()
         message_time_cooldown = 120
-        message_time2 = time.time()
-        message_time_cooldown2 = 5
         while not self.exit_is_set:
-            if time.time() - message_time2 >= message_time_cooldown2:
-                print('LEN bots_dict', len(self.bots_dict))
-                print('LEN bots_processing_set', len(self.bots_processing_set))
-                message_time2 = time.time()
-
-            if self.bots_dict:
-                for key, bot in self.bots_dict.items():
-                    if key not in self.bots_processing_set:
-                        print('BOT key NOT IN', key)
-
-                        threading.Thread(target=self.data_rcv, args=(bot, key)).start()
-                        #self.data_rcv(bot, index)
-                    else:
-                        pass
+            # try:
+            if self.bots_list:
+                for bot in self.bots_list.copy():
+                    if bot not in self.bots_processing_list:
+                        threading.Thread(target=self.data_rcv, args=(bot,)).start()
+                        #self.data_rcv(bot)
             else:
                 if time.time() - message_time >= message_time_cooldown:
                     self.server_message('Сервер пуст.')
@@ -60,27 +47,21 @@ class Server:
             #     self.bots_list.clear()
             #     self.bots_processing_list.clear()
 
-    def data_rcv(self, b, key):
-        print('key', key)
-        self.bots_processing_set.add(key)
+    def data_rcv(self, b):
+        self.bots_processing_list.append(b)
         try:
             data_ = b.recv(self.BUFFERSIZE_TEMPORARY)
+
             if data_:
                 decoded_data = pickle.loads(data_)
                 print(datetime.datetime.now().time(), decoded_data)
                 self.send_data(data_)
-                try:
-                    self.bots_processing_set.remove(key)
-                except:
-                    pass
+                self.bots_processing_list.remove(b)
         except:
             try:
-                try:
-                    self.bots_processing_set.remove(key)
-                except:
-                    pass
+                self.bots_processing_list.remove(b)
                 b.close()
-                del self.bots_dict[key]
+                self.bots_list.remove(b)
                 self.server_message(f'Клиент удалён.')
             except:
                 print('Клиент не в списке!!! Вот и всё...')
@@ -99,9 +80,7 @@ class Server:
         self.server_message('Сервер запущен.')
         while not self.exit_is_set:
             clientsocket, address = self.server.accept()
-            key = random.randint(0, 100000000)
-            #self.bots_list.append(clientsocket)
-            self.bots_dict[key] = clientsocket
+            self.bots_list.append(clientsocket)
             self.server_message('Бот установил связь.')
 
     def server_start(self):
@@ -191,7 +170,7 @@ class Client:
 
     def client_send(self):
 
-        self.count += 1
+        #self.count += 1
         #print('server.send')
         #print('self.connected_m[0]', self.connected_m[0])
 
@@ -203,7 +182,7 @@ class Client:
         if self.connected_m[0]:
         #if self.connected:
             try:
-                print('client_send', self.count)
+                #print('client_send', self.count)
                 self.server[0].send(encoded_data_to_send)
             except:
                 self.client_message('ОШИБКА ОТПРАВКИ ДАННЫХ')
@@ -220,10 +199,8 @@ class Client:
         # return self.dtr[0]
 
     def data_accepting(self):
-        while self.exit_is_set:
-            print('data_accepting self.connected_m[0]', self.connected_m[0])
+        while not self.exit_is_set:
             if self.connected_m[0]:
-            #if self.connected:
                 try:
                     if self.has_received:
                         self.bots_data_collection.clear()
