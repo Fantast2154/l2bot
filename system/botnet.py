@@ -31,20 +31,20 @@ class Server:
         message_time = time.time()
         message_time_cooldown = 120
         while not self.exit_is_set:
-            try:
-                if self.bots_list:
-                    for bot in self.bots_list.copy():
-                        if bot not in self.bots_processing_list:
-                            #threading.Thread(target=self.data_rcv, args=(bot,)).start()
-                            self.data_rcv(bot)
-                else:
-                    if time.time() - message_time >= message_time_cooldown:
-                        self.server_message('Сервер пуст.')
-                        message_time = time.time()
-            except:
-                self.server_message('ОШИБКА ОТПРАВКИ ДАННЫХ.')
-                self.bots_list.clear()
-                self.bots_processing_list.clear()
+            #try:
+            if self.bots_list:
+                for bot in self.bots_list.copy():
+                    if bot not in self.bots_processing_list:
+                        #threading.Thread(target=self.data_rcv, args=(bot,)).start()
+                        self.data_rcv(bot)
+            else:
+                if time.time() - message_time >= message_time_cooldown:
+                    self.server_message('Сервер пуст.')
+                    message_time = time.time()
+            # except:
+            #     self.server_message('ОШИБКА ОТПРАВКИ ДАННЫХ.')
+            #     self.bots_list.clear()
+            #     self.bots_processing_list.clear()
 
     def data_rcv(self, b):
         self.bots_processing_list.append(b)
