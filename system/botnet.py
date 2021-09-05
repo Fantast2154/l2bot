@@ -13,7 +13,7 @@ class Server:
         self.HOST = ''
         self.PORT = 27015
         self.ADDRESS = (self.HOST, self.PORT)
-        self.BUFFERSIZE_TEMPORARY = 1000
+        self.BUFFERSIZE_TEMPORARY = 2048
 
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind(self.ADDRESS)
@@ -28,13 +28,23 @@ class Server:
         print(datetime.datetime.now().time(), 'Сервер:', text)
 
     def data_accepting(self):
+        message_time = time.time()
+        message_time_cooldown = 120
         while not self.exit_is_set:
-            if not self.bots_list:
-                self.bots_data_collection.clear()
-            else:
-                for bot in self.bots_list:
-                    if bot not in self.bots_processing_list:
-                        threading.Thread(target=self.data_rcv, args=(bot,)).start()
+            try:
+                if self.bots_list:
+                    for bot in self.bots_list.copy():
+                        if bot not in self.bots_processing_list:
+                            #threading.Thread(target=self.data_rcv, args=(bot,)).start()
+                            self.data_rcv(bot)
+                else:
+                    if time.time() - message_time >= message_time_cooldown:
+                        self.server_message('Сервер пуст.')
+                        message_time = time.time()
+            except:
+                self.server_message('ОШИБКА ОТПРАВКИ ДАННЫХ.')
+                self.bots_list.clear()
+                self.bots_processing_list.clear()
 
     def data_rcv(self, b):
         self.bots_processing_list.append(b)
@@ -44,8 +54,6 @@ class Server:
             if data_:
                 decoded_data = pickle.loads(data_)
                 print(datetime.datetime.now().time(), decoded_data)
-                #pprint.pprint(decoded_data, width=1)
-                self.bots_data_collection.append(decoded_data)
                 self.send_data(data_)
                 self.bots_processing_list.remove(b)
         except:
@@ -58,7 +66,6 @@ class Server:
                 print('Клиент не в списке!!! Вот и всё...')
 
     def send_data(self, data):
-
         for bot_ in self.bots_list:
             try:
                 bot_.send(data)
@@ -92,13 +99,23 @@ class Client:
 
         self.PORT = 27015
         self.ADDRESS = (self.HOST, self.PORT)
-        self.BUFFERSIZE_TEMPORARY = 1000
+        self.BUFFERSIZE_TEMPORARY = 2048
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connected = False
+        self.reconnected = False
         self.has_received = False
         self.tries = 0
         self.exit_is_set = False
 
+        self.bots_list = []
+        #manager = Manager()
+        #self.bots_data_collection = manager.list()
+        #self.bots_data_collection.append(0)
+        self.bots_data_collection = {}
+
+        self.connect()
+
+    def connect(self):
         while not self.connected and not self.exit_is_set:
             if self.tries >= 2:
                 self.connected = False
@@ -108,6 +125,7 @@ class Client:
                 self.server.connect(self.ADDRESS)
                 self.connected = True
                 self.client_message('Соединение установлено')
+                self.reconnected = False
                 self.data_accepting_thread()
             except:
                 self.client_message(
@@ -117,11 +135,16 @@ class Client:
                 self.client_message(f'Попытка подключения {self.tries}')
                 time.sleep(1)
 
-        self.bots_list = []
-        #manager = Manager()
-        #self.bots_data_collection = manager.list()
-        #self.bots_data_collection.append(0)
-        self.bots_data_collection = {}
+    def autoconnect(self):
+        self.client_message('________________ВОЗНИКЛИ ПРОБЛЕМЫ С СОЕДИНЕНИЕМ. ЗАПУЩЕНО АВТОПОДКЛЮЧЕНИЕ________________')
+        while not self.reconnected:
+            self.connect()
+
+            if self.connected:
+                self.reconnected = True
+            else:
+                time.sleep(60)
+
 
     def is_connected(self):
         return self.connected
@@ -140,6 +163,8 @@ class Client:
             self.server.send(encoded_data_to_send)
         except ConnectionResetError:
             self.server.close()
+            self.connected = False
+            self.autoconnect()
 
     def client_receive_message(self):
         #self.dtr[0] = self.bots_data_collection
@@ -167,6 +192,8 @@ class Client:
 
             except ConnectionResetError:
                 self.server.close()
+                self.connected = False
+                self.autoconnect()
 
     def data_accepting_thread(self):
         t = threading.Thread(target=self.data_accepting)
@@ -176,10 +203,10 @@ class Client:
 
 
 if __name__ == '__main__':
-    s = Server(123)
+    s = Server(1)
     s.server_start()
 
-    # time.sleep(2)
+    #time.sleep(10)
 
-    # c = Client()
-    # c.connect_to_server()
+    #c = Client(1, [0], [0])
+    #c.connect_to_server()
