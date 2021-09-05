@@ -152,7 +152,11 @@ class FishingService:
         self.has_supplier = False
         self.paused_during_supplying = (False, False)
 
-        self.fishing_service_client = Client(self.machine_id, self.data_to_transmit, self.data_to_receive)
+        self.is_connected = manager.list()
+        self.is_connected.append(False)
+        self.server_item = manager.list()
+        self.server_item.append(0)
+        self.fishing_service_client = Client(self.machine_id, self.data_to_transmit, self.data_to_receive, self.is_connected, self.server_item)
 
         if self.number_of_fishers < 1 or self.number_of_fishers > 3:
             print('FISHING SERVICE ERROR')
@@ -927,19 +931,19 @@ class FishingService:
         # self.data_to_transmit.append(0)
         # self.data_to_receive.append(0)
 
-        if self.fishing_service_client.is_connected():
-            print('IS CONNECTED')
-            server_update_process1 = Process(target=self.process_commands)
-            server_update_process2 = Process(target=self.proc_serv_dat)
-            server_update_process3 = Process(target=self.up_to_serv)
-            server_update_process1.start()
-            server_update_process2.start()
-            server_update_process3.start()
+        #if self.fishing_service_client.is_connected():
+        #print('IS CONNECTED')
+        server_update_process1 = Process(target=self.process_commands)
+        server_update_process2 = Process(target=self.proc_serv_dat)
+        server_update_process3 = Process(target=self.up_to_serv)
+        server_update_process1.start()
+        server_update_process2.start()
+        server_update_process3.start()
 
-            return server_update_process1, server_update_process2, server_update_process3
+        return server_update_process1, server_update_process2, server_update_process3
 
-        else:
-            print('NO CONNECTION')
+        #else:
+            #print('NO CONNECTION')
             # server_update_process3 = Process(target=self.offline_requests)
             # server_update_process3.start()
 
