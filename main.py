@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
             for i in range(custom_personal_data.number_of_windows):
                 os.startfile(custom_personal_data.launcher_path)
-                time.sleep(16)
+                time.sleep(40)
 
             name_list, hash_list = get_l2windows_param()
             n = len(name_list)
@@ -189,7 +189,6 @@ if __name__ == '__main__':
             # time.sleep(1)
             # process_wincap.terminate()
             # win_capture.stop()
-
             return windows, queue, process_queue, process_wincap
 
 
@@ -227,7 +226,11 @@ if __name__ == '__main__':
                 # time.sleep(1)
                 # windows, queue, process_queue, process_wincap = tue()
             time.sleep(2)
-            print('main: RELAUNCH COMPLETED ===========================================')
+            print()
+            print('main =================================================')
+            print('main: RELAUNCH COMPLETED')
+            print('main =================================================')
+            print()
 
         # creating gui class
         if gui_window is None:
@@ -248,15 +251,17 @@ if __name__ == '__main__':
             time.sleep(10)
             for fisher in FishService.fishers:
                 fisher.attempt_counter[0] = fisher_attempts[fisher.fisher_id]
-                fisher.next_supplying_counter[0] = next_supplying_attempt[fisher.fisher_id]
+                if not next_supplying_attempt[fisher.fisher_id]:
+                    fisher.next_supplying_counter[0] = fisher.send_counter
+                else:
+                    fisher.next_supplying_counter[0] = next_supplying_attempt[fisher.fisher_id]
 
         relaunch_timer = time.time()
         pause_switch = True
         relaunch_windows = False
         counter = 0
-        time_between_msg = 60
+        time_between_msg = 180
         program_exit = False
-
         visible_true = False
         visible_true_timer = 60
         while True:  # Event Loop
@@ -283,6 +288,11 @@ if __name__ == '__main__':
                 server_restart_module_activated = True
 
                 break
+
+            if win_capture.fatal_error[0]:
+                print(f'main: FATAL WINDOW ERROR DETECTED')
+                event = 'Relaunch windows'
+                time.sleep(.1)
 
             if not visible_true:
                 if time.time() - global_program_timing > visible_true_timer:
@@ -320,6 +330,7 @@ if __name__ == '__main__':
             if event == sg.WIN_CLOSED or event == 'Exit':
                 print('main: PROGRAM ENDS...')
                 program_exit = True
+                time.sleep(.1)
                 break
 
             # FIXME ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FISHER DESTROYES HIMSELF..
@@ -328,47 +339,60 @@ if __name__ == '__main__':
                 gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
             if event == 'Relaunch windows':
-                print('main: RELAUNCHING WINDOWS ===========================================')
+                print()
+                print('main =================================================')
+                print('main: RELAUNCHING WINDOWS')
+                print('main =================================================')
+                print()
                 relaunch_windows = True
+                time.sleep(.1)
                 break
 
             if event == 'supply NOW':
                 print('main: SUPPLY NOW EVENT DETECTED')
                 for fisher in FishService.fishers:
                     fisher.supply_now_function()
+                time.sleep(.1)
 
-        for fisher in FishService.fishers:
-            fisher_attempts[fisher.fisher_id] += fisher.attempt_counter[0]
-            next_supplying_attempt[fisher.fisher_id] = fisher.next_supplying_counter[0]
+            # if event == 'save logs':
+            #     print('main: SAVE LOGS EVENT DETECTED')
+            #
+            #     time.sleep(.1)
+        if not win_capture.fatal_error[0]:
+            for fisher in FishService.fishers:
+                fisher_attempts[fisher.fisher_id] += fisher.attempt_counter[0]
+                next_supplying_attempt[fisher.fisher_id] = fisher.next_supplying_counter[0]
 
-        if FishService.has_supplier:
-            FishService.suppliers[0].current_state[0] = 'busy'
+            # if FishService.has_supplier:
+            #     FishService.suppliers[0].current_state[0] = 'busy'
 
-        FishService.pause_fishers()
+            FishService.pause_fishers()
 
-        closing_time = 50  # awaiting fishers to stop 50 sec is recommended
-        timer = time.time()
-        counter = 0
-        fishers_are_paused = [False] * FishService.number_of_fishers
-        while time.time() - timer < closing_time:
-            counter += 1
-            for i in range(FishService.number_of_fishers):
-                if not fishers_are_paused[i]:
-                    if FishService.fishers[i].current_state[0] == 'paused':
-                        fishers_are_paused[i] = True
-            if all(fishers_are_paused):
-                break
-            time.sleep(1)
+            closing_time = 50  # awaiting fishers to stop 50 sec is recommended
+            timer = time.time()
+            counter = 0
+            fishers_are_paused = [False] * FishService.number_of_fishers
+            while time.time() - timer < closing_time:
+                counter += 1
+                for i in range(FishService.number_of_fishers):
+                    if not fishers_are_paused[i]:
+                        if FishService.fishers[i].current_state[0] == 'paused':
+                            fishers_are_paused[i] = True
+                if all(fishers_are_paused):
+                    break
+                time.sleep(1)
 
-        closing_time = 10
-        timer = time.time()
-        counter = 0
-        while time.time() - timer < closing_time:
-            counter += 1
-            print(f'main: Awaiting fishers to kill a monster ..... {closing_time - counter}')
-            time.sleep(1)
+            closing_time = 10
+            timer = time.time()
+            counter = 0
+            while time.time() - timer < closing_time:
+                counter += 1
+                # print(f'main: Awaiting fishers to kill a monster ..... {closing_time - counter}')
+                time.sleep(1)
 
-        FishService.stop()
+            FishService.stop()
+        else:
+            FishService.emergency_termination()
         queue.stop()
 
         process_wincap.terminate()
@@ -385,6 +409,11 @@ if __name__ == '__main__':
             waiting_time = 1500  # restart timer 1500 is recommended
             timer = time.time()
             counter = 0
+            print()
+            print('main =================================================')
+            print('main: SERVER RESTART')
+            print('main =================================================')
+            print()
             while time.time() - timer < waiting_time:
                 print(f'the program will be relaunched in ..... {(waiting_time - counter) // 60} minutes')
                 counter += 60
@@ -395,9 +424,12 @@ if __name__ == '__main__':
 
         if relaunch_windows or force_restart:
             for window in windows:
-                print('restart', window.hwnd)
-                handle = window.hwnd
-                win32gui.PostMessage(handle, win32con.WM_CLOSE, 0, 0)
+                try:
+                    print('restart', window.hwnd)
+                    handle = window.hwnd
+                    win32gui.PostMessage(handle, win32con.WM_CLOSE, 0, 0)
+                except:
+                    pass
 
         time.sleep(3)
 

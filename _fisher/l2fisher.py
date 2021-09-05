@@ -63,7 +63,7 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 900
+        self.send_counter = 1000
         # if self.fisher_id == 0:
         #     self.send_counter = 4
         # if self.fisher_id == 1:
@@ -169,7 +169,7 @@ class Fisher:
         # trial rod case
         self.current_state[0] = 'not fishing'
         delay = 7
-        delay_correction = delay + 22 * self.fisher_id
+        delay_correction = delay + 14 * self.fisher_id
         self.pause_thread(delay_correction)
         self.send_message(f'fisher will start in ...{delay_correction}')
 
@@ -905,8 +905,7 @@ class Fisher:
 
     def update_current_attempt(self):
         self.attempt_counter[0] += 1
-        self.send_message(f'Attempt # {self.attempt_counter[0]}')
-        self.send_message(f'Attempts to next supplying {self.next_supplying_counter[0] - self.attempt_counter[0]}')
+        self.send_message(f'# {self.attempt_counter[0]} ns {self.next_supplying_counter[0] - self.attempt_counter[0]}')
 
     def send_mail(self):
         pass

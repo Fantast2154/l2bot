@@ -538,9 +538,6 @@ class FishingService:
                                     else:
                                         continue
 
-                            for fisher_c in self.fishers:
-                                self.send_message(
-                                    f'FISHER3 {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
                             # time.sleep(1)
                             # if machine_id != self.machine_id:
                             #     self.send_message('OUTER MACHINE SUPPLYING REQUEST')
@@ -581,9 +578,6 @@ class FishingService:
                                         break
                                     time.sleep(0.5)
 
-                            for fisher_c in self.fishers:
-                                self.send_message(
-                                    f'FISHER4 {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
 
                             self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
                             time.sleep(2)
@@ -599,7 +593,7 @@ class FishingService:
                                 who_has_been_supplied[machine_id].update(fishers_and_stuff)
                             else:
                                 who_has_been_supplied[machine_id] = fishers_and_stuff
-                            self.send_message('BOYKOVSKOE AWAITING')
+                            # self.send_message('BOYKOVSKOE AWAITING')
                             emergency_exit_time = 70
                             emergency_exit_timer = time.time()
                             while time.time() - emergency_exit_timer < emergency_exit_time and not \
@@ -615,13 +609,9 @@ class FishingService:
                                 self.send_command(machine_id, '', -2, '', highpriority=1,
                                                   highpriority_command=f'self.resume_fishers_who_paused()')
                                 time.sleep(2)
-                            self.send_message('BOYKOVSKOE FINISHED')
+                            # self.send_message('BOYKOVSKOE FINISHED')
                             self.suppliers[0].current_state[0] = 'available'
                             time.sleep(2)
-
-                            for fisher_c in self.fishers:
-                                self.send_message(
-                                    f'FISHER5 {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
                     return who_has_been_supplied
                     # exit_ = True
                 else:
@@ -823,7 +813,10 @@ class FishingService:
 
         available_time = time.time()
         timer_fishing_service_start = time.time()
-        self.server_update_process1, self.server_update_process2, self.server_update_process3 = self.server_update_start()
+        try:
+            self.server_update_process1, self.server_update_process2, self.server_update_process3 = self.server_update_start()
+        except:
+            pass
         flag = False
         fisher_id = False
 
@@ -833,11 +826,7 @@ class FishingService:
                 if fisher.current_state[0] == 'requests overweight check':
                     fisher_id = fisher.fisher_id
 
-                    print(f'fisher_{fisher_id}', fisher.current_state[0])
-                    # self.pause_fishers(fisher.fisher_id, except_param=True)
-
                     for fisher_a in self.fishers:
-                        self.send_message(f'FISHER {fisher_a.fisher_id} current_state {fisher_a.current_state[0]}')
                         if fisher_a.current_state[0] != 'requests overweight check' and fisher_a.fisher_id != fisher_id:
                             self.pause_fishers(fisher_a.fisher_id)
 
@@ -872,9 +861,6 @@ class FishingService:
                         0] == 'busy' and time.time() - emergency_exit_timer < emergency_exit_time:
                         time.sleep(.1)
 
-                    for fisher_c in self.fishers:
-                        self.send_message(f'FISHER2 {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
-
                     self.fishers[fisher_id].send_message(f'---------------------------EXIT IS HERE')
 
             time.sleep(1)
@@ -882,9 +868,14 @@ class FishingService:
     def stop(self):
         self.exit_is_set = True
 
-        self.server_update_process1.terminate()
-        self.server_update_process2.terminate()
-        self.server_update_process3.terminate()
+        try:
+
+            self.server_update_process1.terminate()
+            self.server_update_process2.terminate()
+            self.server_update_process3.terminate()
+
+        except:
+            pass
 
         # print('server_update_process1.is_alive() AFTER', self.server_update_process1.is_alive())
         # print('server_update_process2.is_alive() AFTER', self.server_update_process2.is_alive())
@@ -898,13 +889,7 @@ class FishingService:
 
         self.stop_fishers()
 
-        closing_time = 2
-        timer = time.time()
-        counter = 0
-        while time.time() - timer < closing_time:
-            counter += 1
-            self.send_message(f'thread stops in ..... {closing_time - counter}')
-            time.sleep(1)
+        time.sleep(2)
 
         self.send_message(f'stopped')
 
@@ -957,3 +942,34 @@ class FishingService:
             print('NO CONNECTION')
             # server_update_process3 = Process(target=self.offline_requests)
             # server_update_process3.start()
+
+    def emergency_termination(self):
+        try:
+            self.exit_is_set = True
+
+            try:
+
+                self.server_update_process1.terminate()
+                self.server_update_process2.terminate()
+                self.server_update_process3.terminate()
+
+            except:
+                pass
+
+            self.server_update_process1 = None
+            self.server_update_process2 = None
+            self.server_update_process3 = None
+
+            for process in self.process_fishers:
+                process.terminate()
+                time.sleep(1)
+                process.close()
+
+            for process in self.process_suppliers:
+                process.terminate()
+                time.sleep(1)
+                process.close()
+
+            self.send_message(f'emergency stopped')
+        except:
+            pass

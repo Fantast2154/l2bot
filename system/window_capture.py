@@ -102,6 +102,10 @@ class WindowCapture:
         self.accurate = manager.dict()
         self.object_position_and_size = manager.dict()
         self.bar_limits = manager.dict()
+        self.fatal_error = manager.list()
+        self.fatal_error.append(False)
+        self.fatal_window_hwnd = manager.list()
+        self.fatal_window_hwnd.append(0)
 
     def set_windows(self, windows_list):
         if windows_list:
@@ -126,6 +130,11 @@ class WindowCapture:
     #     self.send_message(f'destroyed')
 
     # @classmethod
+    def waiting_loop(self):
+
+        while self.fatal_error[0]:
+            time.sleep(.5)
+
     def capture_screen(self, accurate=False, object_position=(0, 0), object_size=(100, 100)):
         global screenshot
         w_screenshot = {}
@@ -174,8 +183,8 @@ class WindowCapture:
 
                 w_screenshot[game_window.hwnd] = temp
             else:
-
                 wDC = win32gui.GetWindowDC(hwnd_l)
+
                 dcObj = win32ui.CreateDCFromHandle(wDC)
                 cDC = dcObj.CreateCompatibleDC()
                 dataBitMap = win32ui.CreateBitmap()
@@ -228,7 +237,12 @@ class WindowCapture:
 
     def run(self):
         while not exit_event:
-            self.capture_screen()
+            try:
+                self.capture_screen()
+            except:
+                self.fatal_error[0] = True
+                self.waiting_loop()
+                continue
 
     def stop(self):
         global exit_event

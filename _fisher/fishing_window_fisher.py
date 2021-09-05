@@ -98,7 +98,9 @@ class FishingWindow(L2window):
     # [{hwnd1: [], hwnd2: []}]
 
     def update_screenshot(self):
+
         temp = self.screenshot[-1][self.hwnd][0]
+
         # while True:
         #     temp = self.screenshot[-1][0][0]
         #     cv2.imshow('BOYKO MALCHISHKA', temp)
@@ -113,6 +115,7 @@ class FishingWindow(L2window):
 
     def update_accurate_screenshot(self, object=False):
         if object:
+
             temp = self.screenshot[-1][self.hwnd]
             # print('=============================================')
             # print('1+++', type(self.screenshot[-1]))
