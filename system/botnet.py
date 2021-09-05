@@ -1,5 +1,6 @@
 import datetime
 import pprint
+import random
 import threading
 import socket
 import pickle
@@ -20,7 +21,10 @@ class Server:
         self.server.listen(10)
 
         self.bots_list = []
-        self.bots_processing_list = []
+        self.bots_dict = {}
+        #self.bots_processing_list = []
+        self.bots_processing_dict = {}
+        self.bots_processing_set = set()
         self.bots_data_collection = []
         self.exit_is_set = False
 
@@ -30,13 +34,23 @@ class Server:
     def data_accepting(self):
         message_time = time.time()
         message_time_cooldown = 120
+        message_time2 = time.time()
+        message_time_cooldown2 = 5
         while not self.exit_is_set:
-            # try:
-            if self.bots_list:
-                for bot in self.bots_list.copy():
-                    if bot not in self.bots_processing_list:
-                        threading.Thread(target=self.data_rcv, args=(bot,)).start()
-                        #self.data_rcv(bot)
+            if time.time() - message_time2 >= message_time_cooldown2:
+                print('LEN bots_dict', len(self.bots_dict))
+                print('LEN bots_processing_set', len(self.bots_processing_set))
+                message_time2 = time.time()
+
+            if self.bots_dict:
+                for key, bot in self.bots_dict.items():
+                    if key not in self.bots_processing_set:
+                        print('BOT key NOT IN', key)
+
+                        threading.Thread(target=self.data_rcv, args=(bot, key)).start()
+                        #self.data_rcv(bot, index)
+                    else:
+                        pass
             else:
                 if time.time() - message_time >= message_time_cooldown:
                     self.server_message('Сервер пуст.')
@@ -46,21 +60,27 @@ class Server:
             #     self.bots_list.clear()
             #     self.bots_processing_list.clear()
 
-    def data_rcv(self, b):
-        self.bots_processing_list.append(b)
+    def data_rcv(self, b, key):
+        print('key', key)
+        self.bots_processing_set.add(key)
         try:
             data_ = b.recv(self.BUFFERSIZE_TEMPORARY)
-
             if data_:
                 decoded_data = pickle.loads(data_)
                 print(datetime.datetime.now().time(), decoded_data)
                 self.send_data(data_)
-                self.bots_processing_list.remove(b)
+                try:
+                    self.bots_processing_set.remove(key)
+                except:
+                    pass
         except:
             try:
-                self.bots_processing_list.remove(b)
+                try:
+                    self.bots_processing_set.remove(key)
+                except:
+                    pass
                 b.close()
-                self.bots_list.remove(b)
+                del self.bots_dict[key]
                 self.server_message(f'Клиент удалён.')
             except:
                 print('Клиент не в списке!!! Вот и всё...')
@@ -79,7 +99,9 @@ class Server:
         self.server_message('Сервер запущен.')
         while not self.exit_is_set:
             clientsocket, address = self.server.accept()
-            self.bots_list.append(clientsocket)
+            key = random.randint(0, 100000000)
+            #self.bots_list.append(clientsocket)
+            self.bots_dict[key] = clientsocket
             self.server_message('Бот установил связь.')
 
     def server_start(self):
@@ -111,6 +133,7 @@ class Client:
         self.has_received = False
         self.tries = 0
         self.exit_is_set = False
+        self.count = 0
 
         self.bots_list = []
         # manager = Manager()
@@ -167,20 +190,23 @@ class Client:
         print(datetime.datetime.now().time(), f'Бот {self.id}', text)
 
     def client_send(self):
-        # print('client_send', data)
+
+        self.count += 1
         #print('server.send')
         #print('self.connected_m[0]', self.connected_m[0])
 
         data_to_encode = {self.id: self.dtt[0]}
+        #data_to_encode = {1: 2}
         # data_to_encode = {self.id: data}
         # data_to_encode = data
         encoded_data_to_send = pickle.dumps(data_to_encode)
         if self.connected_m[0]:
         #if self.connected:
             try:
+                print('client_send', self.count)
                 self.server[0].send(encoded_data_to_send)
             except:
-                #self.client_message('ОШИБКА ОТПРАВКИ ДАННЫХ')
+                self.client_message('ОШИБКА ОТПРАВКИ ДАННЫХ')
                 self.server[0].close()
                 #self.connected = False
                 self.connected_m[0] = False
@@ -195,7 +221,7 @@ class Client:
 
     def data_accepting(self):
         while self.exit_is_set:
-            #print('data_accepting self.connected_m[0]', self.connected_m[0])
+            print('data_accepting self.connected_m[0]', self.connected_m[0])
             if self.connected_m[0]:
             #if self.connected:
                 try:
@@ -207,7 +233,6 @@ class Client:
                     data_ = self.server[0].recv(self.BUFFERSIZE_TEMPORARY)
 
                     if data_:
-                        print('data_', data_)
                         decoded_data = pickle.loads(data_)
                         self.dtr[0] = decoded_data
                         self.bots_data_collection = decoded_data
@@ -215,7 +240,7 @@ class Client:
                         # print('CLIENT', self.bots_data_collection)
 
                 except:
-                    #self.client_message('ОШИБКА ПРИНЯТИЯ ДАННЫХ')
+                    self.client_message('ОШИБКА ПРИНЯТИЯ ДАННЫХ')
                     self.server[0].close()
                     #self.connected = False
                     self.connected_m[0] = False
@@ -231,10 +256,10 @@ class Client:
 
 
 if __name__ == '__main__':
-    #s = Server(1)
-    #s.server_start()
+    s = Server(1)
+    s.server_start()
 
     # time.sleep(10)
 
-    c = Client(1, [0], [0], [0], [0])
+    #c = Client(1, [0], [0], [0], [0])
     # c.connect_to_server()
