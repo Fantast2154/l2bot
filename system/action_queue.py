@@ -264,7 +264,7 @@ class ActionQueue:
             #   time.sleep(0.001)
             autohotpy.moveMouseToPosition(dot[0], dot[1])
 
-    def turn(self, x, y):
+    def turn(self, x, y, insert=False):
         # print('WOLK DAN STRIT EN TORN KORNAR')
         # if not self.auto_py_started:
         auto_py = AutoHotPy()
@@ -272,38 +272,48 @@ class ActionQueue:
         auto_py_thread = threading.Thread(target=auto_py.start)
         auto_py_thread.start()
         # self.auto_py_started = True
+        if insert:
+            auto_py.LEFT_CTRL.down()
+            auto_py.sleep()
+            auto_py.V.down()
+            auto_py.sleep()
+            auto_py.LEFT_CTRL.up()
+            auto_py.sleep()
+            auto_py.V.up()
+            auto_py.sleep()
 
-        time.sleep(0.02)
-        # self.smooth_move(auto_py, x, y)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
-        win32api.SetCursorPos((x, y))
-        stroke = InterceptionMouseStroke()
+        else:
+            time.sleep(0.02)
+            # self.smooth_move(auto_py, x, y)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
+            win32api.SetCursorPos((x, y))
+            stroke = InterceptionMouseStroke()
 
-        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_DOWN
-        auto_py.sendToDefaultMouse(stroke)
-        time.sleep(0.02)
-        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
-        auto_py.sendToDefaultMouse(stroke)
-        time.sleep(0.02)
+            stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_DOWN
+            auto_py.sendToDefaultMouse(stroke)
+            time.sleep(0.02)
+            stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
+            auto_py.sendToDefaultMouse(stroke)
+            time.sleep(0.02)
 
-        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_DOWN
-        auto_py.sendToDefaultMouse(stroke)
-        time.sleep(0.02)
-        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
-        auto_py.sendToDefaultMouse(stroke)
-        time.sleep(0.02)
+            stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_DOWN
+            auto_py.sendToDefaultMouse(stroke)
+            time.sleep(0.02)
+            stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
+            auto_py.sendToDefaultMouse(stroke)
+            time.sleep(0.02)
 
-        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_DOWN
-        auto_py.sendToDefaultMouse(stroke)
-        # time.sleep(0.02)
-        self.smooth_move(auto_py, x, y + 100)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
-        stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
-        auto_py.sendToDefaultMouse(stroke)
-        time.sleep(0.02)
-        for _ in range(100):
+            stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_DOWN
+            auto_py.sendToDefaultMouse(stroke)
             # time.sleep(0.02)
-            win32api.mouse_event(MOUSEEVENTF_WHEEL, x, y, -1, 0)
+            self.smooth_move(auto_py, x, y + 100)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
+            stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
+            auto_py.sendToDefaultMouse(stroke)
+            time.sleep(0.02)
+            for _ in range(100):
+                # time.sleep(0.02)
+                win32api.mouse_event(MOUSEEVENTF_WHEEL, x, y, -1, 0)
 
-        # auto_py_thread.join()
+            # auto_py_thread.join()
 
     def start_auto_py(self, auto):
         auto.start()
@@ -535,7 +545,8 @@ class ActionQueue:
                     self.turn(x_temp, y_temp)
 
             if 'insert' in params:
-                self.pressHoldRelease('ctrl', 'v')
+                self.turn(0, 0, insert=True)
+                #self.pressHoldRelease('ctrl', 'v')
                 #keyboard.send('ctrl+v')
 
     @classmethod
