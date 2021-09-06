@@ -272,21 +272,22 @@ class ActionQueue:
         auto_py_thread = threading.Thread(target=auto_py.start)
         auto_py_thread.start()
         # self.auto_py_started = True
+
         if insert:
+            time.sleep(0.5)
             #stroke_k = InterceptionKeyStroke()
-
-            auto_py.LEFT_CTRL.press()
-            auto_py.V.press()
+            auto_py.LEFT_CTRL.down()
+            #auto_py.V.press()
 
             #stroke_k.state = InterceptionKeyState.INTERCEPTION_KEY_DOWN
             #auto_py.sleep()
-            #auto_py.V.down()
+            auto_py.V.down()
             #stroke_k.state = InterceptionKeyState.INTERCEPTION_KEY_DOWN
             #auto_py.sleep()
-            #auto_py.LEFT_CTRL.up()
+            auto_py.LEFT_CTRL.up()
             #stroke_k.state = InterceptionKeyState.INTERCEPTION_KEY_UP
             #auto_py.sleep()
-            #auto_py.V.up()
+            auto_py.V.up()
             #stroke_k.state = InterceptionKeyState.INTERCEPTION_KEY_UP
             #auto_py.sleep()
 
