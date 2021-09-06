@@ -19,7 +19,7 @@ import pynput
 
 from win32con import *
 
-from InterceptionWrapper import InterceptionMouseState, InterceptionMouseStroke
+from InterceptionWrapper import InterceptionMouseState, InterceptionMouseStroke, InterceptionKeyState, InterceptionKeyStroke
 from AutoHotPy import AutoHotPy
 
 
@@ -273,14 +273,22 @@ class ActionQueue:
         auto_py_thread.start()
         # self.auto_py_started = True
         if insert:
-            auto_py.LEFT_CTRL.down()
-            auto_py.sleep()
-            auto_py.V.down()
-            auto_py.sleep()
-            auto_py.LEFT_CTRL.up()
-            auto_py.sleep()
-            auto_py.V.up()
-            auto_py.sleep()
+            #stroke_k = InterceptionKeyStroke()
+
+            auto_py.LEFT_CTRL.press()
+            auto_py.V.press()
+
+            #stroke_k.state = InterceptionKeyState.INTERCEPTION_KEY_DOWN
+            #auto_py.sleep()
+            #auto_py.V.down()
+            #stroke_k.state = InterceptionKeyState.INTERCEPTION_KEY_DOWN
+            #auto_py.sleep()
+            #auto_py.LEFT_CTRL.up()
+            #stroke_k.state = InterceptionKeyState.INTERCEPTION_KEY_UP
+            #auto_py.sleep()
+            #auto_py.V.up()
+            #stroke_k.state = InterceptionKeyState.INTERCEPTION_KEY_UP
+            #auto_py.sleep()
 
         else:
             time.sleep(0.02)
