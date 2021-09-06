@@ -348,6 +348,17 @@ class ActionQueue:
             self.action_rate_list.append(action_rate)
         # self.action_rate_list.insert(0, action_rate)
 
+    def pressHoldRelease(self, *args):
+        for i in args:
+            win32api.keybd_event(self.VK_CODE[i], 0, 0, 0)
+            time.sleep(.1)
+
+        time.sleep(.4)
+
+        for i in args:
+            win32api.keybd_event(self.VK_CODE[i], 0, win32con.KEYEVENTF_KEYUP, 0)
+            time.sleep(.1)
+
     def keyboard_button_press(self, x, y, k, param):
         if param:
             self.mouse.position = (x - random.randint(0, 3), y - random.randint(0, 3))
@@ -524,7 +535,8 @@ class ActionQueue:
                     self.turn(x_temp, y_temp)
 
             if 'insert' in params:
-                keyboard.send('ctrl+v')
+                self.pressHoldRelease('ctrl', 'v')
+                #keyboard.send('ctrl+v')
 
     @classmethod
     def start_queueing(cls):
