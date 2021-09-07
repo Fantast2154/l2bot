@@ -625,6 +625,10 @@ class FishingService:
                     continue
 
     def resume_fishers_who_paused(self):
+        for fisher_c in self.fishers:
+            self.send_message(
+                f'resume_fishers_who_paused FISHER {fisher_c.fisher_id} current_state {fisher_c.current_state[0]}')
+
         for fisher in self.fishers:
             if fisher.current_state[0] == 'paused':
                 self.resume_fishers(fisher.fisher_id)
@@ -862,13 +866,14 @@ class FishingService:
 
                     fisher.current_state[0] = 'busy'
 
-                    emergency_exit_time = 100
+                    emergency_exit_time = 300
                     emergency_exit_timer = time.time()
                     while fisher.current_state[
                         0] == 'busy' and time.time() - emergency_exit_timer < emergency_exit_time:
                         time.sleep(.1)
 
                     self.fishers[fisher_id].send_message(f'---------------------------EXIT IS HERE')
+                    fisher.paused[0] = 0
 
             time.sleep(1)
 
