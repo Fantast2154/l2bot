@@ -155,6 +155,7 @@ if __name__ == '__main__':
                             win32gui.PostMessage(handle, win32con.WM_CLOSE, 0, 0)
                         except:
                             pass
+                    time.sleep(3)
                 else:
                     break
         else:
