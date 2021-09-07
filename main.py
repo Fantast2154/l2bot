@@ -263,11 +263,11 @@ if __name__ == '__main__':
         process_fishingService.start()
 
         if log:
-            time.sleep(10)
+            time.sleep(14)
             for fisher in FishService.fishers:
                 fisher.attempt_counter[0] = fisher_attempts[fisher.fisher_id]
                 if not next_supplying_attempt[fisher.fisher_id]:
-                    fisher.next_supplying_counter[0] = fisher.send_counter
+                    pass
                 else:
                     fisher.next_supplying_counter[0] = next_supplying_attempt[fisher.fisher_id]
 
@@ -381,10 +381,12 @@ if __name__ == '__main__':
             #     print('main: SAVE LOGS EVENT DETECTED')
             #
             #     time.sleep(.1)
+        for fisher in FishService.fishers:
+            fisher_attempts[fisher.fisher_id] = fisher.attempt_counter[0]
+            next_supplying_attempt[fisher.fisher_id] = fisher.next_supplying_counter[0]
+
         if not win_capture.fatal_error[0]:
-            for fisher in FishService.fishers:
-                fisher_attempts[fisher.fisher_id] += fisher.attempt_counter[0]
-                next_supplying_attempt[fisher.fisher_id] = fisher.next_supplying_counter[0]
+
 
             # if FishService.has_supplier:
             #     FishService.suppliers[0].current_state[0] = 'busy'

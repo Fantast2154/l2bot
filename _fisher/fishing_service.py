@@ -872,7 +872,7 @@ class FishingService:
                         0] == 'busy' and time.time() - emergency_exit_timer < emergency_exit_time:
                         time.sleep(.1)
 
-                    self.fishers[fisher_id].send_message(f'---------------------------EXIT IS HERE')
+                    self.fishers[fisher_id].send_message(f'------ EXIT IS HERE ------')
                     fisher.paused[0] = 0
 
             time.sleep(1)

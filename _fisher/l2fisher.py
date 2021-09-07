@@ -63,13 +63,13 @@ class Fisher:
         # self.requested_items_to_supply.append(12)
 
         # send/receive counters
-        self.send_counter = 1000
+        self.send_counter = 900
         # if self.fisher_id == 0:
         #     self.send_counter = 4
         # if self.fisher_id == 1:
         #     self.send_counter = 6
         self.next_supplying_counter = manager.list()
-        self.next_supplying_counter.append(2*self.fisher_id + 2)
+        self.next_supplying_counter.append(self.send_counter)
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)
@@ -454,7 +454,7 @@ class Fisher:
 
         self.if_rebuff_time()
 
-        if self.attempt_counter[0] == self.next_supplying_counter[0] or self.supply_now[0]:
+        if self.attempt_counter[0] == self.next_supplying_counter[0] or self.supply_now[0] or self.attempt_counter[0] == (2 + 2*self.fisher_id):
             # print('supply now')
             self.supply_now[0] = False
             self.attack()
