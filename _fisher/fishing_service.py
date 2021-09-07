@@ -1,3 +1,4 @@
+import datetime
 import time
 
 import numpy
@@ -156,7 +157,8 @@ class FishingService:
         self.is_connected.append(False)
         self.server_item = manager.list()
         self.server_item.append(0)
-        self.fishing_service_client = Client(self.machine_id, self.data_to_transmit, self.data_to_receive, self.is_connected, self.server_item)
+        self.fishing_service_client = Client(self.machine_id, self.data_to_transmit, self.data_to_receive,
+                                             self.is_connected, self.server_item)
 
         if self.number_of_fishers < 1 or self.number_of_fishers > 3:
             print('FISHING SERVICE ERROR')
@@ -553,11 +555,13 @@ class FishingService:
 
                             self.send_message('')
                             self.send_message('=========================================')
+                            now = datetime.datetime.now()
+                            current_time = now.strftime("%H:%M:%S")
                             if machine_id != self.machine_id:
-                                self.send_message(f'OUTER MACHINE SUPPLYING REQUEST  fisher_{fisher_id}')
+                                self.send_message(f'{current_time} OUTER MACHINE SUPPLYING REQUEST  fisher_{fisher_id}')
 
                             else:
-                                self.send_message(f'LOCAL MACHINE SUPPLYING REQUEST.  fisher_{fisher_id}')
+                                self.send_message(f'{current_time} LOCAL MACHINE SUPPLYING REQUEST.  fisher_{fisher_id}')
 
                             self.send_message('=========================================')
                             self.send_message('')
@@ -581,7 +585,6 @@ class FishingService:
                                     if sum(list) == self.number_of_fishers:
                                         break
                                     time.sleep(0.5)
-
 
                             self.send_command(machine_id, 'fisher', fisher_id, 'process_supply_request')
                             time.sleep(2)
@@ -836,7 +839,7 @@ class FishingService:
 
                     if self.has_supplier:
                         self.suppliers[0].current_state = 'busy'
-                    time.sleep(2)
+                    time.sleep(.5)
 
                     timer = time.time()
 
@@ -931,8 +934,8 @@ class FishingService:
         # self.data_to_transmit.append(0)
         # self.data_to_receive.append(0)
 
-        #if self.fishing_service_client.is_connected():
-        #print('IS CONNECTED')
+        # if self.fishing_service_client.is_connected():
+        # print('IS CONNECTED')
         server_update_process1 = Process(target=self.process_commands)
         server_update_process2 = Process(target=self.proc_serv_dat)
         server_update_process3 = Process(target=self.up_to_serv)
@@ -942,10 +945,10 @@ class FishingService:
 
         return server_update_process1, server_update_process2, server_update_process3
 
-        #else:
-            #print('NO CONNECTION')
-            # server_update_process3 = Process(target=self.offline_requests)
-            # server_update_process3.start()
+        # else:
+        # print('NO CONNECTION')
+        # server_update_process3 = Process(target=self.offline_requests)
+        # server_update_process3.start()
 
     def emergency_termination(self):
         try:
@@ -966,12 +969,12 @@ class FishingService:
 
             for process in self.process_fishers:
                 process.terminate()
-                time.sleep(1)
+                time.sleep(1.5)
                 process.close()
 
             for process in self.process_suppliers:
                 process.terminate()
-                time.sleep(1)
+                time.sleep(1.5)
                 process.close()
 
             self.send_message(f'emergency stopped')

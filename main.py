@@ -139,12 +139,24 @@ if __name__ == '__main__':
             log = True
             print('log = ', log)
 
-            for i in range(custom_personal_data.number_of_windows):
-                os.startfile(custom_personal_data.launcher_path)
-                time.sleep(40)
+            for i in range(5):
+                for _ in range(custom_personal_data.number_of_windows):
+                    os.startfile(custom_personal_data.launcher_path)
+                    time.sleep(50)
 
-            name_list, hash_list = get_l2windows_param()
-            n = len(name_list)
+                name_list, hash_list = get_l2windows_param()
+                n = len(name_list)
+
+                if n != custom_personal_data.number_of_windows:
+                    for hash in hash_list:
+                        try:
+                            print(f'ERROR restart # {i}', hash)
+                            handle = hash
+                            win32gui.PostMessage(handle, win32con.WM_CLOSE, 0, 0)
+                        except:
+                            pass
+                else:
+                    break
         else:
             log = False
         # screenshot SUPER OBJECT
@@ -226,9 +238,11 @@ if __name__ == '__main__':
                 # time.sleep(1)
                 # windows, queue, process_queue, process_wincap = tue()
             time.sleep(2)
+            now = datetime.datetime.now()
+            current_time = now.strftime("%H:%M:%S")
             print()
             print('main =================================================')
-            print('main: RELAUNCH COMPLETED')
+            print(f'main:{current_time} RELAUNCH COMPLETED')
             print('main =================================================')
             print()
 
@@ -290,7 +304,13 @@ if __name__ == '__main__':
                 break
 
             if win_capture.fatal_error[0]:
-                print(f'main: FATAL WINDOW ERROR DETECTED')
+                now = datetime.datetime.now()
+                current_time = now.strftime("%H:%M:%S")
+                print()
+                print('main =================================================')
+                print(f'main:{current_time} FATAL WINDOW ERROR DETECTED')
+                print('main =================================================')
+                print()
                 event = 'Relaunch windows'
                 time.sleep(.1)
 
@@ -339,9 +359,11 @@ if __name__ == '__main__':
                 gui_window.sg_gui[temp].update(f'{fisher.attempt_counter[0]}')
 
             if event == 'Relaunch windows':
+                now = datetime.datetime.now()
+                current_time = now.strftime("%H:%M:%S")
                 print()
                 print('main =================================================')
-                print('main: RELAUNCHING WINDOWS')
+                print(f'main:{current_time} RELAUNCHING WINDOWS')
                 print('main =================================================')
                 print()
                 relaunch_windows = True
@@ -409,9 +431,11 @@ if __name__ == '__main__':
             waiting_time = 1500  # restart timer 1500 is recommended
             timer = time.time()
             counter = 0
+            now = datetime.datetime.now()
+            current_time = now.strftime("%H:%M:%S")
             print()
             print('main =================================================')
-            print('main: SERVER RESTART')
+            print(f'main:{current_time} SERVER RESTART')
             print('main =================================================')
             print()
             while time.time() - timer < waiting_time:

@@ -8,6 +8,7 @@ class FishingSupplierWindow(L2window):
 
     def __init__(self, window_id, wincap, window_name, hwnd, screenshot):
         super().__init__(window_id, wincap, window_name, hwnd, screenshot)
+        self.send_message('created')
         self.wincap = wincap
         self.screenshot = screenshot
 
@@ -68,7 +69,7 @@ class FishingSupplierWindow(L2window):
         return temp
 
     def send_message(self, message):
-        temp = 'FishingSupplierWindow' + f' {self.window_id}' + ': ' + message
+        temp = '\t' * 11 * 3 + f'FishingSupplierWindow: {message}'
         print(temp)
 
     def find(self, object, accurate=False, coordinates=None, w=None, d=None):  # returns list of positions

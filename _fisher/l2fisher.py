@@ -69,7 +69,7 @@ class Fisher:
         # if self.fisher_id == 1:
         #     self.send_counter = 6
         self.next_supplying_counter = manager.list()
-        self.next_supplying_counter.append(self.send_counter)
+        self.next_supplying_counter.append(2*self.fisher_id + 2)
         self.receive_counter = 0
         self.attempt_counter = manager.list()
         self.attempt_counter.append(0)

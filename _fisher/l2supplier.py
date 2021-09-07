@@ -3,6 +3,8 @@ import random
 import time
 from multiprocessing import Manager
 
+import clipboard
+import win32clipboard
 import pyperclip
 
 from system.botnet import Client
@@ -68,10 +70,10 @@ class Supplier:
         self.send_message('SUPPLYING GOODS IS READY')
         # print('goods', goods)
         self.supply_request[0] = True
-        #self.current_state[0] = 'is_going_to_supp'
+        # self.current_state[0] = 'is_going_to_supp'
 
-        #while self.current_state[0] == 'is_going_to_supp':
-            #self.pause_thread(1)
+        # while self.current_state[0] == 'is_going_to_supp':
+        # self.pause_thread(1)
 
         self.current_state[0] = 'busy'
         self.supplied_clients.append(bot_id)
@@ -93,7 +95,7 @@ class Supplier:
         self.send_message(f"destroyed")
 
     def send_message(self, message):
-        temp = '\t' * 10 * self.supplier_id + 'Supplier ' + f'{self.supplier_id}: {message}'
+        temp = '\t' * 11 * 3 + 'Supplier ' + f'{self.supplier_id}: {message}'
         print(temp)
 
     def pause_supplier(self, delay):
@@ -121,7 +123,7 @@ class Supplier:
                 self.send_message('error exchange menu')
                 continue
 
-            #self.pause_thread(2)
+            # self.pause_thread(2)
             if not self.supply_goods():
                 continue
 
@@ -174,12 +176,12 @@ class Supplier:
         request_soski_pet = self.requested_items_to_supply_d['soski_pet']
         request_potion = self.requested_items_to_supply_d['potion']
 
-        # print('dbaits', request_dbaits)
-        # print('nbaits', request_nbaits)
-        # print('soski', request_soski)
-        # print('request_alacrity', request_alacrity)
-        # print('request_soski_pet', request_soski_pet)
-        # print('request_potion', request_potion)
+        print('dbaits', request_dbaits)
+        print('nbaits', request_nbaits)
+        print('soski', request_soski)
+        print('request_alacrity', request_alacrity)
+        print('request_soski_pet', request_soski_pet)
+        print('request_potion', request_potion)
 
         # self.send_message('dbaits')
         # self.send_message(f'{request_dbaits}')
@@ -215,8 +217,9 @@ class Supplier:
 
         while not self.supplier_window.is_input_field() or not self.supplier_window.is_confirm_button():
             if soski_pos is not None:
+                # self.set_clipboard(request_soski)
                 pyperclip.copy(request_soski)
-                self.pause_thread(0.1)
+                self.pause_thread(1)
                 self.trade_item(soski_pos)
             self.pause_thread(0.6)
 
@@ -230,13 +233,18 @@ class Supplier:
         # print('confirm_button_pos')
         self.pause_thread(0.55)
         self.enter_number(input_field_pos)
-        self.pause_thread(0.55)
+        self.pause_thread(1)
         self.click(confirm_button_pos)
         self.pause_thread(0.55)
 
         if dbaits_pos is not None and request_dbaits:
+            print('request_dbaits', request_dbaits)
+
+            # self.set_clipboard(request_dbaits)
+            # pyperclip.copy(request_dbaits)
             pyperclip.copy(request_dbaits)
-            self.pause_thread(.1)
+
+            self.pause_thread(1)
             if len(dbaits_pos) > 1:
                 self.trade_item(dbaits_pos[0])
             else:
@@ -248,8 +256,11 @@ class Supplier:
             self.pause_thread(0.55)
 
         if alacrity_pos is not None and request_alacrity:
+
+            # self.set_clipboard(request_alacrity)
             pyperclip.copy(request_alacrity)
-            self.pause_thread(.1)
+
+            self.pause_thread(1)
             if len(alacrity_pos) > 1:
                 self.trade_item(alacrity_pos[0])
             else:
@@ -261,8 +272,12 @@ class Supplier:
             self.pause_thread(0.55)
 
         if soski_pet_pos is not None and request_soski_pet:
-            pyperclip.copy(request_soski_pet)
-            self.pause_thread(.1)
+            print('request_soski_pet', request_soski_pet)
+
+            self.set_clipboard(request_soski_pet)
+            # pyperclip.copy(request_soski_pet)
+
+            self.pause_thread(1)
             if len(soski_pet_pos) > 1:
                 self.trade_item(soski_pet_pos[0])
             else:
@@ -275,8 +290,11 @@ class Supplier:
             self.pause_thread(0.55)
 
         if potion_pos is not None and request_potion:
+
+            # self.set_clipboard(request_potion)
             pyperclip.copy(request_potion)
-            self.pause_thread(.1)
+
+            self.pause_thread(1)
             if len(potion_pos) > 1:
                 self.trade_item(potion_pos[0])
             else:
@@ -303,6 +321,9 @@ class Supplier:
         self.current_state[0] = 'available'
         print('SUPPORT IS AVAILABLE')
         return True
+
+    def set_clipboard(self, text):
+        clipboard.copy(text)
 
     def start_supplier(self):
         return True
@@ -350,6 +371,7 @@ class Supplier:
         self.q.new_task('mouse',
                         [coordinates, True, 'LEFT', False, 'double', False],
                         self.supplier_window)
+        self.pause_thread(0.2)
 
     def get_status(self):
         return self.current_state[0]

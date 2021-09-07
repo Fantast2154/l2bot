@@ -12,6 +12,8 @@ import math
 import win32gui as wgui
 import win32process as wproc
 import win32api as wapi
+import win32clipboard
+import clipboard
 from multiprocessing import Manager
 
 from pynput.mouse import Button
@@ -274,7 +276,7 @@ class ActionQueue:
         # self.auto_py_started = True
 
         if insert:
-            time.sleep(0.5)
+            time.sleep(0.6)
             #stroke_k = InterceptionKeyStroke()
             auto_py.LEFT_CTRL.down()
             #auto_py.V.press()
@@ -290,7 +292,7 @@ class ActionQueue:
             auto_py.V.up()
             #stroke_k.state = InterceptionKeyState.INTERCEPTION_KEY_UP
             #auto_py.sleep()
-
+            time.sleep(0.2)
         else:
             time.sleep(0.02)
             # self.smooth_move(auto_py, x, y)  # @TODO ЧТОБЫ НИЧЕГО НЕ ТЕКЛО
@@ -524,6 +526,12 @@ class ActionQueue:
 
     def click_target(self, x, y):
         pass
+
+    def get_clipboard(self):
+        win32clipboard.OpenClipboard()
+        data = win32clipboard.GetClipboardData()
+        win32clipboard.CloseClipboard()
+        return data
 
     def task_execution(self, action, params, window, action_rate='High'):
         if action == 'mouse':
